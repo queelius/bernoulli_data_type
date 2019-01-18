@@ -58,18 +58,5 @@ namespace alex::aset
 
         auto fnr() const
         {
-            using namespace fnr_union_operation;
-            return (a.fnr()*(1-b.fpr())) | (b.fnr()*(1-a.fpr())) | ((a.fnr() * b.fnr()));
-        };
 
-    private:
-        A a;
-        B b;
-    };
-
-    template <class A, class B>
-    auto union_of(A a, B b)
-    {
-        return union_aset<A, B>(a, b);
-    };
 }

@@ -21,7 +21,7 @@
   be aligned (aligned_alloc) according to the architecture being used.
 */
 
-namespace alex { namespace collections
+namespace alex::approximate_set
 {
     static const size_t bits_per_char = 0x08;  // 8 bits in 1 char(unsigned)
     static const unsigned char bit_mask[bits_per_char] =
