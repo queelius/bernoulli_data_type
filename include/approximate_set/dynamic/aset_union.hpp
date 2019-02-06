@@ -1,22 +1,25 @@
-#include "aset.h"
+#include "aset.hpp"
 #include <memory>
 
-namespace approximate_set_model
+namespace random_approximate_set_model
 {
-    template <typename X, typename Interval>
-    class ASetUnion: public ASet<X,Interval>
+    template <
+        typename P = double,
+        typename X,
+        template <typename> class I>
+    class RASUnion: public RAS<P,X,I>
     {
     public:
-        ASetUnion(ASet<X, Interval> const * const s1,
-                ASet<X, Interval> const * const s2)
+        RASUnion(RAS<P,X,I> const * const s1,
+                 RAS<P,X,I> const * const s2)
             : s1(s1), s2(s2) {};
 
-        Interval fpr() const
+        I<P> fpr() const
         {
             return one-(one-s1->fpr())*(one-s2->fpr());
         };
 
-        Interval fnr() const
+        I<P> fnr() const
         {
             return interval_span({
                 s1->fnr()*(one-s2->fnr()),
@@ -30,18 +33,22 @@ namespace approximate_set_model
         };
         
     private:
-        ASet<X,Interval> const * const s1;
-        ASet<X,Interval> const * const s2;
+        RAS<P,X,I> const * const s1;
+        RAS<P,X,I> const * const s2;
 
         constexpr one() { return Interval(1,1); };
     };
 
-    template <typename X, typename Interval>
-    ASetP<X,Interval> make_union(
-        ASet<X,Interval> const * const s1,
-        ASet<X,Interval> const * const s2)
+    template <
+        typename P,
+        typename X,
+        template <typename> class I
+    >
+    RAS_P<P,X,I> make_ras_union(
+        RAS<P,X,I> const * const s1,
+        RAS<P,X,I> const * const s2)
     {
         return std::make_unique(
-            ASetUnion<X,Interval>(s1, s2));
+            RASUnion<P,X,I>(s1, s2));
     };
 }

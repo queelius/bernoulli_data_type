@@ -1,36 +1,53 @@
-#include "aset.h"
+#include "aset.hpp"
 
 namespace approximate_set_model
 {
     // The true positive rate.
-    template <typename X, typename Interval>
-    auto tpr(ASet<X, Interval> const & s)
+    template <
+        typename P,
+        typename X,
+        template <typename> class I>
+    auto tpr(RAS<P,X,I> const & s)
     {
-        return Interval(1,1) - s.fnr();
+        return I<P>(1,1) - s.fnr();
     };
 
     // The true negative rate.
-    template <typename X, typename Interval>
-    auto tnr(ASet<X, Interval> const & s)
+    template <
+        typename P,
+        typename X,
+        template <typename> class I>
+    auto tnr(RAS<P,X,I> const & s)
     {
-        return Interval(1,1) - s.fpr();
+        return I<P>(1,1) - s.fpr();
     };
 
     // The accuracy.
-    template <typename X, typename Interval>
-    auto accuracy(ASet<X, Interval> const & s, Interval lambda)
+    template <
+        typename P,
+        typename X,
+        template <typename> class I>
+    auto accuracy(RAS<P,X,I> const & s, const I<P>& lambda)
     {
     };
         
     // The positive predictive value.
-    template <typename X, typename Interval, typename Cardinality>
-    auto ppv(ASet<X, Interval> const & s, Interval lambda, Cardinality u)
+    template <
+        typename P,
+        typename X,
+        template <typename> class I,
+        typename U>
+    auto ppv(RAS<P,X,I> const & s, const I<P>& lambda, const U& u)
     {
     };
 
     // The positive predictive value.
-    template <typename X, typename Interval, typename Cardinality>
-    auto npv(ASet<X, Interval> const & s, Interval lambda, Cardinality u)
+    template <
+        typename P,
+        typename X,
+        template <typename> class I,
+        typename U>
+    auto npv(RAS<P,X,I> const & s, const I<P>& lambda, const U& u)
     {
     };
 }

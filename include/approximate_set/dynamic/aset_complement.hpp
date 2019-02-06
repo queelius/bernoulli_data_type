@@ -1,20 +1,24 @@
-#include "aset.h"
+#include "aset.hpp"
 
-namespace approximate_set_model
+namespace random_approximate_set_model
 {
-    template <typename X, typename Interval>
-    class ASsetComplement: public ASet<X,Interval>
+    template <
+        typename P = double,
+        typename X,
+        template <typename> class I
+    >
+    class RASComplement: public RAS<P,X,I>
     {
     public:
-        ASetComplement(ASet<X,Interval> const * const s)
+        RASComplement(RAS<P,X,I> const * const s)
             : s(s) {};
         
-        Interval fpr() const
+        I<P> fpr() const
         {
             return s->fnr();
         };
         
-        Interval fnr() const
+        I<P> fnr() const
         {
             return s->fpr();
         };
@@ -25,13 +29,17 @@ namespace approximate_set_model
         };
         
     private:
-        ASet<X,Interval> const * const s;
+        RAS<P,X,I> const * const s;
     };
 
-    template <typename X, typename Interval>
-    ASetP<X,Interval> make_complement(
-        ASet<X,Interval> const * const s)
+    template <
+        typename P,
+        typename X,
+        template <typename> class I
+    >
+    RAS_P<P,X,I> make_ras_complement(
+        RAS<P,X,I> const * const s)
     {
-        return std::make_unique(ASetComplement<X,Interval>(s));
+        return std::make_unique(RASComplement<P,X,I>(s));
     };
 }

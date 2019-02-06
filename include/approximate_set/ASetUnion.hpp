@@ -12,14 +12,14 @@ template <
                                 // same<A::value_type,X> is permissible for
                                 // A and same for B.
     
-    class Interval>             // Supports interval arithmetic operations and
+    template <class> class I>   // Supports interval arithmetic operations and
                                 // overloads
-                                //     span : Interval*Interval -> Interval.
+                                //     span : I<P>*I<P> -> I<P>.
 class ASetUnion
 {
 public:
     using value_type = X;
-    using interval_type = Interval;
+    using interval_type = I;
 
     bool contains(const X& x) { return a.contains(x) || b.contains(x); };
 
@@ -30,22 +30,18 @@ public:
 
     auto fnr() const
     {
-        return span
-        (
+        return span(
             a.fnr() * b.fnr(),
-            span
-            (
+            span(
                 a.fnr()*(one()-b.fpr()),
-                b.fnr()*(one()-a.fpr())
-            )
-        );
+                b.fnr()*(one()-a.fpr())));
     };
 
 private:
     A<X> a;
     B<X> b;
 
-    constexpr Interval one() { return Interval(1,1); };
+    constexpr I<P> one() { return I<P>(1,1); };
 };
 
     template <class A, class B>
