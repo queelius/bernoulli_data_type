@@ -41,7 +41,7 @@ namespace approximate_set_model
     {
     };
 
-    // The negative predictive value.
+    // The positive predictive value.
     template <
         typename P,
         typename X,
