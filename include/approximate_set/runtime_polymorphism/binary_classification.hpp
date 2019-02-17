@@ -2,14 +2,16 @@
 
 namespace approximate_set_model
 {
+    #define RandomApproximateSet typename
+
     // The true positive rate.
-    template <
-        typename P,
-        typename X,
-        template <typename> class I>
-    auto tpr(RAS<P,X,I> const & s)
+    template <RandomApproximateSet A>
+    auto tpr(A const & a)
     {
-        return I<P>(1,1) - s.fnr();
+        if constexpr ()
+        {
+            return I<P>(1,1) - s.fnr();
+        }        
     };
 
     // The true negative rate.
@@ -41,7 +43,7 @@ namespace approximate_set_model
     {
     };
 
-    // The positive predictive value.
+    // The negative predictive value.
     template <
         typename P,
         typename X,

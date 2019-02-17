@@ -39,7 +39,7 @@ namespace alex::math
 	}
 
 	template <typename Set1, typename Set2>
-	auto unite_disjoint_interval_sets(
+	auto disjoint_interval_set_union(
 		Set1 s1,
 		const Set2& s2)
 	{
