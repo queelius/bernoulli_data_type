@@ -1,11 +1,10 @@
 #include "aset.hpp"
 
-namespace random_approximate_set_model
+namespace alex::random_approximate_set
 {
     template <
-        typename P = double,
         typename X,
-        template <typename> class I
+        class P
     >
     class RASComplement: public RAS<P,X,I>
     {
@@ -13,12 +12,12 @@ namespace random_approximate_set_model
         RASComplement(RAS<P,X,I> const * const s)
             : s(s) {};
         
-        I<P> fpr() const
+        P fpr() const
         {
             return s->fnr();
         };
         
-        I<P> fnr() const
+        P fnr() const
         {
             return s->fpr();
         };
@@ -29,13 +28,12 @@ namespace random_approximate_set_model
         };
         
     private:
-        RAS<P,X,I> const * const s;
+        RAS<P,X> const * const s;
     };
 
     template <
         typename P,
-        typename X,
-        template <typename> class I
+        typename X
     >
     RAS_P<P,X,I> make_ras_complement(
         RAS<P,X,I> const * const s)

@@ -1,6 +1,6 @@
-#include "aset.h"
+#include "aset.hpp"
 
-namespace approximate_set_model
+namespace alex::set::approximate_set
 {
     /*
     * ASetIterable is an ASet plus two functions,

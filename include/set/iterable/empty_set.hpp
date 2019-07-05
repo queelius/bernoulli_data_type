@@ -60,7 +60,6 @@ bool subset_equal(EmptySet<T,I>, S const &)
     return true;
 };
 
-
 template <
     typename T,
     typename S,
