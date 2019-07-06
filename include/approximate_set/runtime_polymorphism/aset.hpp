@@ -5,7 +5,7 @@ namespace alex::random_approximate_set::noniterable
     template <
         typename R,
         typename X>
-    class RandomApproximateSet
+    class RandomApproximateSet: public alex::set::noniterable::set<X>
     {
     public:
         // All elements in the approximate set have values of type X.
@@ -20,6 +20,8 @@ namespace alex::random_approximate_set::noniterable
         // true with an expected probability in the interval fpr().
         virtual bool contains(X const &) const = 0;
     };
+
+    using 
 
     template <
         typename R,

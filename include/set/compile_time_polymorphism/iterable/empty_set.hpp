@@ -19,8 +19,8 @@ struct EmptySet
 
     // EmptySet<T> is a singleton, i.e., there is only one
     // value of EmptySet<T>. The iterator is pretty straightforward
-    // as a result, i.e., it is always at the end in the half-open
-    // interval [).
+    // as a result, i.e., it is always at position e, the end, in
+    // the half-open interval [b, e).
     struct const_iterator
     {
         T operator*() { return T(); };

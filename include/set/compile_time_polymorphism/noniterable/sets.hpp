@@ -1,4 +1,5 @@
 #include <set>
+#include <algorithm>
 
 namespace alex::set
 {
@@ -27,12 +28,8 @@ public:
 
     bool contains(value_type const & x) const
     {
-        for (auto const & a : x)
-        {
-            if (!_s.contains(a))
-                return false;
-        }
-        return true;
+        return std::all_of(begin, end,
+            [_s](auto const & x) { return _s.contains(x); });
     };
 
 private:
@@ -49,7 +46,7 @@ public:
 
     CartesianProduct(L l, R r) : l(l), r(r) {};
 
-    bool contains(value_type const & p) const
+    bool contains(value_type const & p) const override
     {
         return l.contains(p.first) && r.contains(p.second);
     };
