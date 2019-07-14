@@ -1,4 +1,4 @@
-template <typename <class> Set, typename X, typename Interval>
+template <typename <typename> Set, typename X, typename Interval>
 class ASetIterableUnion: public ASetUnion<X, Interval>
 {
 public:
