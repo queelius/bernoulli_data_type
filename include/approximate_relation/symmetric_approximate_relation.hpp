@@ -1,11 +1,11 @@
-#include <alex/PairTools.hpp>
+#include "../pair_tools.hpp"
+#include <memory>
 
 namespace alex::approximate_relation
 {
-    template <
-        typename R // R models an approximate binary relation of a symmetric relation.
-    >
-    class SymmetricApproximateRelation
+    // R models an approximate binary relation of a symmetric relation.
+    template <typename R>
+    class symmetric_approximate_relation
     {
     public:
         // value_type should be some sort of pair type
@@ -17,8 +17,7 @@ namespace alex::approximate_relation
         // then (y, x) in R.
         bool contains(value_type const & p) const
         {
-            return _r.contains(p) ||
-                _r.contains(snd(p), fst(p));
+            return _r.contains(p) || _r.contains(snd(p), fst(p));
         };
 
         auto fpr() const { return 1. - std::pow(1 - _r.fpr(), 2.); };
@@ -36,8 +35,8 @@ namespace alex::approximate_relation
     template<
         typename R // R models an approximate binary relation
     >
-    auto symmetric_relation(R const & r)
+    auto make_symmetric_approximate_relation(R r)
     {
-        return SymmetricApproximateRelation<R>(r);
+        return symmetric_approximate_relation<R>{std::move(r)};
     };
 }

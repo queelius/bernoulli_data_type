@@ -2,42 +2,28 @@
 
 #include <cstddef>
 
-namespace alex::set::iterable
+namespace alex::set
 {
-
-template <
-    typename T,
-    typename I = std::size_t
->
-struct EmptySet
+template <typename T>
+struct empty_set
 {
     using value_type = T;
-    using cardinality_type = I;
+    using cardinality_type = size_t;
 
     constexpr bool contains(T const &) const { return false; };
-    constexpr I cardinality() const { return 0; };
+    constexpr cardinality_type cardinality() const { return 0; };
 
-    // EmptySet<T> is a singleton, i.e., there is only one
-    // value of EmptySet<T>. The iterator is pretty straightforward
+    // empty_set<T> is a singleton, i.e., there is only one
+    // value of empty_set<T>. The iterator is pretty straightforward
     // as a result, i.e., it is always at position e, the end, in
     // the half-open interval [b, e).
     struct const_iterator
     {
-        T operator*() { return T(); };
+        T operator*() { return T{}; };
         const_iterator operator++() { return *this; };
         const_iterator operator++(int) { return *this; };
         bool operator==(const_iterator const &) { return true; };
         bool operator!=(const_iterator const &) { return false; };
-    };
-
-    const_iterator cbegin() const
-    {
-        return const_iterator();
-    };
-
-    const_iterator begin() const
-    {
-        return const_iterator();
     };
 
     const_iterator cend() const
@@ -53,20 +39,18 @@ struct EmptySet
 
 template <
     typename T,
-    typename S,
-    typename I>
-bool subset_equal(EmptySet<T,I>, S const &)
+    typename S>
+bool subset(empty_set<T>, S const &)
 {
     return true;
 };
 
 template <
     typename T,
-    typename S,
-    typename I>
-bool equal(EmptySet<T,I>, S const & s)
+    typename S>
+bool equal(empty_set<T>, S const &s)
 {
     return s.cardinality() == 0;
 };
 
-}
+} // namespace alex::set

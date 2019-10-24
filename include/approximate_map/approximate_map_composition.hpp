@@ -13,16 +13,16 @@ template <
     typename F,
     typename G
 >
-class Compose
+class approximate_map_compose
 {
 public:
     using domain = typename G::domain;
     using codomain = typename F::codomain;
     //using fpr_interval = decltype(std::declval<F>().fpr());
 
-    Compose(F f, G g) : _f(f), _g(g) {};
+    approximate_map_compose(F f, G g) : _f(f), _g(g) {};
 
-    // Compose : (Y -> Z) , (X -> Y) -> (X -> Z)
+    // approximate_map_compose : (Y -> Z, X -> Y) -> (X -> Z)
     // so, codomain of F must be domain of G
     // since random approximate maps are partial functions, even
     // if codomain = domain, the domain of definition of G
@@ -66,13 +66,13 @@ private:
 };
 
 template <typename F, typename G>
-auto compose(F f, G g)
+auto approximate_map_compose(F f, G g)
 {
-    return Compose<F,G>(f,g);
+    return approximate_map_composition<F,G>(f,g);
 };
 
 template <typename X>
-class IdentityMap
+class identity_map
 {
 public:
     using domain = X;

@@ -13,13 +13,13 @@ using std::vector;
 using std::initializer_list;
 using std::pair;
 
-namespace alex::collections
+namespace alex
 {
     template <typename U, typename V>
     ostream& operator<<(std::ostream& os, const std::pair<U, V>& p);
 
     template <typename T>
-    class Relation
+    class homogenous_relation_vector
     {
     public:
         typedef size_t size_type;
@@ -31,13 +31,13 @@ namespace alex::collections
         const_iterator cbegin() const { return _v.cbegin(); }
         const_iterator cend() const { return _v.cend(); }
 
-        Relation(const Relation<T>& m) :
+        homogenous_relation_vector(const Relation<T>& m) :
             _v(m._v), _rows(m._rows), _cols(m._cols)
         {
         };
 
         template <typename Iter>
-        Relation(Iter begin, Iter end, size_type rows)
+        homogenous_relation_vector(Iter begin, Iter end, size_type rows)
         {
             _rows = rows;
             for (auto x = begin; x != end; ++x)
@@ -49,7 +49,7 @@ namespace alex::collections
             _v.resize(_rows * _cols);
         };
 
-        Relation(initializer_list<initializer_list<T>> m) : _rows(0), _cols(0)
+        homogenous_relation_vector(initializer_list<initializer_list<T>> m) : _rows(0), _cols(0)
         {
             auto first_row = true;
             for (auto row : m)
@@ -69,7 +69,7 @@ namespace alex::collections
             }
         }
 
-        Relation(initializer_list<T> t, size_type rows = 1) :
+        homogenous_relation_vector(initializer_list<T> t, size_type rows = 1) :
             _v(t.begin(), t.end()),
             _rows(rows),
             _cols(static_cast<size_type>(ceil(static_cast<float>(t.size()) / rows)))
@@ -77,14 +77,14 @@ namespace alex::collections
             _v.resize(_rows * _cols);
         };
 
-        Relation(size_type rows = 0, size_type columns = 0) :
+        homogenous_relation_vector(size_type rows = 0, size_type columns = 0) :
             _v(rows * columns),
             _rows(rows),
             _cols(columns)
         {
         };
 
-        Relation(T val, size_type rows, size_type columns) :
+        homogenous_relation_vectoration(T val, size_type rows, size_type columns) :
             _v(rows * columns, val),
             _rows(rows),
             _cols(columns)
@@ -98,8 +98,6 @@ namespace alex::collections
         size_type size() const { return static_cast<size_type>(_v.size()); };
         T& operator()(size_type index) { return _v[index]; };
         T operator()(size_type index) const { return _v.at(index); };
-
-        operator vector<T>() const { return _v; }
 
     private:
         vector<T> _v;
@@ -127,10 +125,10 @@ namespace alex::collections
     // ],
     // where * is a default initialized value.
     template <typename T>
-    Relation<T> row_append(const Relation<T>& u, const Relation<T>& v)
+    homogenous_relation_vector<T> row_append(const homogenous_relation_vector<T>& u, const homogenous_relation_vector<T>& v)
     {
-        typedef typename Relation<T>::size_type size_type;
-        Relation<T> w(
+        typedef typename homogenous_relation_vector<T>::size_type size_type;
+        homogenous_relation_vector<T> w(
             u.rows() + v.rows(),
             u.columns() < v.columns() ? v.columns() : u.columns()
         );
@@ -171,8 +169,8 @@ namespace alex::collections
     //     [* * * e f]
     // ],
     // where * is a default initialized value.
-    template <typename T>
-    Relation<T> column_append(const Relation<T>& u, const Relation<T>& v)
+    template <typename T, typename U>
+    relation_column_span<T> column_append(const Relation<T>& u, const Relation<T>& v)
     {
         typedef typename Relation<T>::size_type size_type;
         Relation<T> w(
