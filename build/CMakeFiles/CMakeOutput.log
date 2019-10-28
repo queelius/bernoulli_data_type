@@ -1,4 +1,4 @@
-The system is: Linux - 5.0.0-29-generic - x86_64
+The system is: Linux - 5.0.0-32-generic - x86_64
 Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
 Compiler: /usr/bin/g++-9 
 Build flags: 
@@ -10,22 +10,22 @@ The output was:
 
 Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.out"
 
-The CXX compiler identification is GNU, found in "/home/spinoza/Documents/repos/code/approximate_set_adt/build/CMakeFiles/3.13.4/CompilerIdCXX/a.out"
+The CXX compiler identification is GNU, found in "/home/spinoza/Documents/repos/code/random_approximate_data_type/build/CMakeFiles/3.13.4/CompilerIdCXX/a.out"
 
 Determining if the CXX compiler works passed with the following output:
-Change Dir: /home/spinoza/Documents/repos/code/approximate_set_adt/build/CMakeFiles/CMakeTmp
+Change Dir: /home/spinoza/Documents/repos/code/random_approximate_data_type/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/ninja" "cmTC_a1acf"
-[1/2] Building CXX object CMakeFiles/cmTC_a1acf.dir/testCXXCompiler.cxx.o
-[2/2] Linking CXX executable cmTC_a1acf
+Run Build Command:"/usr/bin/ninja" "cmTC_99635"
+[1/2] Building CXX object CMakeFiles/cmTC_99635.dir/testCXXCompiler.cxx.o
+[2/2] Linking CXX executable cmTC_99635
 
 
 Detecting CXX compiler ABI info compiled with the following output:
-Change Dir: /home/spinoza/Documents/repos/code/approximate_set_adt/build/CMakeFiles/CMakeTmp
+Change Dir: /home/spinoza/Documents/repos/code/random_approximate_data_type/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/ninja" "cmTC_862a5"
-[1/2] Building CXX object CMakeFiles/cmTC_862a5.dir/CMakeCXXCompilerABI.cpp.o
-[2/2] Linking CXX executable cmTC_862a5
+Run Build Command:"/usr/bin/ninja" "cmTC_d7135"
+[1/2] Building CXX object CMakeFiles/cmTC_d7135.dir/CMakeCXXCompilerABI.cpp.o
+[2/2] Linking CXX executable cmTC_d7135
 Using built-in specs.
 COLLECT_GCC=/usr/bin/g++-9
 COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/9/lto-wrapper
@@ -37,18 +37,18 @@ Thread model: posix
 gcc version 9.1.0 (Ubuntu 9.1.0-2ubuntu2~19.04) 
 COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/9/:/usr/lib/gcc/x86_64-linux-gnu/9/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/9/:/usr/lib/gcc/x86_64-linux-gnu/
 LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/9/:/usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/9/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/9/../../../:/lib/:/usr/lib/
-COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_862a5' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
- /usr/lib/gcc/x86_64-linux-gnu/9/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/9/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/9/lto-wrapper -plugin-opt=-fresolution=/tmp/ccaLl3AK.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -pie -z now -z relro -o cmTC_862a5 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o -L/usr/lib/gcc/x86_64-linux-gnu/9 -L/usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/9/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/9/../../.. CMakeFiles/cmTC_862a5.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/9/crtendS.o /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crtn.o
-COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_862a5' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_d7135' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
+ /usr/lib/gcc/x86_64-linux-gnu/9/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/9/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/9/lto-wrapper -plugin-opt=-fresolution=/tmp/ccTRdDTU.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -pie -z now -z relro -o cmTC_d7135 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o -L/usr/lib/gcc/x86_64-linux-gnu/9 -L/usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/9/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/9/../../.. CMakeFiles/cmTC_d7135.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/9/crtendS.o /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crtn.o
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_d7135' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
 
 
 Parsed CXX implicit link information from above output:
   link line regex: [^( *|.*[/\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
-  ignore line: [Change Dir: /home/spinoza/Documents/repos/code/approximate_set_adt/build/CMakeFiles/CMakeTmp]
+  ignore line: [Change Dir: /home/spinoza/Documents/repos/code/random_approximate_data_type/build/CMakeFiles/CMakeTmp]
   ignore line: []
-  ignore line: [Run Build Command:"/usr/bin/ninja" "cmTC_862a5"]
-  ignore line: [[1/2] Building CXX object CMakeFiles/cmTC_862a5.dir/CMakeCXXCompilerABI.cpp.o]
-  ignore line: [[2/2] Linking CXX executable cmTC_862a5]
+  ignore line: [Run Build Command:"/usr/bin/ninja" "cmTC_d7135"]
+  ignore line: [[1/2] Building CXX object CMakeFiles/cmTC_d7135.dir/CMakeCXXCompilerABI.cpp.o]
+  ignore line: [[2/2] Linking CXX executable cmTC_d7135]
   ignore line: [Using built-in specs.]
   ignore line: [COLLECT_GCC=/usr/bin/g++-9]
   ignore line: [COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/9/lto-wrapper]
@@ -60,13 +60,13 @@ Parsed CXX implicit link information from above output:
   ignore line: [gcc version 9.1.0 (Ubuntu 9.1.0-2ubuntu2~19.04) ]
   ignore line: [COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/9/:/usr/lib/gcc/x86_64-linux-gnu/9/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/9/:/usr/lib/gcc/x86_64-linux-gnu/]
   ignore line: [LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/9/:/usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/9/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/9/../../../:/lib/:/usr/lib/]
-  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_862a5' '-shared-libgcc' '-mtune=generic' '-march=x86-64']
-  link line: [ /usr/lib/gcc/x86_64-linux-gnu/9/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/9/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/9/lto-wrapper -plugin-opt=-fresolution=/tmp/ccaLl3AK.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -pie -z now -z relro -o cmTC_862a5 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o -L/usr/lib/gcc/x86_64-linux-gnu/9 -L/usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/9/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/9/../../.. CMakeFiles/cmTC_862a5.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/9/crtendS.o /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crtn.o]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_d7135' '-shared-libgcc' '-mtune=generic' '-march=x86-64']
+  link line: [ /usr/lib/gcc/x86_64-linux-gnu/9/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/9/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/9/lto-wrapper -plugin-opt=-fresolution=/tmp/ccTRdDTU.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -pie -z now -z relro -o cmTC_d7135 /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o -L/usr/lib/gcc/x86_64-linux-gnu/9 -L/usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/9/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/9/../../.. CMakeFiles/cmTC_d7135.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/9/crtendS.o /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crtn.o]
     arg [/usr/lib/gcc/x86_64-linux-gnu/9/collect2] ==> ignore
     arg [-plugin] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/9/liblto_plugin.so] ==> ignore
     arg [-plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/9/lto-wrapper] ==> ignore
-    arg [-plugin-opt=-fresolution=/tmp/ccaLl3AK.res] ==> ignore
+    arg [-plugin-opt=-fresolution=/tmp/ccTRdDTU.res] ==> ignore
     arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
     arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
     arg [-plugin-opt=-pass-through=-lc] ==> ignore
@@ -84,7 +84,7 @@ Parsed CXX implicit link information from above output:
     arg [-znow] ==> ignore
     arg [-zrelro] ==> ignore
     arg [-o] ==> ignore
-    arg [cmTC_862a5] ==> ignore
+    arg [cmTC_d7135] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/9/crtbeginS.o] ==> ignore
@@ -96,7 +96,7 @@ Parsed CXX implicit link information from above output:
     arg [-L/usr/lib/x86_64-linux-gnu] ==> dir [/usr/lib/x86_64-linux-gnu]
     arg [-L/usr/lib/../lib] ==> dir [/usr/lib/../lib]
     arg [-L/usr/lib/gcc/x86_64-linux-gnu/9/../../..] ==> dir [/usr/lib/gcc/x86_64-linux-gnu/9/../../..]
-    arg [CMakeFiles/cmTC_862a5.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+    arg [CMakeFiles/cmTC_d7135.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
     arg [-lstdc++] ==> lib [stdc++]
     arg [-lm] ==> lib [m]
     arg [-lgcc_s] ==> lib [gcc_s]
@@ -122,11 +122,11 @@ Parsed CXX implicit link information from above output:
 
 
 Detecting CXX [-std=c++2a] compiler features compiled with the following output:
-Change Dir: /home/spinoza/Documents/repos/code/approximate_set_adt/build/CMakeFiles/CMakeTmp
+Change Dir: /home/spinoza/Documents/repos/code/random_approximate_data_type/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/ninja" "cmTC_19879"
-[1/2] Building CXX object CMakeFiles/cmTC_19879.dir/feature_tests.cxx.o
-[2/2] Linking CXX executable cmTC_19879
+Run Build Command:"/usr/bin/ninja" "cmTC_7dae9"
+[1/2] Building CXX object CMakeFiles/cmTC_7dae9.dir/feature_tests.cxx.o
+[2/2] Linking CXX executable cmTC_7dae9
 
 
     Feature record: CXX_FEATURE:1cxx_aggregate_default_initializers
@@ -189,11 +189,11 @@ Run Build Command:"/usr/bin/ninja" "cmTC_19879"
 
 
 Detecting CXX [-std=c++17] compiler features compiled with the following output:
-Change Dir: /home/spinoza/Documents/repos/code/approximate_set_adt/build/CMakeFiles/CMakeTmp
+Change Dir: /home/spinoza/Documents/repos/code/random_approximate_data_type/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/ninja" "cmTC_8e557"
-[1/2] Building CXX object CMakeFiles/cmTC_8e557.dir/feature_tests.cxx.o
-[2/2] Linking CXX executable cmTC_8e557
+Run Build Command:"/usr/bin/ninja" "cmTC_ae982"
+[1/2] Building CXX object CMakeFiles/cmTC_ae982.dir/feature_tests.cxx.o
+[2/2] Linking CXX executable cmTC_ae982
 
 
     Feature record: CXX_FEATURE:1cxx_aggregate_default_initializers
@@ -256,11 +256,11 @@ Run Build Command:"/usr/bin/ninja" "cmTC_8e557"
 
 
 Detecting CXX [-std=c++14] compiler features compiled with the following output:
-Change Dir: /home/spinoza/Documents/repos/code/approximate_set_adt/build/CMakeFiles/CMakeTmp
+Change Dir: /home/spinoza/Documents/repos/code/random_approximate_data_type/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/ninja" "cmTC_067b2"
-[1/2] Building CXX object CMakeFiles/cmTC_067b2.dir/feature_tests.cxx.o
-[2/2] Linking CXX executable cmTC_067b2
+Run Build Command:"/usr/bin/ninja" "cmTC_d80ae"
+[1/2] Building CXX object CMakeFiles/cmTC_d80ae.dir/feature_tests.cxx.o
+[2/2] Linking CXX executable cmTC_d80ae
 
 
     Feature record: CXX_FEATURE:1cxx_aggregate_default_initializers
@@ -323,11 +323,11 @@ Run Build Command:"/usr/bin/ninja" "cmTC_067b2"
 
 
 Detecting CXX [-std=c++11] compiler features compiled with the following output:
-Change Dir: /home/spinoza/Documents/repos/code/approximate_set_adt/build/CMakeFiles/CMakeTmp
+Change Dir: /home/spinoza/Documents/repos/code/random_approximate_data_type/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/ninja" "cmTC_5f568"
-[1/2] Building CXX object CMakeFiles/cmTC_5f568.dir/feature_tests.cxx.o
-[2/2] Linking CXX executable cmTC_5f568
+Run Build Command:"/usr/bin/ninja" "cmTC_ad1bd"
+[1/2] Building CXX object CMakeFiles/cmTC_ad1bd.dir/feature_tests.cxx.o
+[2/2] Linking CXX executable cmTC_ad1bd
 
 
     Feature record: CXX_FEATURE:0cxx_aggregate_default_initializers
@@ -390,11 +390,11 @@ Run Build Command:"/usr/bin/ninja" "cmTC_5f568"
 
 
 Detecting CXX [-std=c++98] compiler features compiled with the following output:
-Change Dir: /home/spinoza/Documents/repos/code/approximate_set_adt/build/CMakeFiles/CMakeTmp
+Change Dir: /home/spinoza/Documents/repos/code/random_approximate_data_type/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/ninja" "cmTC_c1015"
-[1/2] Building CXX object CMakeFiles/cmTC_c1015.dir/feature_tests.cxx.o
-[2/2] Linking CXX executable cmTC_c1015
+Run Build Command:"/usr/bin/ninja" "cmTC_690d0"
+[1/2] Building CXX object CMakeFiles/cmTC_690d0.dir/feature_tests.cxx.o
+[2/2] Linking CXX executable cmTC_690d0
 
 
     Feature record: CXX_FEATURE:0cxx_aggregate_default_initializers

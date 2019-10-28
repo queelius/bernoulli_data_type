@@ -95,5 +95,6 @@
     },
     "gtest-adapter.debugConfig": [
         "Run C/C++"
-    ]
+    ],
+    "editor.detectIndentation": false
 }

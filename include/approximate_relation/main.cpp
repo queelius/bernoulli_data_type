@@ -7,7 +7,6 @@
 #include <set/iterable/universal_set.hpp>
 #include <set>
 
-
 template <typename A, typename B>
 std::ostream& operator<<(std::ostream& out, std::pair<A,B> p)
 {
