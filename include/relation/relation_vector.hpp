@@ -34,21 +34,24 @@ namespace alex::relation
         const_iterator cbegin() const { return _v.cbegin(); }
         const_iterator cend() const { return _v.cend(); }
 
-        relation(relation<tuple_type> const & copy) : _v(copy._v) {};
+        relation(relation const & copy) : _v(copy._v) {};
         relation(size_type rows = 0) : _v(rows) {};
 
-        size_type nrows() const { return _v.size(); };
-        size_type ncols() const { return std::tuple_size<tuple_type>::value; };
+        size_type nr() const { return _v.size(); };
+        size_type nc() const { return std::tuple_size<tuple_type>::value; };
 
         template <size_t Row, size_t Column>
         auto operator()() const { return std::get<Column>(_v.at(Row)); };
 
-        T& operator()(size_type index) { return _v[index]; };
-        T operator()(size_type index) const { return _v.at(index); };
+        tuple_type& operator()(size_type index) { return _v[index]; };
+        tuple_type operator()(size_type index) const { return _v.at(index); };
 
     private:
         std::vector<tuple_type> _v;
     };
+
+
+
 
     // if u =
     // [
