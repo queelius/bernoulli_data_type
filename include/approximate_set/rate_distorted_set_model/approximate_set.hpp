@@ -1,7 +1,7 @@
 /**
  * rate_distorted_set<X,W,F> models a rate-distorted
- * set (RDS) of type X with a false negative rate W, and false positive
- * rate F.
+ * set (RDS) of type X with an expected false negative rate W and an expected
+ * false positive rate E.
  * 
  */
 
