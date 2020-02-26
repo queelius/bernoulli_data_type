@@ -52,12 +52,12 @@ public:
     //    return decltype(tpr())(1) - tpr();
     //};
 
-    std::optional<codomain> operator()(domain const & x) const
+    auto operator()(domain const & x) const
     {
         if (auto y = _g(x) ; y)
             return _f(*y);
         else
-            return {};
+            return std::optional<codomain>{};
     };
 
 private:
@@ -72,7 +72,7 @@ auto approximate_map_compose(F f, G g)
 };
 
 template <typename X>
-class identity_map
+class identity
 {
 public:
     using domain = X;
@@ -81,6 +81,6 @@ public:
     double fpr() const { return 0; };
     double tpr() const { return 1; };
 
-    std::optional<codomain> operator()(domain const & x) const { return x; };
+    auto operator()(domain const & x) const { return x; };
 };
 }

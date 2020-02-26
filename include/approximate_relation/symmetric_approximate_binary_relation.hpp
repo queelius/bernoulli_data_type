@@ -13,6 +13,8 @@ class symmetric_approximate_relation
     // otherwise symmetry should not be possible.
     using value_type = typename R::value_type;
 
+    bool 
+
     // we enforce the invariant that if (x, y) in R
     // then (y, x) in R.
     bool contains(value_type const& p) const
