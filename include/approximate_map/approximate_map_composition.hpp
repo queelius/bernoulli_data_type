@@ -13,14 +13,14 @@ template <
     typename F,
     typename G
 >
-class approximate_map_compose
+class approximate_map_composition
 {
 public:
     using domain = typename G::domain;
     using codomain = typename F::codomain;
     //using fpr_interval = decltype(std::declval<F>().fpr());
 
-    approximate_map_compose(F f, G g) : _f(f), _g(g) {};
+    approximate_map_composition(F f, G g) : _f(f), _g(g) {};
 
     // approximate_map_compose : (Y -> Z, X -> Y) -> (X -> Z)
     // so, codomain of F must be domain of G

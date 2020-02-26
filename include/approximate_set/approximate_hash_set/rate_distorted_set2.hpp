@@ -34,6 +34,7 @@
 
 
 
+#include "power_probability.hpp"
 
 namespace alex::set
 {
@@ -67,30 +68,31 @@ namespace alex::set
     template <
         typename T,
         typename HashSetFunction,
-        int FalsePositiveRate,
-        int LoadFactor,
+        unsigned int K,
+        power_probability<K,2u> FPR,
+        // LoadFactor,
         typename Hash,
         typename Coder = Identity<T>>
-    class rate_distorted_set
+    class positive_approximate_hash_set // models first_order_positive_rate_distorted_set
     {
     public:
         using value_type = T;
 
         using hash_fn = Hash;
 
-        auto perfect_hash(T const & x) const
+        auto hash_set(T const & x) const
         {
             return _ph(_coder(x));
         }
 
         template <typename I>
-        PerfectHashFilter(
+        rate_distorted_set(
             I begin,
             I end,
             Coder coder = Coder{})
         {
                         
-        };
+        }
 
         bool contains(T const & x) const
         {
@@ -101,9 +103,9 @@ namespace alex::set
             return _hashes[index] == hash;
         };
 
-        long double fpr() const
+        constexpr auto fpr() const
         {
-            return 1 / static_cast<long double>(_N);
+            return FPR;
         };
 
         // If ValueType is a countably infinite set, then
@@ -122,20 +124,20 @@ namespace alex::set
         // predicate may not behave the same with non-regular functions
         // that compute output based on load_factor or objective set size.
         bool operator==(
-            PerfectHashFilter<ValueType, PerfHash, Hash, Coder> const & other) const
+            rate_distorted_set const & rhs) const
         {
-            if (_N != other._N ||
-                _h != other._h ||
-                _ph != other._ph ||
-                _coder == other._coder ||
-                _hashes.size() != other._hashes.size())
+            if (_N != rhs._N ||
+                _h != rhs._h ||
+                _ph != rhs._ph ||
+                _coder == rhs._coder ||
+                _hashes.size() != rhs._hashes.size())
             {
                 return false;
             }
 
             for (size_t i = 0; i < _hashes.size(); ++i)
             {
-                if (_hashes[i] != other._hashes[i])
+                if (_hashes[i] != rhs._hashes[i])
                     return false;
             }
             return true;
@@ -148,7 +150,7 @@ namespace alex::set
         // then subsets are possible given a countably infinite universe. For instance, suppose X and Y
         // are PHFs, then X \ Y is a subset of X.
         constexpr bool subset(
-            PerfectHashFilter<ValueType, PerfHash, Hash, Coder> const & other) const
+            rate_distorted_set const &) const
         {
             return false;
         };
@@ -156,7 +158,7 @@ namespace alex::set
     private:
         using hash_type = typename Hash::hash_type;
 
-        PerfHash _ph;
+        HashSetFunction _ph;
         Hash _h;
         hash_type _N;
         Coder _coder;
