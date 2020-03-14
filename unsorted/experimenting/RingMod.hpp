@@ -5,9 +5,9 @@
 #include <limits>
 
 /**
- * RingMod<N> is integer modulo 2^N.
+ * RingMod<N> is Z modulo 2^N.
  * 
- * Most of the properties of integer modulo k
+ * Most of the properties of Z modulo 2^N
  * are not implemented, only enough to be useful
  * as a set of hash values of arbitrary length
  * with multiplication, addition, and xor.
@@ -59,8 +59,8 @@ namespace alex::ringmod
         return a;
     };
 
-    template <size_t N1, size_t N2>
-    bool operator==(RingMod<N1> a, RingMod<N2> b)
+    template <size_t N>
+    bool operator==(RingMod<N> a, RingMod<N> b)
     {
         return a.digits == b.digits;
     };

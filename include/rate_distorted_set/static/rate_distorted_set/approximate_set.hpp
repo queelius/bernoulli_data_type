@@ -24,17 +24,17 @@ namespace alex::set::rate_distorted
     struct empty {};
     struct universal {};
 
-    template <typename T>
-    struct approximate_set_concept
+    template <typename X, typename R>
+    struct first_order_approximate_set_concept
     {
-        using rate_type = alex::math::interval<double>;
-        virtual bool contains(T const &) const = 0;
-        virtual rate_type fpr() const = 0;
-        virtual rate_type tpr() const = 0;
+        using rate_type = R;
+        virtual bool contains(X const &) const = 0;
+        virtual R fpr() const = 0;
+        virtual R fnr() const = 0;
     };
 
     template <typename T>
-    class rdset
+    class first_order_approximate_set
     {
     public:
         using value_type = T;

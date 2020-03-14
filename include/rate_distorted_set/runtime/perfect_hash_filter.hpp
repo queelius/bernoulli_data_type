@@ -1,52 +1,48 @@
-#ifndef __PERFECT_HASH_FILTER_HPP__
-#define __PERFECT_HASH_FILTER_HPP__
+#pragma once
 
 #include <set>
 
-namespace alex::approximate_sets
+namespace alex::runtime::rate_distorted_set
 {
     // Perfect hash filter (PHF): an implementation of the positive approximate
     // set ADT.
     template <
         typename T,
-        template <class> class PerfectHashFunc,
-        class Coder,
-        class HashFunc,
-        class BitMatrix>    
-    class PerfectHashFilter
+        template <typename> typename PerfHashFn,
+        typename EncoderFn,
+        typename DecoderFn,
+        typename HashFn,
+        typename ByteMatrix>    
+    class perf_hash_filter
     {
         public:
             using value_type = T;
-            using perfect_hash_func = PerfectHashFunc;
-            using hash_func = HashFunc;
+            using perf_hash_fn = PerfHashFn;
+            using hash_fn = HashFn;
             using bit_matrix = BitMatrix;
+            using encoder_fn = EncoderFn;
+            using decoder_fn = DecoderFn;
 
-            PerfectHashFilter() {};
-            PerfectHashFilter(const PerfectHashFilter& copy)
+            perf_hash_filter() {};
+            perf_hash_filter(const perf_hash_filter& copy)
             {
             };
 
-            PerfectHashFilter(PerfectHashFilter&& rval)
+            perf_hash_filter(perf_hash_filter&& rval)
             {
             };
 
-            PerfectHashFilter& operator=(PerfectHashFilter&& rval)
+            perf_hash_filter& operator=(perf_hash_filter&& rval)
             {
-                if (this != &other)
-                {
-                }
                 return *this;
             };
 
-            PerfectHashFilter& operator=(const PerfectHashFilter& rhs)
+            perf_hash_filter& operator=(const perf_hash_filter& rhs)
             {
-                if (this != &other)
-                {
-                }
                 return *this;
             };
 
-            virtual ~PerfectHashFilter() { clear(); };
+            virtual ~perf_hash_filter() { clear(); };
 
             void clear()
             {
@@ -66,10 +62,10 @@ namespace alex::approximate_sets
                 // generate a hash of x. if x is in objective set, this is
                 // a perfect hash with respect to other elements that are
                 // in the objective set.
-                auto idx = _ph(x);
+                auto l1 = _ph(x);
 
                 //  generate another hash of x 
-                auto hash = _h(x) % _hashes.ncols();
+                auto l2 = _h(x) % _hashes.ncols();
                 return true;
             };
 
@@ -79,20 +75,20 @@ namespace alex::approximate_sets
             // for type T is finite. Maybe look into conf. intervals
             // and return an alpha interval instead?
             auto fpr() const { return std::pow(2., -hash_width()); };
+            auto fnr() const { return 0.; };
 
         private:
             static const unsigned int MAX_BYTE = (1 << CHAR_BIT);
         
-            PerfectHashFunc _ph;
-            BitMatrix _hashes;
-            HashFunc _h;
+            PerfHashFn ph_;
+            HashFn h_;
+            ByteMatrix hashes_;            
     };
 
     template <
-        typename T
-        template <typename> PerfectHashFunc,
-
-        >
+        typename T,
+        template <typename> typename PerfHashFn
+    >
     class PerfectHashFilterBuilder
     {
     public:
@@ -131,5 +127,3 @@ namespace alex::approximate_sets
     public:
     };
 }
-
-#endif

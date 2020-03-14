@@ -35,11 +35,12 @@
 
 
 #include "power_probability.hpp"
+#include <vector>
 
 namespace alex::set
 {
     template <typename X>
-    struct Identity
+    struct identity
     {
         X operator()(X x) const { return x };
     };
@@ -66,64 +67,63 @@ namespace alex::set
      * Todo: make N a template parameter, and thus fpr a template?
      */
     template <
-        typename T,
-        typename HashSetFunction,
-        unsigned int K, // fpr = 2^(-K) or K = -log2(fpr)
-        typename Hash,
-        typename Coder = Identity<T>,
-        bool Complement = false>
-    class approximate_hash_set // models FirstOrderRateDistortedSet[T,FPR,0]
-                               //        RateDistortedSet[T,FPR,0]
-                               //        FirstOrderRandomApproximateSet[T,FPR,0]
-                               //        RandomApproximateSet[T,FPR,0]
-                               //        Set[T]
+        typename    X,
+        typename    PerfHashFn,
+        int         K,                  // fpr() = 2^(-K) or K = -log2(fpr)
+        typename    HashFn,
+        typename    CoderFn = identity<X>,
+        bool        Complement = false>
+    class perf_hash_filter // models FirstOrderRateDistortedSet[T,FPR,0]
+                           //        FirstOrderRandomApproximateSet[T,FPR,0]
+                           //        Set[T]
     {
     public:
-        using value_type = T;
+        static_assert(K > 0, "K must be positive");
 
-        using hash_fn = Hash;
+        using value_type = X;
+        using hash_fn = HashFn;
+        using coder_fn = CoderFn;
+        using perf_hash_fn = PerfHashFn;
+        using hash_type = typename HashFn::hash_type;
 
-        auto hash_set(T const & x) const { return _ph(_coder(x)); }
+        auto perf_hash(X const & x) const { return _ph(_coder(x)); }
 
         template <typename I>
-        approximate_hash_set(
+        perf_hash_filter(
             I begin,
             I end,
             float load_factor = .85f,
-            Hash h = Hash{},
-            Coder coder = Coder{})
+            HashFn h = Hash{},
+            CoderFn coder = Coder{}) :
+                coder_(coder),
+                h_(h)
         {
             auto const m = std::distance(begin, end);
-            _N = static_cast<hash_type>(std::ceil(m / load_factor));
-            _ph = HashSetFunction(begin, end, load_factor);
-            _coder = coder;
-            _h = h;
-            _hashes.resize(_N);
-
+            auto const N = static_cast<hash_type>(std::ceil(m / load_factor));
+            ph_ = PerfHashFn(begin, end, N_);
+            
+            hashes_.resize(N);
             for (auto x = begin; x != end; ++x)
             {
                 auto const code = _coder(*x);
-                _hashes[_ph(code)] = _h(code) % K;
+                hashes_[ph_(code)] = h_(code) % K;
             }
         }
 
-        bool contains(T const & x) const
+        bool contains(X const & x) const
         {
-            auto const code = _coder(x);
-            auto const hash_index = _ph(code);
-            auto const hash_check = _h(code) % _N;
-            
-            return _hashes[hash_index] == hash_check;
+            auto const code = coder_(x);
+            return hashes_[ph_(code)] == h_(code) % K;
         }
 
         constexpr auto fnr() const
         {
-            return _ph.rate_distortion() * tnr();
+            return ph_.rate_distortion() * tnr();
         }
 
         constexpr auto tpr() const
         {
-            return 1. - fnr();
+            return static_cast<decltype(fnr())>(1) - fnr();
         }
 
         constexpr auto fpr() const
@@ -133,26 +133,27 @@ namespace alex::set
 
         constexpr auto tnr() const
         {
-            return 1. - static_cast<long double>(power_probability<K,2u>{});
+            return static_cast<long double>(1) -
+                   static_cast<long double>(fpr());
         }
 
         template <
-            typename T2,
-            unsigned int K2>
+            typename X2,
+            unsigned int K2
+        >
         bool operator==(
-            approximate_hash_set<T2, HashSetFunction, K2, Hash, Coder> const & rhs) const
+            perfect_hash_filter<X2, PerfHashFn, K2, HashFn, CoderFn> const & rhs) const
         {
-            if (_N != rhs._N ||
-                _h != rhs._h ||
-                _ph != rhs._ph ||
-                _coder == rhs._coder)
+            if (h_ != rhs.h_ ||
+                ph_ != rhs.ph_ ||
+                coder_ == rhs.coder_)
             {
                 return false;
             }
 
-            for (size_t i = 0; i < static_cast<size_t>(_N); ++i)
+            for (size_t i = 0; i < static_cast<size_t>(N_); ++i)
             {
-                if (_hashes[i] != rhs._hashes[i])
+                if (hashes_[i] != rhs.hashes_[i])
                     return false;
             }
             return true;            
@@ -176,18 +177,17 @@ namespace alex::set
         // that compute output based on load_factor or objective set size.
 
     private:
-        using hash_type = typename Hash::hash_type;
 
-        HashSetFunction _ph;
-        Hash _h;
-        hash_type _N;
-        Coder _coder;
+        PerfHashFn ph_;
+        HashFn h_;
+        hash_type N_;
+        CoderFn coder_;
 
         // this should be a packed container type
         // that (assuming discrete uniform distribution
         // [0,N)) that can be compactly stored
         // in ceil(|S|/r log2 N) bits.
-        std::vector<hash_type> _hashes;
+        std::vector<hash_type> hashes_;
     };
 
 
@@ -202,16 +202,16 @@ namespace alex::set
     // and not distributions.
     template <
         typename T,
-        typename HashSetFunction,
+        typename PerfHashFn,
         unsigned int K1,
         unsigned int K2,
-        typename Hash,
-        typename Coder,
+        typename HashFn,
+        typename CoderFn,
         bool Complement
     >
     constexpr bool subset_eq(
-        approximate_hash_set<T,HashSetFunction,K1,Hash,Coder,Complement> const lhs,
-        approximate_hash_set<T,HashSetFunction,K2,Hash,Coder,Complement> const rhs)
+        perf_hash_filter<T,PerfHashFn,K1,HashFn,CoderFn,Complement> const lhs,
+        perf_hash_filter<T,PerfHashFn,K2,HashFn,CoderFn,Complement> const rhs)
     {
         return lhs == rhs;
     }
@@ -219,54 +219,51 @@ namespace alex::set
     template <
         typename T1,
         typename T2,
-        typename HashSetFunction1,
-        typename HashSetFunction2,
+        typename PerfHashFn1,
+        typename PerfHashFn2,
         unsigned int K1,
         unsigned int K2,
-        typename Hash1,
-        typename Hash2,
-        typename Coder1,
-        typename Coder2,
+        typename HashFn1,
+        typename HashFn2,
+        typename CoderFn1,
+        typename CoderFn2,
         bool Complement1,
         bool Complement2
     >
     constexpr bool subset(
-        approximate_hash_set<T1,HashSetFunction1,K1,Hash1,Coder1,Complement1> const lhs,
-        approximate_hash_set<T2,HashSetFunction2,K2,Hash2,Coder2,Complement2> const rhs)
+        perf_hash_filter<T1,PerfHashFn1,K1,HashFn1,CoderFn1,Complement1> const lhs,
+        perf_hash_filter<T2,PerfHashFn2,K2,HashFn2,CoderFn2,Complement2> const rhs)
     {
         return false;
     }
 
     template <
         typename T,
-        typename HashSetFunction,
+        typename PerfHashFn,
         unsigned int K,
-        typename Hash,
-        typename Coder,
+        typename HashFn,
+        typename CoderFn,
         bool Complement
     >
     constexpr bool is_member(
         T lhs,
-        approximate_hash_set<T,HashSetFunction,K,Hash,Coder,Complement> const rhs)
+        perf_hash_filter<T,PerfHashFn,K,HashFn,CoderFn,Complement> const rhs)
     {
         return rhs.contains(lhs);
     }
 
     template <
         typename T,
-        typename HashSetFunction,
+        typename PerfHashFn,
         unsigned int K,
-        typename Hash,
-        typename Coder,
+        typename HashFn,
+        typename CoderFn,
         bool Complement
     >
     constexpr bool contains(
-        approximate_hash_set<T,HashSetFunction,K,Hash,Coder,Complement> const lhs,
-        T rhs,
+        perf_hash_filter<T,PerfHashFn,K,HashFn,CoderFn,Complement> const lhs,
+        T rhs)
     {
         return lhs.contains(rhs);
     }
-
-
-
 }
