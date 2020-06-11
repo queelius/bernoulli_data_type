@@ -1,6 +1,5 @@
 #pragma once
 
-#include <memory>
 #include <type_traits>
 
 namespace alex::iterators {
@@ -19,46 +18,43 @@ class forward_const_iterator
     using reference = T const&;
     using iterator_category = std::forward_iterator_tag;
 
-    template<typename Iterator>
-    forward_const_iterator(Iterator it)
-      : _it(std::make_unique<concept_model<Iterator>>(std::move(it))){};
+    template<typename I>
+    forward_const_iterator(I i)
+      : i_(std::make_unique<concept_model<I>>(std::move(i))){};
 
     forward_const_iterator(forward_const_iterator const& copy)
     {
-        _it = copy._it->copy();
+        i_ = copy.i_->copy();
     };
-
-    forward_const_iterator(forward_const_iterator&& src)
-      : _it(std::move(src._it)){};
 
     forward_const_iterator& operator++()
     {
-        _it->next();
+        i_->next();
         return *this;
     };
 
     forward_const_iterator operator++(int)
     {
         auto copy = *this;
-        _it->next();
+        i_->next();
         return copy;
     };
 
     bool operator!=(forward_const_iterator const& other) const
     {
-        return !_it->equals(other._it.get());
+        return !i_->equals(other.i_.get());
     };
 
     bool operator==(forward_const_iterator const& other) const
     {
-        return _it->equals(other._it.get());
+        return i_->equals(other.i_.get());
     };
 
-    T operator*() const { return _it->value(); };
+    T operator*() const { return i_->value(); };
 
     forward_const_iterator operator=(forward_const_iterator const& rhs)
     {
-        _it = rhs._it->copy();
+        i_ = rhs.i_->copy();
         return *this;
     };
 
@@ -71,37 +67,36 @@ class forward_const_iterator
         virtual std::unique_ptr<concept> copy() const = 0;
     };
 
-    template<typename Iterator>
+    template<typename I>
     struct concept_model final : concept
     {
-        concept_model(Iterator it)
-          : it(std::move(it)){};
+        concept_model(I i)
+          : i_(std::move(i)){};
 
         bool equals(concept* const other) const
         {
-            return it == dynamic_cast<concept_model<Iterator>*>(other)->it;
+            return i_ == dynamic_cast<concept_model<I>*>(other)->i_;
         };
 
-        T value() const { return *it; };
+        T value() const { return *i_; };
 
-        void next() { ++it; };
+        void next() { ++i_; };
 
         std::unique_ptr<concept> copy() const
         {
-            return std::make_unique<concept_model<Iterator>>(it);
+            return std::make_unique<concept_model<I>>(i_);
         };
 
-        Iterator it;
+        I i_;
     };
 
-    std::unique_ptr<concept> _it;
+    std::unique_ptr<concept> i_;
 };
 
-template<typename Iterator>
-auto
-make_forward_const_iterator(Iterator it)
+template<typename I>
+auto make_forward_const_iterator(I i)
 {
-    using value_type = typename std::iterator_traits<Iterator>::value_type;
-    return forward_const_iterator<value_type>(std::move(it));
+    using value_type = typename std::iterator_traits<I>::value_type;
+    return forward_const_iterator<value_type>(i);
 };
 }
