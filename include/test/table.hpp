@@ -7,18 +7,24 @@
 using std::invalid_argument;
 using std::vector;
 
-class op_table
+class binary_op_table
 {
 public:
-    table(bounded_nat const & nr, bounded_nat const & nc, bounded_nat) :
-        cols_(nc.get()),
-        els_(nr.get() * cols_, init)
+    binary_op_table(bounded_nat const & n, bounded_nat init) :
+        n_(n),
+        els_(n * n, init)
     {
         
     }
 
-    bounded_nat size() const { return els_.size(); }
+    bounded_nat cardinality() const { return bounded_nat(els_.size()); }
 
+    // naturally represents a function type (N,N)->N, but it also
+    // provides a bijection between (N,N) and N, e.g.,
+    // if f(x,y) = z, then f(p) = z where p is the encoding of (x,y),
+    // which is just p = x*n+y. alternatively, if we want to see it 
+    // as a unary function f : N -> N, but wish to map it to a
+    // binary function, then if f(i) = j, f(i/n, i-floor(i/n)*n) = j.
     bounded_nat & operator()(bounded_nat i)
     {
         if (i > els_.size())
@@ -29,51 +35,45 @@ public:
 
     bounded_nat operator()(bounded_nat i) const
     {
-        if (i > els_.size())
+        if (i > bounded_nat(els_.size()))
             throw invalid_argument("Index out of range.");
 
         return els_[i];
     }
 
-    bounded_nat const operator()(bounded_nat r, bounded_nat c) const
+    // let f be of type binary_op_table. then,
+    // it represents an operation of type (bounded_nat, bounded_nat) -> bounded_nat,
+    // where bounded_nat is the set of natural numbers {0,1,...,n-1}.
+    bounded_nat const operator()(bounded_nat x, bounded_nat y) const
     {
-        if (c >= nc() || r >= nr())
-            throw invalid_argument("Index out of range.");
+        if (x >= n_ || y >= n_)
+            throw invalid_argument("Not in the domain of definition.");
 
-        return els_[r * nc() + c];
+        return els_[x * n_ + y];
     }
 
-    bounded_nat & operator()(int r, int c)
+    bounded_nat & operator()(bounded_nat x, bounded_nat y)
     {
-        if (c >= nc() || r >= nr())
-            throw invalid_argument("Index out of range.");
+        if (x >= n_ || y >= n_)
+            throw invalid_argument("Not in the domain of definition.");
 
-        return els_[r * nc() + c];
+        return els_[x * n_ + y];
     }
 
-    bounded_nat nc() const { return cols_; };
-    bounded_nat nr() const { return els_.size() / cols_; };
+    bounded_nat n() const { return n_; };
 
 private:
-    bounded_nat cols_;
+    bounded_nat n_;
     vector<bounded_nat> els_;
 };
 
-bool is_square(table const & t)
+bool is_commutative(binary_op_table const & f)
 {
-    return t.nr() == t.nc();
-}
-
-bool is_symmetric(table const & t)
-{
-    if (!is_square(t))
-        return false;
-
-    for (unsigned int i = 1; i < t.nr(); ++i)
+    for (bounded_nat x(1); x < f.n(); x = x + bounded_nat(1))
     {
-        for (unsigned int j = 0; j < i; ++j)
+        for (bounded_nat y(0); y < x; y = y + bounded_nat(1))
         {
-            if (t(i,j) != t(j,i))
+            if (f(x,y) != f(y,x))
                 return false;
         }
     }
@@ -92,7 +92,7 @@ bool is_symmetric(table const & t)
  *     - t(x',x) = e for every x in I
  * 
  */
-bool is_group(table const & t)
+bool is_group(binary_op_table const & t)
 {
 
 }
@@ -101,7 +101,7 @@ bool is_group(table const & t)
 /**
  * R(R(x,y),z) = R(x,R(y,z))
  */
-bool is_associative(table const & t)
+bool is_associative(binary_op_table const & t)
 {
     if (!is_square(t))
         return false;
@@ -128,13 +128,13 @@ bool is_associative(table const & t)
 /**
  * let v = t . u. t()
  */
-table<unsigned int> compose(
-    table<unsigned int> const & t,
-    table<unsigned int> const & u)
+binary_op_table compose(
+    binary_op_table const & t,
+    binary_op_table const & u)
 {
-    for (int i = 0; i < t.nr(); ++i)
+    for (bounded_nat i = 0; i < t.nr(); ++i)
     {
-        for (int j = 0; j < t.nc(); ++j)
+        for (bounded_nat j = 0; j < t.nc(); ++j)
         {
             auto k = t(i,j);
         }
