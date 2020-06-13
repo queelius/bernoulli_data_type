@@ -81,6 +81,15 @@ bool is_commutative(binary_op_table const & f)
     return true;
 }
 
+bool is_closed(binary_fn_table const & f)
+{
+    return all_of(
+        vector<bounded_nat>(f).begin(),
+        vector<bounded_nat>(f).end(),
+        [](bouned_nat const & z) { return z < f.n(); };
+}
+
+
 /**
  * (t, I), t : (I,I) -> I, is a group if:
  * 
