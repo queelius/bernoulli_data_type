@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 #include <vector>
-#include "bounded_nat.hpp"
+#include "nat.hpp"
 #include <algorithm>
 
 
@@ -35,42 +35,51 @@ using std::all_of;
 
 // a vector (x1,x2,...,xn), where xi in {0,1,...,m} and a natural number have a
 // bijection. encode the vector as the natural number.
+
+
+/**
+ * abelian_op<K> is an abelian operation of type (N,N)->N where N is the set of natural
+ * numbers {0,1,...,N}.
+ */
+
+template <unsigned int K>
 class abelian_op
 {
+    static_assert(K>0);
+
 public:
-    abelian_op(bounded_nat const & n, bounded_nat init) :
-        n_(n),
-        els_(n * n, init)
+    abelian_op(nat<K> init) :
+        els_(K*K, init)
     {
         
     }
 
-    bounded_nat cardinality() const { return bounded_nat(n_*n_); }
+    constexpr auto cardinality() const { return K*K; };
 
-    bounded_nat const operator()(bounded_nat x, bounded_nat y) const
+    nat<K> const & operator()(nat<N> const & x, nat<N> const & y) const
     {
-        if (x >= n_ || y >= n_)
-            throw invalid_argument("Not in the domain of definition.");
-        return els_[max(x,y)*(max(x,y)+1)/2 + min(x,y)];
+        return els_[max((unsigned int)x,(unsigned int)y)*
+            (max((unsigned int)x,(unsigned int)y)+1)/2+
+            min((unsigned int)x,(unsigned int)y)];
     }
 
-    bounded_nat & operator()(bounded_nat x, bounded_nat y)
+    nat<K> & operator()(nat<K> const & x, nat<K> const & y)
     {
-        if (x >= n_ || y >= n_)
-            throw invalid_argument("Not in the domain of definition.");
-        return els_[max(x,y)*(max(x,y)+1)/2 + min(x,y)];
+        return els_[max((unsigned int)x,(unsigned int)y)*
+            (max((unsigned int)x,(unsigned int)y)+1)/2+
+            min((unsigned int)x,(unsigned int)y)];
     }
 
-    bounded_nat n() const { return n_; };
+    constexpr auto k() const { return K; };
 
-    operator const vector<bounded_nat> & () const { return els-; };
+    operator const vector<nat<K>> & () const { return els_; };
 
 private:
-    bounded_nat n_;
-    vector<bounded_nat> els_;
+    vector<nat<K>> els_;
 };
 
-bool is_commutative(abelian_op const & f)
+template <typename K>
+bool is_commutative(abelian_op<K> const &)
 {
     return true;
 }
@@ -86,31 +95,31 @@ bool is_commutative(abelian_op const & f)
  *     - t(x',x) = e for every x in I
  * 
  */
-bool is_group(abelian_op const & f)
+template <typename K>
+bool is_group(abelian_op<K> const & f)
 {
     auto e = identity(f);
     if (!e || !is_associative())
         return false;
-
-
-    
+    return true;    
 }
 
-bool is_closed(abelian_op const &)
+template <typename K>
+bool is_closed(abelian_op<K> const &)
 {
     return true;
 }
 
-
-bool invertible(abelian_op const & f)
+template <typename K>
+bool invertible(abelian_op<K> const & f)
 {
     auto e = identity(f);
     if (!e)
         return false;
 
-    for (bounded_nat x = 0; x < f.n(); x = x + 1)
+    for (nat<K> x = 0; x < K; ++x)
     {
-        for (bounded_nat y = 0; y <= x; y = y + 1)
+        for (nat<K> y = 0; y <= x; ++y)
         {
             if (f(x,y) == *e)
         }
@@ -122,22 +131,18 @@ bool invertible(abelian_op const & f)
 /**
  * f(f(x,y),z) = f(x,f(y,z)) for all x,y,z in {0,1,...,n-1}.
  */
-bool is_associative(abelian_op const & f)
+template <unsigned int K>
+bool is_associative(abelian_op<K> const & f)
 {
-    for (bounded_nat i = 0; i < f.n(); ++i)
+    for (nat<K> i = 0; i < K; ++i)
     {
-        for (bounded_nat j = 0; j <= i; ++j)
+        for (nat<K> j = 0; j <= i; ++j)
         {
-            for (bounded_nat k = 0; k < f.n(); ++k)
-            {
-                auto const a = f(i,j);
-                auto const b = f(j,k);
-                if (a >= f.n() || b >= f.n() || f(a,k) != f(i,b))
+            for (nat<K> k = 0; k < K; ++k)
+                if (f(f(i,j),k) != f(i,f(j,k)))
                     return false;
-            }
         }
     }
-
     return true;
 }
 
@@ -145,20 +150,23 @@ bool is_associative(abelian_op const & f)
  * true by definition of abelian operations, which abelian_op has as
  * an invariant.
  */
-bool is_functional(abelian_op const &)
+template <unsigned int K>
+bool is_functional_relation(abelian_op<K> const &)
 {
     return true;
 }
 
+
 /**
  * f(e,x) = f(x,e) = x for all x in {0,1,...,n-1}.
  */
-optional<bounded_nat> identity(abelian_op const & f)
+template <unsigned int K>
+optional<nat<K>> identity(abelian_op<K> const & f)
 {
-    for (bounded_nat e = 0; e < f.n(); e = e+1)
+    for (auto e = nat<K>::min(); e < K; ++e)
     {
         bool found = true;
-        for (bounded_nat y = 0; y < f.n(); y=y+1)
+        for (auto y = nat<K>::min(); y < K; ++y)
         {
             if (f(e,y) != y)
             {
@@ -172,3 +180,29 @@ optional<bounded_nat> identity(abelian_op const & f)
 
     return {};
 }
+
+
+
+
+/**
+ * f|0 1 2
+ * -+-----
+ * 0|0 1 2
+ * 1|1 a b
+ * 2|2 b d
+ * 
+ * identity: f(e,a) = f(a,e) = a
+ * let e = 0. a = 0 -> f(e,a) = f(a,e) = a = 0
+ * 
+ * 0 is identity
+ * what makes 1 identity? f(0,1) = 1; f(1,a) = 1; f(2,a) = 2
+ * 
+ * f|0 1 2
+ * -+-----
+ * 0|0 1 2
+ * 1|1 1 2
+ * 2|2 2 b
+ * 
+ * what makes 2 identity? f()
+ * 
+ */
