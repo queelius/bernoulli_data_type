@@ -191,6 +191,8 @@ optional<nat<K>> identity(abelian_op<K> const & f)
  * 1|1 a b
  * 2|2 b d
  * 
+ * 3*3*3=27 possibilities
+ * 
  * identity: f(e,a) = f(a,e) = a
  * let e = 0. a = 0 -> f(e,a) = f(a,e) = a = 0
  * 
