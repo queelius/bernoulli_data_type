@@ -1,5 +1,17 @@
 #include "random_approximate_value.hpp"
 
+/**
+ * The first-order random approximate Boolean is a straightforward monad.
+ * 
+ * This is the simplest type. There are conceptually two simpler types,
+ *     template <size_t N, typename T> // T models Singleton
+ *     random_approximate
+ * and
+ *     template <size_t N>
+ *     random_approximate<N,void>,
+ * where void denotes the absurd type which has no values, are equivalent to
+ * T and void, or alternatively, random_approximate<0,void>
+ */
 template <>
 struct random_approximate<1,bool>
 {
@@ -101,3 +113,4 @@ auto operator&(approximate<1,bool> a, approximate<1,bool> b)
     // a.value && !b.value
     return approximate<3,bool>{(1.-a.alpha)*b.alpha, false};
 }
+

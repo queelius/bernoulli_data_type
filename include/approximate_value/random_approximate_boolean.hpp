@@ -218,9 +218,8 @@ auto pdf(random_approximate<N,T> x)
 }
 
 
+
 /**
- * The first-order random approximate Boolean is a straightforward monad.
- * 
  * As a function of a random variable, f : bool -> bool is a random
  * variable. Since we apply f to a first-order random approximate Boolean,
  * the output is a first-order random approximate Boolean in which the
@@ -228,16 +227,27 @@ auto pdf(random_approximate<N,T> x)
  * 
  * It is nocomputation in the context of a first-order approximation error
  * on boolean values.
- * 
- * This is the simplest type. random_approximate<unit> and
- * random_approximate<void>, where void denotes the absurd type which has
- * no values, are equivalent to unit and void.
- * 
  */
 auto fmap(function<bool(bool)> f, random_approximate<1,bool> x)
 {
     return random_approximate<1,bool>(f(x()),x.epsilon);
 }
+
+auto fmap(function<random_approximate<1,bool>(bool) f, random_approximate<1,bool> x)
+{
+    auto y = f(x());
+    // incorrect, fix
+    return random_approximate<1,bool>(y,x.epsilon*y.epsilon);
+}
+
+
+
+auto fmap(function<bool(bool)> f, random_approximate<1,bool> x)
+{
+    return random_approximate<1,bool>(f(x()),x.epsilon);
+}
+
+
 
 auto fmap(function<bool(bool)> f, random_approximate<2,bool> x)
 {
