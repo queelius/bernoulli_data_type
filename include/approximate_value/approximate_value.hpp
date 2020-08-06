@@ -43,6 +43,40 @@ struct approximate_value
     T value;
 };
 
+template <typename T>
+approximate_value<T> retrn(T x, double err)
+{
+    return approximate_value<T>{err,value};
+}
+
+template <typename T>
+struct ret
+{
+    
+    ret(T v) : v(v) {}
+    
+    T operator()(Args args) 
+    {
+        return v;
+    }
+
+    T v;
+};
+
+
+template <typename T>
+approximate_value<T> join(approximate_value<approximate_value<T>> x)
+{
+    return x.value;
+}
+
+// fmap : (a -> b) -> M a -> M b
+
+template <typename T>
+struct fmap
+{
+
+}
 
 approximate_value<bool> operator&(approximate_value<bool> a, approximate_value<bool> b)
 {
