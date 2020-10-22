@@ -10,7 +10,7 @@
 
 
 template <int N, typename T>
-struct random_approximate {};
+struct random_bernoulli {};
 
 /**
  * This is the maximum uncertainty random approximate value for type T.
@@ -22,7 +22,7 @@ struct random_approximate {};
  *     the p values?
  */
 template <typename T>
-struct random_approximate<-1,T>
+struct random_bernoulli<-1,T>
 {
     using value_type = T;
     constexpr int order = -1;
@@ -47,7 +47,7 @@ struct random_approximate<-1,T>
  * which is equivalent to a value type T.
  */
 template <typename T>
-struct random_approximate<0,T>
+struct random_bernoulli<0,T>
 {
     using value_type = T;
     constexpr int order = 0;

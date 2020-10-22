@@ -64,11 +64,20 @@ struct ret
 };
 
 
+// an approximate value of an approximate value of ... is an approximate value.
 template <typename T>
 approximate_value<T> join(approximate_value<approximate_value<T>> x)
 {
-    return x.value;
+    return join(x.value);
 }
+
+
+template <typename T>
+approximate_value<T> join(approximate_value<T> x)
+{
+    return x;
+}
+
 
 // fmap : (a -> b) -> M a -> M b
 
