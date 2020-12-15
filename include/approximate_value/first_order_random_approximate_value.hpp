@@ -92,25 +92,3 @@ struct approximate<1,bool>
     auto operator()() const { return value; }
 };
 
-auto operator~(approximate<1,bool> a)
-{
-    return approximate<1,bool>{!a.value,a.err};
-}
-
-// at some point, for higher orders, just need to start
-// using intervals to span the fpr and fnr.
-auto operator&(approximate<1,bool> a, approximate<1,bool> b)
-{
-    if (a.value && b.value)
-        return approximate<3,bool>{a.alpha+b.alpha-a.alpha*b.alpha, true};
-
-    if (!a.value && !b.value)
-        return approximate<3,bool>{a.alpha*b.alpha, false};
-
-    if (!a.value && b.value)
-        return approximate<3,bool>{a.alpha*(1.-b.alpha), false};
-
-    // a.value && !b.value
-    return approximate<3,bool>{(1.-a.alpha)*b.alpha, false};
-}
-

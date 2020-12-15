@@ -106,3 +106,65 @@ $x_{n-1} A x_n$.
 
 For more on the random approximate set model, see
 https://github.com/queelius/random_approximate_relation_model.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+template <int N, typename T>
+struct retrn {};
+
+template <typename T>
+struct retrn<0>
+{
+    bernoulli<0,T> operator()(T x) const
+    {
+        return bernoulli<0,T>{x};
+    }
+};
+
+template <typename T>
+struct retrn<1>
+{
+    bernoulli<1,T> operator()(T x, double err) const
+    {
+        return bernoulli<1,T>{rate_interval<E>{err},x};
+    }
+
+    template <typename E>
+    bernoulli<1,T> operator()(T x, rate_interval<E> err) const
+    {
+        return bernoulli<1,T>{err,x};
+    }
+};
+
+
+// a Beroulli of a Bernoulli ... of a Bernoulli is a Bernoulli.
+template <int N, typename T>
+bernoulli<N,T> join(bernoulli<N,bernoulli<N,T>> x)
+{
+    return join(x.value);
+}
+
+template <int N, typename T>
+bernoulli<N,T> join(bernoulli<N,T> x)
+{
+    return x;
+}
