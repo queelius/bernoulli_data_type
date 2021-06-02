@@ -5,7 +5,7 @@
  * 
  * By an accident of history, the unit type is denoted by the keyword 'void' in
  * C++, which is the absurd type (empty set). Additionally, in C++, we cannot
- *  use values of the unit type in an expression. So, for the sake of
+ * use values of the unit type in an expression. So, for the sake of
  * completeness, we specify a unit type
  *     struct unit{}.
  * 
@@ -20,9 +20,9 @@ struct random_bernoulli<0,unit>
     using value_type = unit;
     static auto order() { return 0; }
 
-    static auto fpr() const { return error(); }
-    static auto fnr() const { return error(); }
-    static double error() const { return 0; }
+    static auto fpr() const { return 0.; }
+    static auto fnr() const { return 0.; }
+    static auto error(unit const &) const { return 0.; }
 
     auto operator()() const { return unit{}; }
 
