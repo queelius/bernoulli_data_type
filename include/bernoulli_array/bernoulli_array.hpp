@@ -8,8 +8,6 @@ using std::vector;
 using std::optional;
 using std::array;
 
-
-
 /**
  * Consider the Boolean algebra
  *     (array<bool,N>, +, *, ~, array<bool,N>{false}, array<bool,N>{true})
@@ -18,10 +16,10 @@ using std::array;
  * as
  *     bool contains(A,i) { return i >= 0 && i < N && A[i]; }.
  * 
- * Then, if we replace the bool value type by the bernoulli<K,bool> value type,
- * which is understood to be the K-th order Bernoulli over the equality
+ * Then, if we replace the bool value type by the bernoulli<K,bool,eq> value type,
+ * which is understood to be the a Bernoulli type over the equality
  * predicate for Boolean values, then, for instance,
- *     P[bernoulli<1,bool>{x} == bool{x}] = E.
+ *     P[bernoulli<K,bool,eq>{x} == bool{x}] = E.
  * Thus, we have a Bernoulli approximation of the original Boolean algebra,
  *     (array<random_bernoulli<K,bool>,N>,
  *      |, &, ~,
@@ -103,11 +101,30 @@ using std::array;
  * We choose to provide a template specialization for this particular
  * type.
  */
-template <typename T, size_t N>
-struct first_order_random_approximate_vector {};
 
-template <size_t N>
-struct first_order_random_approximate_vector<bool,N>
+
+
+// a bernoull type over vectors of type T for which
+//
+//     operator[](int) -> bernoulli<P,T,eq>
+//
+// models the bernoulli approximate.
+//
+// Observe that the equality predicate for this bernoulli type may be 
+// approximated 
+
+template <typename T>
+struct seq;
+
+template <typename P, typename T>
+struct bernoulli<P,seq<T>,struct index>;
+
+template <typename P, typename T>
+using bernoulli_seq = bernoulli<P,seq<T>,struct index>
+
+
+template <typeanme T>
+struct bernoulli<first_order<universal<T>>,seq<T>,struct index>
 {
     array<bool,N> given;
     double contains_error;
