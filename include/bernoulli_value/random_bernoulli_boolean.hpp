@@ -82,11 +82,6 @@
 
 #include <random>
 
-template <int N, typename T>
-struct bernoulli {}
-
-template <int N, typename T>
-struct random_bernoulli {}
 
 /**
  * This is the maximum uncertainty random approximate value for type T.
@@ -97,26 +92,34 @@ struct random_bernoulli {}
  * Make anothr one for pdf p1, p2, ..., p3 with error rate a function of
  *     the p values?
  */
-template <typename T>
-struct uniform_bernoulli<-1,T>
+template <typename T, typename F>
+struct random_bernoulli<first_order,T,F>
 {
     using value_type = T;
     constexpr int order = -1;
 
-    auto error() const { return 1. - 1. / size(values<T>()); }
-    auto fnr() const { return error(); }
-    auto fpr() const { return error(); }
+    double const error_rate;
+    T const & given;
+
+    auto error(T const &) const
+    {
+        return error_rate;
+    }
 
     static auto cardinality()
     {
         return distance(values<T>().begin(),values<T>().end())
     }
 
-    template <typename R>
-    auto sample(R & r)
+    template <typename U>
+    auto sample(U & urbg)
     {
-        return bernoulli<-1,T>(values<T>().first +
-            uniform_int_distribution(0,size(xs))(r));
+        bernoulli_distribution ber(error_rate);
+        if (ber(urbg))
+        {
+            return bernoulli<first_order,T,F>(values<T>().first + uniform_int_distribution(0,size(xs))(urbg));
+        }
+        return bernoulli<first_order,T,F>(given);
     }
 };
 
@@ -148,7 +151,7 @@ auto operator^(bernoulli<N,bool> a, bernoulli<N,bool> b)
 
 
 template <>
-struct random_bernoulli<2,bool>
+struct random_bernoulli<second_order<pos_neg>,bool,eq>
 {
     using value_type = bool;
     constexpr int order = 2;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "bernoulli_value.hpp"
+#include "bernoulli.hpp"
 
 /**
  * data Bernoulli : a -> Vect n e -> Type where
@@ -90,9 +90,12 @@
  * 
  * 
  * Any Bernoulli type
- *     (Set X, in : X -> Set X -> bool, N)
+ *     (2^X, contains : X -> 2^X -> bool, P)
+ * or
+ *     bernoulli<set<X>, set<X>::contains, P>
  * may be denoted by
- *     bernoulli_set<
+ *     bernoulli_set<X,P>
+ *
  */
 
 
@@ -100,22 +103,16 @@
  * Models the concept of a first-order Bernoulli structure over
  *     (bool, ==, 1).
  */
-template <int N, typename T, typename P>
-struct bernoulli
+
+struct zeroth_order {};
+
+template <typename T, typename F>
+struct bernoulli<zeroth_order>
 {
     using value_type = T;
-    using pred = P;
-
-    static auto order() { return N; }
-};
-
-template <int N, typename T>
-using bernoulli_value = bernoulli<N,T,std::equal_to<T>>;
-
-template <int N, typename T>
-struct bernoulli: public bernoulli<N,T,std::equal_to<T>>
-{
-
+    using fun = F;
+    
+    static auto order() { return 0; }
 };
 
 template <typename T, typename P>

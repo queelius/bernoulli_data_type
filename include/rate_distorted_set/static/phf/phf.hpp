@@ -37,15 +37,16 @@
 #include "power_probability.hpp"
 #include <vector>
 
-namespace alex::set
+namespace bernoulli::set
 {
     template <typename X>
-    struct identity
+    struct identity_fn
     {
-        X operator()(X x) const { return x };
+        X const & operator()(X const & x) const { return x };
     };
 
     /**
+     * phf<X,PH// models second-order bernoulli over (2^X, member-of : (X,2^X) -> bool)
      * Hash : Hashable -> HashType
      * PerfHash : Hashable -> [0,N)
      * Coder : T -> Hashable
@@ -63,49 +64,47 @@ namespace alex::set
      * 
      * The default Coder is the identity on ValueType, in which
      * case ValueType must be Hashable.
-     * 
-     * Todo: make N a template parameter, and thus fpr a template?
      */
     template <
         typename    X,
-        typename    PerfHashFn,
-        int         K,                  // fpr() = 2^(-K) or K = -log2(fpr)
-        typename    HashFn,
-        typename    CoderFn = identity<X>,
-        bool        Complement = false>
-    class perf_hash_filter // models FirstOrderRateDistortedSet[T,FPR,0]
-                           //        FirstOrderRandomApproximateSet[T,FPR,0]
-                           //        Set[T]
+        typename    PH,
+        int         K,  // fpr() := 2^(-8K)
+        typename    H,
+        typename    Coder = identity_fn<X>>
+    class phf //: public set_expr<phf<X,PH,K,H,Coder>>
     {
     public:
         static_assert(K > 0, "K must be positive");
 
         using value_type = X;
-        using hash_fn = HashFn;
-        using coder_fn = CoderFn;
-        using perf_hash_fn = PerfHashFn;
-        using hash_type = typename HashFn::hash_type;
+        using hash_fn = H;
+        using coder_fn = Coder;
+        using perf_hash_fn = PH;
+        using hash_type = typename H::hash_type;
 
-        auto perf_hash(X const & x) const { return _ph(_coder(x)); }
+        /**
+         * phf<X,PH,K,H,Coder>
+         */
+        auto ph(X const & x) const { return _ph(_coder(x)); }
 
         template <typename I>
-        perf_hash_filter(
+        phf(
             I begin,
             I end,
-            float load_factor = .85f,
-            HashFn h = Hash{},
-            CoderFn coder = Coder{}) :
+            double load_factor = .85,
+            H h = H{},
+            Coder coder = Coder{}) :
                 coder_(coder),
                 h_(h)
         {
             auto const m = std::distance(begin, end);
             auto const N = static_cast<hash_type>(std::ceil(m / load_factor));
-            ph_ = PerfHashFn(begin, end, N_);
+            ph_ = PH(begin, end, N);
             
             hashes_.resize(N);
             for (auto x = begin; x != end; ++x)
             {
-                auto const code = _coder(*x);
+                auto const code = coder_(*x);
                 hashes_[ph_(code)] = h_(code) % K;
             }
         }

@@ -49,6 +49,7 @@
 using std::shared_ptr;
 using std::make_shared;
 
+
 template <typename X>
 class second_order_approximate_set
 {

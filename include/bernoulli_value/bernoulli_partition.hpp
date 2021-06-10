@@ -1,9 +1,3 @@
-#incude <array>
-
-#define partition typename;
-#define equality_comparable typename;
-using interval = std::pair<double,double>;
-
 
 /**
  * Let T := {a} + {b} + {c} = {a,b,c}.
@@ -57,15 +51,6 @@ using interval = std::pair<double,double>;
  * 
  * 
  */
-
-
-
-/**
- * P models the concept of a partition, where
- *     P::order() denotes the number of blocks in the partition.
- */
-template <equality_comparable T, partition P>
-struct bernoulli_value {};
 
 
 template <typename T, int L, int H>

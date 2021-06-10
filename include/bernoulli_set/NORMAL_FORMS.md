@@ -10,17 +10,7 @@ Sentences like "`'a` is an `Atom`", "`cons 'a 'b'` is a `(Pair Atom Atom)` are j
 
 Another judgement is "`cons 'a 'b` is the same `(Pair Atom Atom)` as `cons 'a b'`". However, `cons 'a 'b` is not the same `Atom` as `cons 'b 'a`. For two `(Pair Atom Atom)` to be the same, they must have the same `car` and `cdr`.
 
-It must also be true that `cons 'a 'b'` is the same `(Pair Atom Atom)` as `car (cons (cons 'a 'b) 'c)`, but `cons 'a 'b'` is a simpler expression. Given the set of expressions that are the same `Atoms` as `'a`, the *simplest* expression is its normal form, which is just `'a`. More generally, given any set of expressions that the same type as some 
-
-
-Normal forms of ... things?
-
-
-Normal forms of types of things.
-
-We have a type like ASet[t,f].
-
-
+It must also be true that `cons 'a 'b'` is the same `(Pair Atom Atom)` as `car (cons (cons 'a 'b) 'c)`, but `cons 'a 'b'` is a simpler expression. Given the set of expressions that are the same `Atoms` as `'a`, the *simplest* expression is its normal form, which is just `'a`.
 
 ## Normal Forms
 
