@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>Algorithm - Amusement Park Simulation</title>
+        <link href="../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+
+        <script src="../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="..">Amusement Park Simulation</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href=".." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem active">
+                                <a href="./" class="nav-link">Algorithm</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../BERNOULLI_ALGEBRAS/" class="nav-link">Algebra</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../BERNOULLI_RELATION/" class="nav-link">Relation</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../NORMAL_FORMS/" class="nav-link">Normal form</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../NUMBER_TYPE/" class="nav-link">Numbers</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../PHF/" class="nav-link">Perfect hash filter</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../VALUE/" class="nav-link">Values</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href=".." class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../BERNOULLI_ALGEBRAS/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#bernoulli-algorithms" class="nav-link">Bernoulli algorithms</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#bernoulli-algorithm-is_sorted-bool-bernoullibool" class="nav-link">Bernoulli algorithm: is_sorted : bool* -&gt; bernoulli&lt;?,bool&gt;</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="bernoulli-algorithms">Bernoulli algorithms</h1>
+<p>Return a random element with a false positive rate
+    k / N,
+where k is size of black list set and N is cardinality of domain.</p>
+<p>Randomly sample without replacement m of the k elements
+and returning the first sample with no collisions.</p>
+<p>The false positive rate is r = (k - m)/N, and the no-collision
+outcome is geometrically distributed with probability of no
+collision 1-r and thus there are expected to be 1/(1-r) trials.</p>
+<h2 id="bernoulli-algorithm-is_sorted-bool-bernoullibool">Bernoulli algorithm: is_sorted : bool* -&gt; bernoulli&lt;?,bool&gt;</h2>
+<p>Suppose we have a sequence of $n$ elements.</p>
+<p>If we want to determine if the sequence is sorted, we may do a single pass
+through the sequence, checking that $x_i \leq x_{i+1}$ for $i=1,...,n-1$.</p>
+<p>However, $O(n)$ may be too slow for whatever reason.
+Alternatively, we could <em>sample</em> (without replacement) a subset and determine if
+the subset is sorted and use that information to estimate, with some probability
+of error, that the larger collection is sorted.</p>
+<p>Assume the sequence contains values sampled uniformly from a value type $X$.</p>
+<p>Say we have a sequence of $3$ Boolean values, $0$ or $1$, and we check the
+first two values for sortedness. What is the probability the sequence is sorted
+if we assume the Boolean values are sampled uniformly at random?</p>
+<p>There are $2^n = 2^4 = 16$ possible sequences over Boolean values.</p>
+<p>$$
+    {
+        (0, 0, 0, 0),
+        (0, 0, 0, 1),
+        (0, 0, 1, 0),
+        (0, 0, 1, 1),\
+        (0, 1, 0, 0),
+        (0, 1, 0, 1),
+        (0, 1, 1, 0),
+        (0, 1, 1, 1),\
+        (1, 0, 0, 0),
+        (1, 0, 0, 1),
+        (1, 0, 1, 0),
+        (1, 0, 1, 1),\
+        (1, 1, 0, 0),
+        (1, 1, 0, 1),
+        (1, 1, 1, 0),
+        (1, 1, 1, 1)
+    }.
+$$</p>
+<p>Of these, those that are in order, assuming $0 &lt; 1$, are given by</p>
+<p>$$
+    {
+        (0, 0, 0, 0),
+        (0, 0, 0, 1),
+        (0, 0, 1, 1),\
+        (0, 1, 1, 1),
+        (1, 1, 1, 1)
+    }.
+$$</p>
+<h3 id="case-m1">Case m=1</h3>
+<p>If we sample $m=1$, this is <em>always</em> sorted. Recall that we assume that the
+collection has elements sampled uniformly from $X := \rm{Boolean}$. So, what is
+the probability that the larger collection is ordered?</p>
+<p>If we sampled a $0$, we look at all the ordered sub-samples that contain $0$ and
+then divide it by the total number of sub-samples that contain $0$.
+There are $4$ ordered sub-samples that contain $0$ and there are $15$ sub-samples
+that contain $0$, thus the probability that the collection is sorted is given
+by $4/15$.</p>
+<p>If we sampled a $1$, then we see there are $4$ ordered sub-samples that contain
+$1$ and $15$ sub-samples that contain $1$. Again, the probability comes out to
+$4/15$.</p>
+<p>In each case, the probability that $\rm{is_sorted}$ outputs an erroneous value
+is $11/15$.
+This calls for a larger sample.</p>
+<h3 id="case-m2">Case m=2</h3>
+<p>If we sample $m=2$, what is the probability that the larger collection is ordered
+if the sample is ordered? The possible ordered sub-samples are given by</p>
+<p>$$
+    {
+        (0,0),(0,1),(1,1)
+    }.
+$$</p>
+<p>If we sampled a $(0,0)$, we look at all the ordered sub-samples that contain
+$(0,0)$ and then divide it by the total number of sub-samples that contain $(0,0)$.
+There are $3$ ordered sub-samples that contain $(0,0)$ and there are $8$ sub-samples
+that contain $(0,0)$, thus the probability that the collection is sorted is given
+by $3/8$.</p>
+<p>If we sampled a $(0,1)$, then we see there are $3$ ordered sub-samples that contain
+$(0,1)$ and $11$ sub-samples that contain $(0,1)$, thus the probability that the collection is sorted is given by $3/11$.</p>
+<p>If we sampled a $(1,1)$, then we see there are $3$ ordered sub-samples that contain
+$(1,1)$ and $8$ sub-samples that contain $(1,1)$, thus the probability that the collection is sorted is given by $3/8$.</p>
+<p>The probability of error is still probably too large.</p>
+<h3 id="case-m3">Case m=3</h3>
+<p>If we sample $m=3$, what is the probability that the larger collection is ordered
+if the sample is ordered? The possible ordered sub-samples are given by</p>
+<p>$$
+    {
+        (0,0,0),(0,0,1),(0,1,1),(1,1,1)
+    }.
+$$</p>
+<p>If we sampled a $(0,0,0)$, we look at all the ordered sub-samples that contain
+$(0,0,0)$ and then divide it by the total number of sub-samples that contain $(0,0,0)$.
+There are $2$ ordered sub-samples that contain $(0,0,0)$ and there are $3$ sub-samples
+that contain $(0,0,0)$, thus the probability that the collection is sorted is given
+by $2/3$.</p>
+<p>If we sampled a $(0,0,1)$, then we see there are $2$ ordered sub-samples that contain
+$(0,0,1)$ and $4$ sub-samples that contain $(0,0,1)$, thus the probability that the collection is sorted is given by $2/4=1/2$.</p>
+<p>If we sampled a $(0,1,1)$, then we see there are $2$ ordered sub-samples that contain
+$(1,1)$ and $4$ sub-samples that contain $(0,1,1)$, thus the probability that the collection is sorted is given by $3/8$.</p>
+<p>If we sampled a $(1,1,1)$, then we see there are $2$ ordered sub-samples that contain
+$(1,1,1)$ and $3$ sub-samples that contain $(1,1,1)$, thus the probability that the collection is sorted is given by $2/3$.</p>
+<p>The probability of error is still probably too large.
+However, if we sample $m=4$, the probability of error is $0$ since this reduces
+to the exact $\rm{is_ordered}$ test function.</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../js/base.js" defer></script>
+        <script src="../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
