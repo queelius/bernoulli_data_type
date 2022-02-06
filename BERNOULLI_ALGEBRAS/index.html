@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>Algebra - Amusement Park Simulation</title>
+        <link href="../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+
+        <script src="../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="..">Amusement Park Simulation</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href=".." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../BERNOULLI_ALGORITHMS.md" class="nav-link">Algorithm</a>
+                            </li>
+                            <li class="navitem active">
+                                <a href="./" class="nav-link">Algebra</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../BERNOULLI_RELATION/" class="nav-link">Relation</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../NORMAL_FORMS/" class="nav-link">Normal form</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../NUMBER_TYPE/" class="nav-link">Numbers</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../PHF/" class="nav-link">Perfect hash filter</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../VALUE/" class="nav-link">Values</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href=".." class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../BERNOULLI_RELATION/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#random-approximate-alebras" class="nav-link">Random approximate alebras</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="random-approximate-alebras">Random approximate alebras</h1>
+<p>A random approximate algebra is a random approximate map with additional
+structure.</p>
+<p>A groupoid is...</p>
+<p>A monoid</p>
+<p>$$
+    (X,+,1)
+$$</p>
+<p>is one of the simplest and useful algebraic structures.
+It defines a binary operation</p>
+<p>$$
+    + : X \mapsto X \mapsto X
+$$</p>
+<p>where $+$ is associative and there exists an element $e$ such that
+$a + e = a$ for any $a in X$.</p>
+<p>If the random approximate map is *rate-distorted, for instance, then
+the identity $e$ cannot be guaranteed. However, if there is a total
+order on $X$, then $x (+) y$ can be defined as</p>
+<p>$$
+x + y :=
+\begin{cases}
+    x + y &amp; x \leq y\
+    y + x &amp; y &lt; x.
+\end{cases}
+$$</p>
+<p>if $x &lt; y$, $y + x$ can be converted to $x + y$
+such that the commutative law (Abelian) is in the computational basis
+of random approximate maps (even if the values it maps have some non-zero loss). Alterantively, to try to minimize loss, if there is some function</p>
+<p>$$
+    avg : X \mapsto X \mapsto X
+$$</p>
+<p>then $x (+) y$ can be defined as</p>
+<p>$$
+    x (+) y := avg(x + y, y + x),
+$$</p>
+<p>which may reduce the expected loss on $(+)$ with respect to $+$,
+assuming that the random approximate commutative map $+$ attempted to map both $x$ to $y$ and $y$ to $x$. Of course, if the random approximate commutative map only attempted to map $x$ to $y$, $x &lt; y$, with the understanding that it is Abelian and will convert $y + x$ to $x + y$, then this latter approach is expected to have more loss.</p>
+<p>However, the associative law cannot be guaranteed. For instance, given a set $X = {x_1,\ldots,x_n$ and a total order $x_1 &lt; x_2 \ldots &lt; x_n$. Then, $x_2 + x_3 + x_4 = x_2 + (x_3 + x_4)$ which may be computed as following:
+    1. Let $a = x_3 + x_4$.
+    2. If $a &lt; x_2$, then the result is $a + x_2$ else $x_2 + a$.</p>
+<p>Alternatively, by the associative law, $x_2 + x_3 + x_4 = (x_2 + x_3) + x_4$, which may be computed as following:
+    1. Let $b = x_2 + x_3$.
+    2. If $b &lt; x_4$, then the result is $b + x_4$ else $x_4 + b$.</p>
+<p>In the above, the first one neither computes $x_2 + x_3$ nor $the second
+one never computes $x_3 + x_4$, a</p>
+<p>We say that two tuples $x$ and $y$ are <em>related</em> by $R$ if $(x,y) \in R$. Relations have many properties, like symmetry,
+reflectivity, transitivity, and other properties like being functional
+over some projection.</p>
+<p>We may re-use a concrete model of random approximate sets to construct
+models of random approximate relations. Many types or properties of
+relations are representable by random approximate relations,
+like symmetry and reflexivity, but many properties are not (efficiently)
+representable, like transitivity. We see that the random approximate relation model has
+a <em>computational basis</em> that is a subset of the relational model.</p>
+<p>For instance, random approximate binary symmetric relations are trivially
+representable by taking the <em>symmetric closure</em> of random approximate
+binary relations. For instance, given a binary relation $R := A x A$ and
+a total order $&lt;= : A x A$, the symmetric closure of a binary relation
+$R := A x A$ may be obtained <em>ordering</em> $x,y in A$ such that, if $x &lt; y$,
+$y R x$ is converted to $x R y$ (and $x R y$ is unchanged).</p>
+<p>If $R := A x B$, and we have isomorphisms $f : A \mapsto C$ and $ g : B \mapsto C$
+with $&lt;= : C x C$, then if $f x &lt; f y$, $y R x$ is converted into $x R y$.
+NOPE...</p>
+<p>As approximate sets, approximate relations have the usual set-theoretic
+operations like complements and unions. They have additional operations,
+however, like selection, projection, and joins which have a different
+sorts of approximation errors.</p>
+<p>In additional to a Boolean algebra, relational properties
+provide additional query structure, like $a$ is between $b$ and $c$
+if $(a,b,c) \in B$ or $a$ is adjacent to $b$ if $a A b$. Other types
+of queries, with their own source of approximation error, may
+be constructed from these, e.g., we may approximate the relation
+$x_1 x_2 \ldots x_n \in S$, where $S$ represents 'is a sequence',
+with the adacent relation $A$ as follows: $x_1 x_2 \ldots x_n$ is
+a sequence in $S$ if $x_1 A x_2$ and $x_2 A x_3$ and $\ldots$ and
+$x_{n-1} A x_n$.</p>
+<p>For more on the random approximate set model, see
+https://github.com/queelius/random_approximate_relation_model.</p>
+<p>template <int N, typename T>
+struct retrn {};</p>
+<p>template <typename T>
+struct retrn&lt;0&gt;
+{
+    bernoulli&lt;0,T&gt; operator()(T x) const
+    {
+        return bernoulli&lt;0,T&gt;{x};
+    }
+};</p>
+<p>template <typename T>
+struct retrn&lt;1&gt;
+{
+    bernoulli&lt;1,T&gt; operator()(T x, double err) const
+    {
+        return bernoulli&lt;1,T&gt;{rate_interval<E>{err},x};
+    }</p>
+<pre><code>template &lt;typename E&gt;
+bernoulli&lt;1,T&gt; operator()(T x, rate_interval&lt;E&gt; err) const
+{
+    return bernoulli&lt;1,T&gt;{err,x};
+}
+</code></pre>
+<p>};</p>
+<p>// a Beroulli of a Bernoulli ... of a Bernoulli is a Bernoulli.
+template <int N, typename T>
+bernoulli<N,T> join(bernoulli<N,bernoulli\<N,T>> x)
+{
+    return join(x.value);
+}</p>
+<p>template <int N, typename T>
+bernoulli<N,T> join(bernoulli<N,T> x)
+{
+    return x;
+}</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../js/base.js" defer></script>
+        <script src="../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
