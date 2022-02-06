@@ -1,7 +1,7 @@
 site_name: Amusement Park Simulation
 nav:
   - Home: README.md
-  - Algorithm: BERNOULLI_ALGORITHMS.md
+  - Algorithm: BERNOULLI_ALGORITHM.md
   - Algebra: BERNOULLI_ALGEBRAS.md
   - Relation: BERNOULLI_RELATION.md
   - "Normal form": NORMAL_FORMS.md
