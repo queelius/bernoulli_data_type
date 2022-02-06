@@ -103,40 +103,40 @@
                     <div class="col-md-9" role="main">
 
 <h1 id="approximate-number-types">Approximate number types</h1>
-<p>Assuming $T$ models a numerical type $R$ where $T$ has
-$n$ digits of precision and $R$ has $N$ digits of precision,
-$n &lt; N$, then</p>
-<p>$$
+<p>Assuming <span class="arithmatex">\(T\)</span> models a numerical type <span class="arithmatex">\(R\)</span> where <span class="arithmatex">\(T\)</span> has
+<span class="arithmatex">\(n\)</span> digits of precision and <span class="arithmatex">\(R\)</span> has <span class="arithmatex">\(N\)</span> digits of precision,
+<span class="arithmatex">\(n &lt; N\)</span>, then</p>
+<div class="arithmatex">\[
     == : (T,T) -&gt; bool
-$$</p>
+\]</div>
 <p>is an <em>approximation</em> of</p>
-<p>$$
+<div class="arithmatex">\[
     == : (R,R) -&gt; bool
-$$</p>
-<p>since, the mapping from $R$ to $T$ must be non-injective, i.e.,
-at least two values in $R$ map to the same value in $T$.</p>
-<p>Depending on how $T$ represents $R$, there may be variability
-in the approximation error over the values in $R$.</p>
-<p>Suppose $R$ represents numbers as a sequence of $N$ bits, where
-the $k$-th most significant bit is the $k$-th element of the sequence.</p>
-<p>Then, if $T$ models numbers in the same way, except with $n$ bit
-sequences where $n &lt; N$, then the mapping from $R$ to $T$ that results
-in the smallest uniform error is given by keeping the first $n$ bits
+\]</div>
+<p>since, the mapping from <span class="arithmatex">\(R\)</span> to <span class="arithmatex">\(T\)</span> must be non-injective, i.e.,
+at least two values in <span class="arithmatex">\(R\)</span> map to the same value in <span class="arithmatex">\(T\)</span>.</p>
+<p>Depending on how <span class="arithmatex">\(T\)</span> represents <span class="arithmatex">\(R\)</span>, there may be variability
+in the approximation error over the values in <span class="arithmatex">\(R\)</span>.</p>
+<p>Suppose <span class="arithmatex">\(R\)</span> represents numbers as a sequence of <span class="arithmatex">\(N\)</span> bits, where
+the <span class="arithmatex">\(k\)</span>-th most significant bit is the <span class="arithmatex">\(k\)</span>-th element of the sequence.</p>
+<p>Then, if <span class="arithmatex">\(T\)</span> models numbers in the same way, except with <span class="arithmatex">\(n\)</span> bit
+sequences where <span class="arithmatex">\(n &lt; N\)</span>, then the mapping from <span class="arithmatex">\(R\)</span> to <span class="arithmatex">\(T\)</span> that results
+in the smallest uniform error is given by keeping the first <span class="arithmatex">\(n\)</span> bits
 of the sequence.</p>
 <p>If we do this, the error is bounded by</p>
-<p>$$
+<div class="arithmatex">\[
     [0,2^(N-n)].
-$$</p>
+\]</div>
 <p>If we only wish to view this as a Bernoulli approximation, then</p>
-<p>$$
+<div class="arithmatex">\[
     P[T(X) == R(X) | X ~ UNIF(R)] = 2^-(N-n)
-$$</p>
-<p>where $UNIF(R)$ is the discrete uniform distribution over $R$.</p>
-<p>If $R$ is an infinite set, like the real numbers, then $T$, as a
+\]</div>
+<p>where <span class="arithmatex">\(UNIF(R)\)</span> is the discrete uniform distribution over <span class="arithmatex">\(R\)</span>.</p>
+<p>If <span class="arithmatex">\(R\)</span> is an infinite set, like the real numbers, then <span class="arithmatex">\(T\)</span>, as a
 finite precision representation, can only exactly model a finite number
-of numbers on the order of $O(2^n)$ and the probability $P[T(X) == R(X)]$
-is zero unless we assign non-zero probability to specific values of $X$
-in the domain of $T$.</p></div>
+of numbers on the order of <span class="arithmatex">\(O(2^n)\)</span> and the probability <span class="arithmatex">\(P[T(X) == R(X)]\)</span>
+is zero unless we assign non-zero probability to specific values of <span class="arithmatex">\(X\)</span>
+in the domain of <span class="arithmatex">\(T\)</span>.</p></div>
             </div>
         </div>
 
@@ -149,6 +149,9 @@ in the domain of $T$.</p></div>
                 shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
         </script>
         <script src="../js/base.js" defer></script>
+        <script src="../js/mathjax.js" defer></script>
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6" defer></script>
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" defer></script>
         <script src="../search/main.js" defer></script>
 
         <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">

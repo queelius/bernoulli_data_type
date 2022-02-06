@@ -116,103 +116,103 @@ and returning the first sample with no collisions.</p>
 outcome is geometrically distributed with probability of no
 collision 1-r and thus there are expected to be 1/(1-r) trials.</p>
 <h2 id="bernoulli-algorithm-is_sorted-bool-bernoullibool">Bernoulli algorithm: is_sorted : bool* -&gt; bernoulli&lt;?,bool&gt;</h2>
-<p>Suppose we have a sequence of $n$ elements.</p>
+<p>Suppose we have a sequence of <span class="arithmatex">\(n\)</span> elements.</p>
 <p>If we want to determine if the sequence is sorted, we may do a single pass
-through the sequence, checking that $x_i \leq x_{i+1}$ for $i=1,...,n-1$.</p>
-<p>However, $O(n)$ may be too slow for whatever reason.
+through the sequence, checking that <span class="arithmatex">\(x_i \leq x_{i+1}\)</span> for <span class="arithmatex">\(i=1,...,n-1\)</span>.</p>
+<p>However, <span class="arithmatex">\(O(n)\)</span> may be too slow for whatever reason.
 Alternatively, we could <em>sample</em> (without replacement) a subset and determine if
 the subset is sorted and use that information to estimate, with some probability
 of error, that the larger collection is sorted.</p>
-<p>Assume the sequence contains values sampled uniformly from a value type $X$.</p>
-<p>Say we have a sequence of $3$ Boolean values, $0$ or $1$, and we check the
+<p>Assume the sequence contains values sampled uniformly from a value type <span class="arithmatex">\(X\)</span>.</p>
+<p>Say we have a sequence of <span class="arithmatex">\(3\)</span> Boolean values, <span class="arithmatex">\(0\)</span> or <span class="arithmatex">\(1\)</span>, and we check the
 first two values for sortedness. What is the probability the sequence is sorted
 if we assume the Boolean values are sampled uniformly at random?</p>
-<p>There are $2^n = 2^4 = 16$ possible sequences over Boolean values.</p>
-<p>$$
-    {
+<p>There are <span class="arithmatex">\(2^n = 2^4 = 16\)</span> possible sequences over Boolean values.</p>
+<div class="arithmatex">\[
+    \{
         (0, 0, 0, 0),
         (0, 0, 0, 1),
         (0, 0, 1, 0),
-        (0, 0, 1, 1),\
+        (0, 0, 1, 1),\\
         (0, 1, 0, 0),
         (0, 1, 0, 1),
         (0, 1, 1, 0),
-        (0, 1, 1, 1),\
+        (0, 1, 1, 1),\\
         (1, 0, 0, 0),
         (1, 0, 0, 1),
         (1, 0, 1, 0),
-        (1, 0, 1, 1),\
+        (1, 0, 1, 1),\\
         (1, 1, 0, 0),
         (1, 1, 0, 1),
         (1, 1, 1, 0),
         (1, 1, 1, 1)
-    }.
-$$</p>
-<p>Of these, those that are in order, assuming $0 &lt; 1$, are given by</p>
-<p>$$
-    {
+    \}.
+\]</div>
+<p>Of these, those that are in order, assuming <span class="arithmatex">\(0 &lt; 1\)</span>, are given by</p>
+<div class="arithmatex">\[
+    \{
         (0, 0, 0, 0),
         (0, 0, 0, 1),
-        (0, 0, 1, 1),\
+        (0, 0, 1, 1),\\
         (0, 1, 1, 1),
         (1, 1, 1, 1)
-    }.
-$$</p>
+    \}.
+\]</div>
 <h3 id="case-m1">Case m=1</h3>
-<p>If we sample $m=1$, this is <em>always</em> sorted. Recall that we assume that the
-collection has elements sampled uniformly from $X := \rm{Boolean}$. So, what is
+<p>If we sample <span class="arithmatex">\(m=1\)</span>, this is <em>always</em> sorted. Recall that we assume that the
+collection has elements sampled uniformly from <span class="arithmatex">\(X := \rm{Boolean}\)</span>. So, what is
 the probability that the larger collection is ordered?</p>
-<p>If we sampled a $0$, we look at all the ordered sub-samples that contain $0$ and
-then divide it by the total number of sub-samples that contain $0$.
-There are $4$ ordered sub-samples that contain $0$ and there are $15$ sub-samples
-that contain $0$, thus the probability that the collection is sorted is given
-by $4/15$.</p>
-<p>If we sampled a $1$, then we see there are $4$ ordered sub-samples that contain
-$1$ and $15$ sub-samples that contain $1$. Again, the probability comes out to
-$4/15$.</p>
-<p>In each case, the probability that $\rm{is_sorted}$ outputs an erroneous value
-is $11/15$.
+<p>If we sampled a <span class="arithmatex">\(0\)</span>, we look at all the ordered sub-samples that contain <span class="arithmatex">\(0\)</span> and
+then divide it by the total number of sub-samples that contain <span class="arithmatex">\(0\)</span>.
+There are <span class="arithmatex">\(4\)</span> ordered sub-samples that contain <span class="arithmatex">\(0\)</span> and there are <span class="arithmatex">\(15\)</span> sub-samples
+that contain <span class="arithmatex">\(0\)</span>, thus the probability that the collection is sorted is given
+by <span class="arithmatex">\(4/15\)</span>.</p>
+<p>If we sampled a <span class="arithmatex">\(1\)</span>, then we see there are <span class="arithmatex">\(4\)</span> ordered sub-samples that contain
+<span class="arithmatex">\(1\)</span> and <span class="arithmatex">\(15\)</span> sub-samples that contain <span class="arithmatex">\(1\)</span>. Again, the probability comes out to
+<span class="arithmatex">\(4/15\)</span>.</p>
+<p>In each case, the probability that <span class="arithmatex">\(\rm{is_sorted}\)</span> outputs an erroneous value
+is <span class="arithmatex">\(11/15\)</span>.
 This calls for a larger sample.</p>
 <h3 id="case-m2">Case m=2</h3>
-<p>If we sample $m=2$, what is the probability that the larger collection is ordered
+<p>If we sample <span class="arithmatex">\(m=2\)</span>, what is the probability that the larger collection is ordered
 if the sample is ordered? The possible ordered sub-samples are given by</p>
-<p>$$
-    {
+<div class="arithmatex">\[
+    \{
         (0,0),(0,1),(1,1)
-    }.
-$$</p>
-<p>If we sampled a $(0,0)$, we look at all the ordered sub-samples that contain
-$(0,0)$ and then divide it by the total number of sub-samples that contain $(0,0)$.
-There are $3$ ordered sub-samples that contain $(0,0)$ and there are $8$ sub-samples
-that contain $(0,0)$, thus the probability that the collection is sorted is given
-by $3/8$.</p>
-<p>If we sampled a $(0,1)$, then we see there are $3$ ordered sub-samples that contain
-$(0,1)$ and $11$ sub-samples that contain $(0,1)$, thus the probability that the collection is sorted is given by $3/11$.</p>
-<p>If we sampled a $(1,1)$, then we see there are $3$ ordered sub-samples that contain
-$(1,1)$ and $8$ sub-samples that contain $(1,1)$, thus the probability that the collection is sorted is given by $3/8$.</p>
+    \}.
+\]</div>
+<p>If we sampled a <span class="arithmatex">\((0,0)\)</span>, we look at all the ordered sub-samples that contain
+<span class="arithmatex">\((0,0)\)</span> and then divide it by the total number of sub-samples that contain <span class="arithmatex">\((0,0)\)</span>.
+There are <span class="arithmatex">\(3\)</span> ordered sub-samples that contain <span class="arithmatex">\((0,0)\)</span> and there are <span class="arithmatex">\(8\)</span> sub-samples
+that contain <span class="arithmatex">\((0,0)\)</span>, thus the probability that the collection is sorted is given
+by <span class="arithmatex">\(3/8\)</span>.</p>
+<p>If we sampled a <span class="arithmatex">\((0,1)\)</span>, then we see there are <span class="arithmatex">\(3\)</span> ordered sub-samples that contain
+<span class="arithmatex">\((0,1)\)</span> and <span class="arithmatex">\(11\)</span> sub-samples that contain <span class="arithmatex">\((0,1)\)</span>, thus the probability that the collection is sorted is given by <span class="arithmatex">\(3/11\)</span>.</p>
+<p>If we sampled a <span class="arithmatex">\((1,1)\)</span>, then we see there are <span class="arithmatex">\(3\)</span> ordered sub-samples that contain
+<span class="arithmatex">\((1,1)\)</span> and <span class="arithmatex">\(8\)</span> sub-samples that contain <span class="arithmatex">\((1,1)\)</span>, thus the probability that the collection is sorted is given by <span class="arithmatex">\(3/8\)</span>.</p>
 <p>The probability of error is still probably too large.</p>
 <h3 id="case-m3">Case m=3</h3>
-<p>If we sample $m=3$, what is the probability that the larger collection is ordered
+<p>If we sample <span class="arithmatex">\(m=3\)</span>, what is the probability that the larger collection is ordered
 if the sample is ordered? The possible ordered sub-samples are given by</p>
-<p>$$
-    {
+<div class="arithmatex">\[
+    \{
         (0,0,0),(0,0,1),(0,1,1),(1,1,1)
-    }.
-$$</p>
-<p>If we sampled a $(0,0,0)$, we look at all the ordered sub-samples that contain
-$(0,0,0)$ and then divide it by the total number of sub-samples that contain $(0,0,0)$.
-There are $2$ ordered sub-samples that contain $(0,0,0)$ and there are $3$ sub-samples
-that contain $(0,0,0)$, thus the probability that the collection is sorted is given
-by $2/3$.</p>
-<p>If we sampled a $(0,0,1)$, then we see there are $2$ ordered sub-samples that contain
-$(0,0,1)$ and $4$ sub-samples that contain $(0,0,1)$, thus the probability that the collection is sorted is given by $2/4=1/2$.</p>
-<p>If we sampled a $(0,1,1)$, then we see there are $2$ ordered sub-samples that contain
-$(1,1)$ and $4$ sub-samples that contain $(0,1,1)$, thus the probability that the collection is sorted is given by $3/8$.</p>
-<p>If we sampled a $(1,1,1)$, then we see there are $2$ ordered sub-samples that contain
-$(1,1,1)$ and $3$ sub-samples that contain $(1,1,1)$, thus the probability that the collection is sorted is given by $2/3$.</p>
+    \}.
+\]</div>
+<p>If we sampled a <span class="arithmatex">\((0,0,0)\)</span>, we look at all the ordered sub-samples that contain
+<span class="arithmatex">\((0,0,0)\)</span> and then divide it by the total number of sub-samples that contain <span class="arithmatex">\((0,0,0)\)</span>.
+There are <span class="arithmatex">\(2\)</span> ordered sub-samples that contain <span class="arithmatex">\((0,0,0)\)</span> and there are <span class="arithmatex">\(3\)</span> sub-samples
+that contain <span class="arithmatex">\((0,0,0)\)</span>, thus the probability that the collection is sorted is given
+by <span class="arithmatex">\(2/3\)</span>.</p>
+<p>If we sampled a <span class="arithmatex">\((0,0,1)\)</span>, then we see there are <span class="arithmatex">\(2\)</span> ordered sub-samples that contain
+<span class="arithmatex">\((0,0,1)\)</span> and <span class="arithmatex">\(4\)</span> sub-samples that contain <span class="arithmatex">\((0,0,1)\)</span>, thus the probability that the collection is sorted is given by <span class="arithmatex">\(2/4=1/2\)</span>.</p>
+<p>If we sampled a <span class="arithmatex">\((0,1,1)\)</span>, then we see there are <span class="arithmatex">\(2\)</span> ordered sub-samples that contain
+<span class="arithmatex">\((1,1)\)</span> and <span class="arithmatex">\(4\)</span> sub-samples that contain <span class="arithmatex">\((0,1,1)\)</span>, thus the probability that the collection is sorted is given by <span class="arithmatex">\(3/8\)</span>.</p>
+<p>If we sampled a <span class="arithmatex">\((1,1,1)\)</span>, then we see there are <span class="arithmatex">\(2\)</span> ordered sub-samples that contain
+<span class="arithmatex">\((1,1,1)\)</span> and <span class="arithmatex">\(3\)</span> sub-samples that contain <span class="arithmatex">\((1,1,1)\)</span>, thus the probability that the collection is sorted is given by <span class="arithmatex">\(2/3\)</span>.</p>
 <p>The probability of error is still probably too large.
-However, if we sample $m=4$, the probability of error is $0$ since this reduces
-to the exact $\rm{is_ordered}$ test function.</p></div>
+However, if we sample <span class="arithmatex">\(m=4\)</span>, the probability of error is <span class="arithmatex">\(0\)</span> since this reduces
+to the exact <span class="arithmatex">\(\rm{is_ordered}\)</span> test function.</p></div>
             </div>
         </div>
 
@@ -225,6 +225,9 @@ to the exact $\rm{is_ordered}$ test function.</p></div>
                 shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
         </script>
         <script src="../js/base.js" defer></script>
+        <script src="../js/mathjax.js" defer></script>
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6" defer></script>
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" defer></script>
         <script src="../search/main.js" defer></script>
 
         <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
