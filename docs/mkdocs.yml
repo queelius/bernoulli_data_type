@@ -1,10 +1,12 @@
 site_name: Amusement Park Simulation
 nav:
   - Home: README.md
-  - About: ABOUT.md
-  - Algorithms: BERNOULLI_ALGORITHMS.md
-  - Types:
-    - Numbers: types/NUMBER_TYPE.md
-    - Sets: types/BERNOULLI_SETS.md
+  - Algorithm: BERNOULLI_ALGORITHMS.md
+  - Algebra: BERNOULLI_ALGEBRAS.md
+  - Relation: BERNOULLI_RELATION.md
+  - "Normal form": NORMAL_FORMS.md
+  - Numbers: NUMBER_TYPE.md
+  - "Perfect hash filter": PHF.md
+  - Values: VALUE.md
 theme:
   name: mkdocs
