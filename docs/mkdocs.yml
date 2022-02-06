@@ -2,11 +2,9 @@ site_name: Amusement Park Simulation
 nav:
   - Home: README.md
   - About: ABOUT.md
-  - Algorithms:
-    - "Ping Pong": types/NUMBER_TYPE.md
-    - Balloon: games/balloon.md
-  - Rides:
-    - "Scary Coaster": rides/scary.md
-    - "Drop of Doom": rides/drop.md
+  - Algorithms: BERNOULLI_ALGORITHMS.md
+  - Types:
+    - Numbers: types/NUMBER_TYPE.md
+    - Sets: types/BERNOULLI_SETS.md
 theme:
-  name: material
+  name: mkdocs
