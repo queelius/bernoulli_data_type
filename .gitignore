@@ -4,6 +4,7 @@
 # tracked
 !/.gitignore
 
+/docs/site/
 /build* 
 main.pdf
 *.out

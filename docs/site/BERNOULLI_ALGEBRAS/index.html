@@ -107,47 +107,47 @@
 structure.</p>
 <p>A groupoid is...</p>
 <p>A monoid</p>
-<p>$$
+<div class="arithmatex">\[
     (X,+,1)
-$$</p>
+\]</div>
 <p>is one of the simplest and useful algebraic structures.
 It defines a binary operation</p>
-<p>$$
+<div class="arithmatex">\[
     + : X \mapsto X \mapsto X
-$$</p>
-<p>where $+$ is associative and there exists an element $e$ such that
-$a + e = a$ for any $a in X$.</p>
+\]</div>
+<p>where <span class="arithmatex">\(+\)</span> is associative and there exists an element <span class="arithmatex">\(e\)</span> such that
+<span class="arithmatex">\(a + e = a\)</span> for any <span class="arithmatex">\(a in X\)</span>.</p>
 <p>If the random approximate map is *rate-distorted, for instance, then
-the identity $e$ cannot be guaranteed. However, if there is a total
-order on $X$, then $x (+) y$ can be defined as</p>
-<p>$$
+the identity <span class="arithmatex">\(e\)</span> cannot be guaranteed. However, if there is a total
+order on <span class="arithmatex">\(X\)</span>, then <span class="arithmatex">\(x (+) y\)</span> can be defined as</p>
+<div class="arithmatex">\[
 x + y :=
 \begin{cases}
-    x + y &amp; x \leq y\
+    x + y &amp; x \leq y\\
     y + x &amp; y &lt; x.
 \end{cases}
-$$</p>
-<p>if $x &lt; y$, $y + x$ can be converted to $x + y$
+\]</div>
+<p>if <span class="arithmatex">\(x &lt; y\)</span>, <span class="arithmatex">\(y + x\)</span> can be converted to <span class="arithmatex">\(x + y\)</span>
 such that the commutative law (Abelian) is in the computational basis
 of random approximate maps (even if the values it maps have some non-zero loss). Alterantively, to try to minimize loss, if there is some function</p>
-<p>$$
+<div class="arithmatex">\[
     avg : X \mapsto X \mapsto X
-$$</p>
-<p>then $x (+) y$ can be defined as</p>
-<p>$$
+\]</div>
+<p>then <span class="arithmatex">\(x (+) y\)</span> can be defined as</p>
+<div class="arithmatex">\[
     x (+) y := avg(x + y, y + x),
-$$</p>
-<p>which may reduce the expected loss on $(+)$ with respect to $+$,
-assuming that the random approximate commutative map $+$ attempted to map both $x$ to $y$ and $y$ to $x$. Of course, if the random approximate commutative map only attempted to map $x$ to $y$, $x &lt; y$, with the understanding that it is Abelian and will convert $y + x$ to $x + y$, then this latter approach is expected to have more loss.</p>
-<p>However, the associative law cannot be guaranteed. For instance, given a set $X = {x_1,\ldots,x_n$ and a total order $x_1 &lt; x_2 \ldots &lt; x_n$. Then, $x_2 + x_3 + x_4 = x_2 + (x_3 + x_4)$ which may be computed as following:
-    1. Let $a = x_3 + x_4$.
-    2. If $a &lt; x_2$, then the result is $a + x_2$ else $x_2 + a$.</p>
-<p>Alternatively, by the associative law, $x_2 + x_3 + x_4 = (x_2 + x_3) + x_4$, which may be computed as following:
-    1. Let $b = x_2 + x_3$.
-    2. If $b &lt; x_4$, then the result is $b + x_4$ else $x_4 + b$.</p>
-<p>In the above, the first one neither computes $x_2 + x_3$ nor $the second
-one never computes $x_3 + x_4$, a</p>
-<p>We say that two tuples $x$ and $y$ are <em>related</em> by $R$ if $(x,y) \in R$. Relations have many properties, like symmetry,
+\]</div>
+<p>which may reduce the expected loss on <span class="arithmatex">\((+)\)</span> with respect to <span class="arithmatex">\(+\)</span>,
+assuming that the random approximate commutative map <span class="arithmatex">\(+\)</span> attempted to map both <span class="arithmatex">\(x\)</span> to <span class="arithmatex">\(y\)</span> and <span class="arithmatex">\(y\)</span> to <span class="arithmatex">\(x\)</span>. Of course, if the random approximate commutative map only attempted to map <span class="arithmatex">\(x\)</span> to <span class="arithmatex">\(y\)</span>, <span class="arithmatex">\(x &lt; y\)</span>, with the understanding that it is Abelian and will convert <span class="arithmatex">\(y + x\)</span> to <span class="arithmatex">\(x + y\)</span>, then this latter approach is expected to have more loss.</p>
+<p>However, the associative law cannot be guaranteed. For instance, given a set <span class="arithmatex">\(X = \{x_1,\ldots,x_n\)</span> and a total order <span class="arithmatex">\(x_1 &lt; x_2 \ldots &lt; x_n\)</span>. Then, <span class="arithmatex">\(x_2 + x_3 + x_4 = x_2 + (x_3 + x_4)\)</span> which may be computed as following:
+    1. Let <span class="arithmatex">\(a = x_3 + x_4\)</span>.
+    2. If <span class="arithmatex">\(a &lt; x_2\)</span>, then the result is <span class="arithmatex">\(a + x_2\)</span> else <span class="arithmatex">\(x_2 + a\)</span>.</p>
+<p>Alternatively, by the associative law, <span class="arithmatex">\(x_2 + x_3 + x_4 = (x_2 + x_3) + x_4\)</span>, which may be computed as following:
+    1. Let <span class="arithmatex">\(b = x_2 + x_3\)</span>.
+    2. If <span class="arithmatex">\(b &lt; x_4\)</span>, then the result is <span class="arithmatex">\(b + x_4\)</span> else <span class="arithmatex">\(x_4 + b\)</span>.</p>
+<p>In the above, the first one neither computes <span class="arithmatex">\(x_2 + x_3\)</span> nor $the second
+one never computes <span class="arithmatex">\(x_3 + x_4\)</span>, a</p>
+<p>We say that two tuples <span class="arithmatex">\(x\)</span> and <span class="arithmatex">\(y\)</span> are <em>related</em> by <span class="arithmatex">\(R\)</span> if <span class="arithmatex">\((x,y) \in R\)</span>. Relations have many properties, like symmetry,
 reflectivity, transitivity, and other properties like being functional
 over some projection.</p>
 <p>We may re-use a concrete model of random approximate sets to construct
@@ -158,26 +158,26 @@ representable, like transitivity. We see that the random approximate relation mo
 a <em>computational basis</em> that is a subset of the relational model.</p>
 <p>For instance, random approximate binary symmetric relations are trivially
 representable by taking the <em>symmetric closure</em> of random approximate
-binary relations. For instance, given a binary relation $R := A x A$ and
-a total order $&lt;= : A x A$, the symmetric closure of a binary relation
-$R := A x A$ may be obtained <em>ordering</em> $x,y in A$ such that, if $x &lt; y$,
-$y R x$ is converted to $x R y$ (and $x R y$ is unchanged).</p>
-<p>If $R := A x B$, and we have isomorphisms $f : A \mapsto C$ and $ g : B \mapsto C$
-with $&lt;= : C x C$, then if $f x &lt; f y$, $y R x$ is converted into $x R y$.
+binary relations. For instance, given a binary relation <span class="arithmatex">\(R := A x A\)</span> and
+a total order <span class="arithmatex">\(&lt;= : A x A\)</span>, the symmetric closure of a binary relation
+<span class="arithmatex">\(R := A x A\)</span> may be obtained <em>ordering</em> <span class="arithmatex">\(x,y in A\)</span> such that, if <span class="arithmatex">\(x &lt; y\)</span>,
+<span class="arithmatex">\(y R x\)</span> is converted to <span class="arithmatex">\(x R y\)</span> (and <span class="arithmatex">\(x R y\)</span> is unchanged).</p>
+<p>If <span class="arithmatex">\(R := A x B\)</span>, and we have isomorphisms <span class="arithmatex">\(f : A \mapsto C\)</span> and $ g : B \mapsto C$
+with <span class="arithmatex">\(&lt;= : C x C\)</span>, then if <span class="arithmatex">\(f x &lt; f y\)</span>, <span class="arithmatex">\(y R x\)</span> is converted into <span class="arithmatex">\(x R y\)</span>.
 NOPE...</p>
 <p>As approximate sets, approximate relations have the usual set-theoretic
 operations like complements and unions. They have additional operations,
 however, like selection, projection, and joins which have a different
 sorts of approximation errors.</p>
 <p>In additional to a Boolean algebra, relational properties
-provide additional query structure, like $a$ is between $b$ and $c$
-if $(a,b,c) \in B$ or $a$ is adjacent to $b$ if $a A b$. Other types
+provide additional query structure, like <span class="arithmatex">\(a\)</span> is between <span class="arithmatex">\(b\)</span> and <span class="arithmatex">\(c\)</span>
+if <span class="arithmatex">\((a,b,c) \in B\)</span> or <span class="arithmatex">\(a\)</span> is adjacent to <span class="arithmatex">\(b\)</span> if <span class="arithmatex">\(a A b\)</span>. Other types
 of queries, with their own source of approximation error, may
 be constructed from these, e.g., we may approximate the relation
-$x_1 x_2 \ldots x_n \in S$, where $S$ represents 'is a sequence',
-with the adacent relation $A$ as follows: $x_1 x_2 \ldots x_n$ is
-a sequence in $S$ if $x_1 A x_2$ and $x_2 A x_3$ and $\ldots$ and
-$x_{n-1} A x_n$.</p>
+<span class="arithmatex">\(x_1 x_2 \ldots x_n \in S\)</span>, where <span class="arithmatex">\(S\)</span> represents 'is a sequence',
+with the adacent relation <span class="arithmatex">\(A\)</span> as follows: <span class="arithmatex">\(x_1 x_2 \ldots x_n\)</span> is
+a sequence in <span class="arithmatex">\(S\)</span> if <span class="arithmatex">\(x_1 A x_2\)</span> and <span class="arithmatex">\(x_2 A x_3\)</span> and <span class="arithmatex">\(\ldots\)</span> and
+<span class="arithmatex">\(x_{n-1} A x_n\)</span>.</p>
 <p>For more on the random approximate set model, see
 https://github.com/queelius/random_approximate_relation_model.</p>
 <p>template <int N, typename T>
@@ -227,6 +227,9 @@ bernoulli<N,T> join(bernoulli<N,T> x)
                 shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
         </script>
         <script src="../js/base.js" defer></script>
+        <script src="../js/mathjax.js" defer></script>
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6" defer></script>
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" defer></script>
         <script src="../search/main.js" defer></script>
 
         <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">

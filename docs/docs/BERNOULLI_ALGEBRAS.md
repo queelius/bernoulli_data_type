@@ -1,4 +1,4 @@
-# Random approximate alebras
+# Bernoulli alegebras
 
 A random approximate algebra is a random approximate map with additional
 structure.

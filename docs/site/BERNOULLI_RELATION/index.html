@@ -105,7 +105,7 @@
 <h1 id="random-approximate-relations">Random approximate relations</h1>
 <p>A random approximate relation is a random approximate set with additional
 structure between tuples of elements in the set.</p>
-<p>We say that two tuples $x$ and $y$ are <em>related</em> by $R$ if $(x,y) \in R$. Relations have many properties, like symmetry,
+<p>We say that two tuples <span class="arithmatex">\(x\)</span> and <span class="arithmatex">\(y\)</span> are <em>related</em> by <span class="arithmatex">\(R\)</span> if <span class="arithmatex">\((x,y) \in R\)</span>. Relations have many properties, like symmetry,
 reflectivity, transitivity, and other properties like being functional
 over some projection.</p>
 <p>We may re-use a concrete model of random approximate sets to construct
@@ -116,26 +116,26 @@ representable, like transitivity. We see that the random approximate relation mo
 a <em>computational basis</em> that is a subset of the relational model.</p>
 <p>For instance, random approximate binary symmetric relations are trivially
 representable by taking the <em>symmetric closure</em> of random approximate
-binary relations. For instance, given a binary relation $R := A x A$ and
-a total order $&lt;= : A x A$, the symmetric closure of a binary relation
-$R := A x A$ may be obtained <em>ordering</em> $x,y in A$ such that, if $x &lt; y$,
-$y R x$ is converted to $x R y$ (and $x R y$ is unchanged).</p>
-<p>If $R := A x B$, and we have isomorphisms $f : A -&gt; C$ and $ g : B -&gt; C$
-with $&lt;= : C x C$, then if $f x &lt; f y$, $y R x$ is converted into $x R y$.
+binary relations. For instance, given a binary relation <span class="arithmatex">\(R := A x A\)</span> and
+a total order <span class="arithmatex">\(&lt;= : A x A\)</span>, the symmetric closure of a binary relation
+<span class="arithmatex">\(R := A x A\)</span> may be obtained <em>ordering</em> <span class="arithmatex">\(x,y in A\)</span> such that, if <span class="arithmatex">\(x &lt; y\)</span>,
+<span class="arithmatex">\(y R x\)</span> is converted to <span class="arithmatex">\(x R y\)</span> (and <span class="arithmatex">\(x R y\)</span> is unchanged).</p>
+<p>If <span class="arithmatex">\(R := A x B\)</span>, and we have isomorphisms <span class="arithmatex">\(f : A -&gt; C\)</span> and $ g : B -&gt; C$
+with <span class="arithmatex">\(&lt;= : C x C\)</span>, then if <span class="arithmatex">\(f x &lt; f y\)</span>, <span class="arithmatex">\(y R x\)</span> is converted into <span class="arithmatex">\(x R y\)</span>.
 NOPE...</p>
 <p>As approximate sets, approximate relations have the usual set-theoretic
 operations like complements and unions. They have additional operations,
 however, like selection, projection, and joins which have a different
 sorts of approximation errors.</p>
 <p>In additional to a Boolean algebra, relational properties
-provide additional query structure, like $a$ is between $b$ and $c$
-if $(a,b,c) \in B$ or $a$ is adjacent to $b$ if $a A b$. Other types
+provide additional query structure, like <span class="arithmatex">\(a\)</span> is between <span class="arithmatex">\(b\)</span> and <span class="arithmatex">\(c\)</span>
+if <span class="arithmatex">\((a,b,c) \in B\)</span> or <span class="arithmatex">\(a\)</span> is adjacent to <span class="arithmatex">\(b\)</span> if <span class="arithmatex">\(a A b\)</span>. Other types
 of queries, with their own source of approximation error, may
 be constructed from these, e.g., we may approximate the relation
-$x_1 x_2 \ldots x_n \in S$, where $S$ represents 'is a sequence',
-with the adacent relation $A$ as follows: $x_1 x_2 \ldots x_n$ is
-a sequence in $S$ if $x_1 A x_2$ and $x_2 A x_3$ and $\ldots$ and
-$x_{n-1} A x_n$.</p>
+<span class="arithmatex">\(x_1 x_2 \ldots x_n \in S\)</span>, where <span class="arithmatex">\(S\)</span> represents 'is a sequence',
+with the adacent relation <span class="arithmatex">\(A\)</span> as follows: <span class="arithmatex">\(x_1 x_2 \ldots x_n\)</span> is
+a sequence in <span class="arithmatex">\(S\)</span> if <span class="arithmatex">\(x_1 A x_2\)</span> and <span class="arithmatex">\(x_2 A x_3\)</span> and <span class="arithmatex">\(\ldots\)</span> and
+<span class="arithmatex">\(x_{n-1} A x_n\)</span>.</p>
 <p>For more on the random approximate set model, see
 https://github.com/queelius/random_approximate_relation_model.</p></div>
             </div>
@@ -150,6 +150,9 @@ https://github.com/queelius/random_approximate_relation_model.</p></div>
                 shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
         </script>
         <script src="../js/base.js" defer></script>
+        <script src="../js/mathjax.js" defer></script>
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6" defer></script>
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" defer></script>
         <script src="../search/main.js" defer></script>
 
         <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">

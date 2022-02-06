@@ -1,4 +1,4 @@
-site_name: Amusement Park Simulation
+site_name: The concept of Bernoulli types
 nav:
   - Home: README.md
   - Algorithm: BERNOULLI_ALGORITHM.md
@@ -8,9 +8,6 @@ nav:
   - Numbers: NUMBER_TYPE.md
   - "Perfect hash filter": PHF.md
   - Values: VALUE.md
-
-theme:
-  name: readthedocs
 
 markdown_extensions:
   - pymdownx.arithmatex:
