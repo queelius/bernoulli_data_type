@@ -1,1 +1,12 @@
-site_name: My Docs
+site_name: Amusement Park Simulation
+nav:
+  - Home: README.md
+  - About: ABOUT.md
+  - Algorithms:
+    - "Ping Pong": types/NUMBER_TYPE.md
+    - Balloon: games/balloon.md
+  - Rides:
+    - "Scary Coaster": rides/scary.md
+    - "Drop of Doom": rides/drop.md
+theme:
+  name: material
