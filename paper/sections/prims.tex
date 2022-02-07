@@ -1,0 +1,91 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+\section{Primitive approximate \emph{values}}
+Here are a basic list of primitive algebraic data types and operations on types.
+
+These are \emph{first-order} approximate types since t
+
+\subsection{Void type}
+The most primitive type is the \emph{empty set} type, denoted by \Void.
+There are no elements in the empty set and therefore it is not possible to construct values of this type.
+There is only one function in the set $\Void \mapsto \Set{X}$, known as the \emph{absurd} function since it can never be invoked.
+Since \Void has no values, $\AT{\Void}$ is equivalent to \Void.
+
+$\AT{\Void}$ is necessary to complete the algebra of algebraic data types, but serves only a theoretical purpose.
+
+\subsection{Unit type}
+The \emph{unit} type, denoted by \Unit, is isomorphic to any set with only a single element, i.e., any \emph{singleton set}.
+The set $\Unit \mapsto \Set{X}$ has a cardinality $\Card{\Set{X}}$ and the set $\Set{X} \mapsto \Unit$ has a cardinality $1$.
+If we are talking about \emph{partial} functions, then $\Set{X} \pfun \Unit$ has cardinality $2^{\Set{X}}$.
+
+The set $\Unit \mapsto \Unit$ has a cardinality of $1$, which is the identity function $\IdFun \colon \Unit \mapsto \Unit$.
+
+The approximate unit type $\AT{\Unit}$ is necessary to complete the algebra, but given a void \Unit type, similar to the \Void type there is no uncertainty about its value, i.e., $\AT{\Unit}$ is equivalent to \Unit.
+
+In addition, if there is some function $\Fun{f} \colon \Unit \mapsto \Set{X}$ its approximate analog is $\APFun{f} \colon \Unit \mapsto \Set{X}$, which models an \emph{approximate} constant.
+
+\subsection{Sum types}
+
+A sum type $X + Y$ is the disjoint union of types $X$ and $Y$.
+The \emph{first-order} approximate sum type $\AT{\left(X + Y\right)}$ is an approximate of the type $X+Y$.
+
+The \emph{higher-order} sum type is different, e.g., $\AT{X} + \AT{Y}$ is a higher order sum type, as is $\AT{X} + Y$ and $\AT{\left(\AT{X} + \AT{Y}\right)}$ is even a higher order.
+
+If we replace $X$ and $Y$ by $\AT{X}$ and $\AT{Y}$, we have a sum type $\AT{X} + \AT{Y}$.
+
+Values of these types are naturally constructed from approximate maps that map to the type $X+Y$.
+
+\subsection{Product types}
+
+A product type $X \times Y$ is the Cartesian product of types $X$ and $Y$.
+If we replace $X$ and $Y$ by $\AT{X}$ and $\AT{Y}$, we have a product type $\AT{X} \times \AT{Y}$.
+
+Values of these types are naturally constructed from approximate maps that map to the type $X+Y$ and form a random approximate set over the type $X \times Y$.
+
+\subsection{Exponential types (functions)}
+
+These have already been discussed.
+Random approximate maps are the same thing as random approximate exponential types.
+	
+
+When we generate a set of approximate value types and a set of approximate functions over those value types and compose them together to generate a \emph{program}, we may consider this composition to be an \emph{approximate} program.
+
+TODO:
+A \emph{partial function} is not defined on entire domain.
+We allow elements not in the preimage, i.e., not defined by the partial function, to either correctly map to \emph{nothing} or, map to some other element in the codomain.
+The \emph{false mapping rate} $\fprate_{y}$ for element $y$ may be specified explicitly, i.e.,
+\begin{equation}
+\Prob{\Fun{f}(x) = y \Given x \notin \Dom(\Fun{f})} = \fprate_{y}\,,
+\end{equation}
+and the \emph{total} false mapping rate is
+\begin{equation}
+\sum_{y \in \Codom(\Fun{f})} \Prob{\Fun{f}(x) = y \Given x \notin \Dom(\Fun{f})} = \fprate\,,
+\end{equation}
+by the fact that each outcome is mutually exclusive (a function $\Fun{f}$ maps to only one element).
+Alternatively,
+\begin{equation}
+\sum_{y \in \Codom(\Fun{f})} \Prob{\Fun{f}(x) \neq y \Given x \notin \Dom(\Fun{f})} = 1-\fprate = \tnrate\,.
+\end{equation}
+
+\begin{example}
+	Suppose we have a predicate function $\Fun{f} \colon \Set{X} \mapsto \Bool$, i.e., set indicator.
+	Then, we may construct a partial function from $\Fun{f}$ with an \emph{approximate map} over those elements that return \True.
+	If we specify a false mapping rate $\fprate_{\False}$, this predicate is isomorphic to an approximate set over $\Set{X}$ with a false positive rate $\fprate = \fprate_{\False}$.
+	
+	An optimal approximate map obtains the information-theoretic lower-bound on the expected space complexity, $-1.44 \log_2 \fprate$ bits per positive element.
+	
+	While a random approximate set is in practice simpler to implement, theoretically an optimal approximate map is both fully generalized (for any function over any domain and codomain) and obtains the same space efficiency.
+	
+	The obfuscated approximate map has the same characteristics, and the optimal implementation is a black box that is able to increase obfuscation power for less space efficiency.
+	WORK THIS OUT EXACTly, and move all of this out of the example env of course.
+\end{example}
+
+\begin{remark}
+NOTE: Clarify: we call a value an approximate value when it should be $x$ but there is a probability it is something else due to the approximate map or some other noisy process.
+\end{remark}
+
+Most approximate maps are black boxes.
+They introduce an approximation error, and in addition, the inputs may also have an approximation error. At that point, the values being mapped to are higher-order random approximate values.
+
+\end{document}

@@ -1,0 +1,66 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+\section{Random approximate algebraic data types}
+Suppose we have a function $\Fun{g} \colon \BitSet \mapsto \BitSet$.
+
+The random approximate value type $\AT{\BitSet}[\fprate][\fnrate]$ is a \emph{monad}.
+If we provide it as input to $\Fun{g}$, we git a random approximate value type as output.
+
+That is, the function $\Fun{g}$ is lifted to the function type $\AT{\BitSet}[\fprate][\fnrate] \mapsto \AT{\BitSet}$, denoted by $\APFun{g}$.
+The output $\AT{\BitSet}$ is a random variable, in particular, it is a first-order random approximate value type.
+
+To compute its false positive and false negative rates, we simply have to compute the following.
+
+Suppose it is given the true value is $0$.
+Then, by definition, $\AT{\BitSet}[\fprate][\fnrate]$ realizes $0$ with probability $1-\fnrate$ and $1$ with probability $\fnrate$.
+Since $\Fun{g}$ is a function of a random variable, it is also a random variable (unless it is constant).
+So, the output is $\Fun{g}(0)$ with probability $1-\fnrate$ and $\Fun{g}(1)$ with probability $\fnrate$.
+That is, it has a conditional probability mass function given by
+\begin{equation}
+\Fun{p}(b \Given 0) =
+\begin{cases}
+1-\fnrate 	& \text{if $b = \Fun{g}(0)$} \\
+\fnrate	 	& \text{if $b = \Fun{g}(1)$}\,.
+\end{cases}
+\end{equation}
+
+Alternatively, assume it is given true value is $1$.
+Then, by definition, $\AT{\BitSet}[\fprate][\fnrate]$ realizes $0$ with probability $\fprate$ and $1$ with probability $1-\fprate$ and therefore the output is a random variable $\RV{O}$ that models $\AT{\BitSet}$ that realizes $\Fun{g}(0)$ with probability $1-\fnrate$ and $\Fun{g}(1)$ with probability $\fnrate$ with the conditional probability mass function given by
+\begin{equation}
+\Fun{p}_{\RV{O}}(b \Given 1) =
+\begin{cases}
+\fprate 	& \text{if $b = \Fun{g}(0)$} \\
+1-\fprate	& \text{if $b = \Fun{g}(1)$}\,.
+\end{cases}
+\end{equation}
+
+The random approximate map is the \emph{exponential type}.
+
+Other types may be generated from this type.
+
+
+A \emph{type} is a set and the elements of the set are called the \emph{values} 
+of the type. In programming languages, \emph{composite} types are typically composed in two ways, the \emph{sum type} and the \emph{product type}. The product type is a Cartesian product of types (sets).
+
+For instance, a product type may the Cartesian product of integer and Boolean types, $\IntSet \times \{0,1\}$. In the C++ family of programming language, this product type may be represented by \emph{pair<int,bool>}.
+
+Since it may be inconvenient to refer to member types by their respective tuple indices, programming languages typically allow the indices to be \emph{labeled}. In C++, keywords like \emph{struct} and \emph{class} are commonly used to provide named product types.
+
+A data type may be thought of as a product type with \emph{invariants}, or \emph{constraints} on which values member types may be assigned. Thus, it may be thought of as a \emph{relation} or \emph{correspondence} over the product type. In many cases, this may make approximate relations unsuitable for representing data types, e.g., a tuple that violates one or more of the invariants may be generated from an objective value of the data type.
+
+However, if an approximate relation does violate the invariants, it can simply be considered invalid. In this case, we may pose questions like, what is the probability that an approximate data type generates an invalid result?
+
+\begin{equation}
+\Prob{\ASet{X_1}}
+\end{equation}
+
+
+
+An \emph{abstract data type} is a type and a set of operations on values of the type. For example, the \emph{integer} abstract data type is defined by the set of integers and standard operations like addition and subtraction.
+A \emph{data structure} is a particular way of organizing data and 
+may implement one or more abstract data types.
+
+
+
+\end{document}

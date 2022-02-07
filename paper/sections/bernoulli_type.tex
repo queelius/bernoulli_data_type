@@ -1,0 +1,96 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+\section{Random approximate algebraic data types}
+%An algebraic data type is defined by a set of \emph{higher-order} operations on \emph{data types}.
+%In other words, operations on sets, like Cartesian product or disjoint union.
+Viewing a \emph{type} as a set, most programming languages have primitive types like \emph{integers}, \emph{Booleans}, and \emph{characters}.
+In C++, these are respectively denoted by \mintinline{c++}{int}, \mintinline{c++}{bool}, and \mintinline{c++}{char} with cardinalities given respectively by $2^{32}$, $2^8$, and $2^1$.
+Any type needs one or more \emph{value constructors} to construct objects that model values in that type.
+For instance, in C++ the value that denotes the Boolean value of \emph{true} is constructed with the syntax \mintinline{c++}{true}.
+
+The \emph{unit} type is special singleton set with a single value, i.e., a cardinality of $2^0$.
+In C++, the confusing notation of \mintinline{c++}{void} denotes the unit type (and the single value).
+\begin{remark}
+The \emph{absurd} type is a special type with zero values, i.e., the \emph{empty set}.
+Since there are no values in the absurd type, no values of this type can be constructed.
+There is no primitive absurd type in C++.
+\end{remark}
+
+A \emph{product type} is the $n$-fold Cartesian product of zero or more types where the zero-th product is the unit type.
+For instance, in C++, \mintinline{c++}{struct { char y, bool z }} is a \emph{named} product type and \mintinline{c++}{tuple<char,bool>}
+is the \emph{unamed} counterpart, where both are product types \mintinline{c++}{char} $\times$ \mintinline{c++}{bool}.
+The cardinality of this product type is $2^8 \cdot 2^1 = 512$.
+One way a particular value of this product type may be constructed is \mintinline{c++}{tuple<char,bool>('a', true)}.
+
+The values of a sum type are typically grouped into several classes, called variants.
+The set of all possible values of a sum type is the disjoint union of the sets of all possible values of its variants.
+For instance, in C++, \mintinline{c++}{variant<char,bool>}
+is the sum type \mintinline{c++}{char} $+$ \mintinline{c++}{bool}, which has a cardinality of $2^8 + 2^1 = 258$.
+One way a particular value of this sum type may be constructed is \mintinline{c++}{variant<char,bool>('1', true)}.
+A particularly useful type in C++ is \mintinline{c++}{optional<X>}, which conceptually models the sum type \mintinline{c++}{X} + \mintinline{c++}{void} where \mintinline{c++}{void} denotes the variant ``not a value of type \mintinline{c++}{X}.'
+\begin{remark}
+This is not valid C++ syntax, even though the unit type value should be first-class.
+\end{remark}
+The cardinality of the \mintinline{c++}{optional<X>} is the cardinality of \mintinline{c++}{X} plus $1$.
+We label the value in this singleton \emph{nothing} and may test whether a particular value is either \emph{nothing} or alternatively a value in \mintinline{c++}{X}.
+
+Exponential types are \emph{functions}.
+In C++, \mintinline{c++}{[](tuple<char,bool>) -> bool} is the set of functions \mintinline{c++}{char} $\times$ \mintinline{c++}{bool} $\mapsto$ \mintinline{c++}{bool}, which has a cardinality of $2^{512}$.
+Usually, a more convenient syntax is used, like \mintinline{c++}{[](char,bool) -> bool}.
+The constant \mintinline{c++}{true} function of the exponential type \mintinline{c++}{char} $\times$ \mintinline{c++}{bool} $\mapsto$ \mintinline{c++}{bool} may be constructed with the definition \mintinline{c++}{[](char,bool) -> bool { return true; }}.
+\begin{remark}
+The exponential type \mintinline{c++}{[](X x) -> void} is of little practical value and, in C++, usually denotes a \emph{procedure} that causes \emph{side-effects} like writing to IO.
+\end{remark}
+
+Recall that any subset of a set corresponds to a \emph{relation}. Types are \emph{subsets} of the algebraic types where subsets are defined by \emph{invariants}.
+We may compose primitive types to specify a variety of \emph{compound} types.
+\begin{example}
+\emph{Rationals} may be implemented as a product type of two integers,
+\begin{minted}{c++}
+  using Rational = tuple<int,int>,
+\end{minted}
+where the first and last elements of the tuple represent the numerator and denominator respectively.
+If the invariant is that the denominator is not $0$, then a \emph{value constructor} \mintinline{c++}{rational} $\colon$ \mintinline{c++}{int} $\times$ \mintinline{c++}{int} $\mapsto$ \mintinline{c++}{optional<Rational>} that takes a numerator and denominator and outputs either a rational or, if the invariants are violated, \emph{nothing}, is given by \cref{lst:valuector}.\footnote{Alternatively, the value constructor can be a \emph{partial function} \mintinline{c++}{rational} $\colon$ \mintinline{c++}{int} $\times$ \mintinline{c++}{int} $\pfun$ \mintinline{c++}{Rational} that is undefined for input $\Pair{x}{0}$ for any $x \in$ \mintinline{c++}{int}.}
+
+\begin{listing}[H]
+\begin{minted}
+[
+	mathescape=true,
+%	frame=single,
+%	frame=lines,
+	frame=leftline,
+	framesep=2mm,
+%	baselinestretch=.9,
+%	bgcolor=LightGray,
+%	fontsize=\footnotesize,
+%	linenos
+]{c++}
+optional<Rational> rational(int num, int denom)
+{
+  if (denom == 0)
+    return {}; // Return the value that denotes $\text{\emph{nothing}}$.  
+  return tuple<int,int>(num, denom);
+}.
+\end{minted}
+\caption{A value constructor for rationals.}
+\label{lst:valuector}
+\end{listing}
+
+The expected operators on rationals, like addition \mintinline{c++}{operator+(Rational,Rational) -> Rational}, may be implemented so that \mintinline{c++}{Rational} models the \emph{concept} of rationals.
+%As long as we use \emph{regular} functions over a regular syntax, we may substitute any rational implementation for any other to produce equivalent behavior on any algorithm.
+
+The \mintinline{c++}{Rational} type is a subset of the product type \mintinline{c++}{tuple<int,int>} and is thus
+a \emph{binary relation} on $\IntSet \times \IntSet$.
+\begin{remark}
+We implemented \mintinline{c++}{Rational} as a product type \mintinline{c++}{tuple<int,int>} and a value constructor \mintinline{c++}{rational} for pedagogical reasons, but generally programming structures like \emph{class} are utilized since they facilitate important concepts like \emph{encapsulation}.
+\end{remark}
+\end{example}
+
+Each of these types and operators has a corresponding random approximation, e.g., the exponential type is just a random approximate map, and the \emph{relations} that define types are just random approximate relations with \emph{deterministic} properties that model the invariants.
+
+The invariants may not be easy to satisfy, and so a random approximation relation of the corresponding type may not be practical.
+However, when the invariants can be satisfied, we may implement \emph{random approximate algebraic data types} of the \emph{algebraic data types}, e.g., we can compose random approximate algebraic data types as before to construct compound random approximate data types of the corresponding compound algebraic data type.
+
+This may not seem particularly useful, but it permits space-efficient representations and, moreover, concepts like \emph{oblivious algebraic data types} may be based on it with some notion of closure.
+\end{document}
