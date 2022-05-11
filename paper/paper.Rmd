@@ -1,0 +1,598 @@
+\documentclass[11pt,final,hidelinks]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage[activate={true,nocompatibility},final,tracking=true,kerning=true,spacing=true,factor=1100,stretch=10,shrink=10]{microtype}
+\microtypecontext{spacing=nonfrench}
+\usepackage[noend]{algorithm2e}
+\usepackage{caption}
+\usepackage{mathtools}
+\usepackage{commath}
+\usepackage{minted}
+\usepackage{enumerate}
+\usepackage{amsmath}
+\usepackage{subfiles}
+\usepackage{booktabs}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{pgfplots}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usepackage{tikzscale}
+\usepackage[square,numbers]{natbib}
+\bibliographystyle{plainnat}
+\usepackage{cleveref}
+\usepackage[super]{nth}
+\usepackage{siunitx}
+\usepackage[section]{placeins}
+\usepackage{subcaption}
+
+\usepackage{functionnotation}
+\usepackage[plain]{setnotation}
+\usepackage{approxsetnotation}
+\usepackage{approx_data_type_notation}
+\usepackage{probabilitynotation}
+\usepackage[fancy]{relationnotation}
+\usepackage{approxrelationnotation}
+\usepackage[section]{envnotation}
+\usepackage{algorithmnotation}
+%\usepackage{alexmisc}
+
+\newcommand{\amapsto}[2]{\,\ATOverUnder{\mapsto}[#1][\text{\raisebox{3pt}{$#2$}}]\,}
+
+\hypersetup{
+    pdftitle={Random approximate values over algebraic types},
+    pdfauthor={Alexander Towell},               % author
+    pdfsubject={computer science},              % subject of the document
+    pdfkeywords={
+        probabilistic data structure,
+        partial function,
+        random approximate set,
+        random approximate data type,
+        random approximate relation,
+        random approximate map,
+        random approximate Boolean,
+        random approximate unit,
+        random approximate sum type,
+        random approximate product type,
+        random approximate exponential type,
+        random approximate void type,
+        relation,
+        set        
+	},                    % keywords
+    colorlinks=false,                           % false: boxed links;
+    citecolor=green,                            % color of links to 
+    filecolor=magenta,                          % color of file links
+    urlcolor=green                              % color of external
+}
+
+\title
+{
+    The random approximate values over algebraic types
+}
+\author
+{
+    Alexander Towell\\
+    \texttt{atowell@siue.edu}
+}
+\date{}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+We define the semantics of \emph{random approximate values} over algebraic data types.
+\end{abstract}
+
+%\microtypesetup{protrusion=false}
+\tableofcontents
+%\microtypesetup{protrusion=true}
+
+
+%\listoffigures
+%\listofalgorithms
+
+\subfile{sections/intro}
+\subfile{sections/approx_algebraic_types2}
+\subfile{sections/prims}
+\subfile{sections/bool_alg}
+\subfile{sections/cpp}
+
+\bibliography{references}
+\end{document}
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+\section{Introduction}
+
+
+The primary mechanism by which a value is an \emph{approximation} is given by the random approximate map model.
+If a first-order random approximate map of type $X \amapsto{\fprate}{\fnrate} Y$ takes in an exact value $X$ then it maps to a random approximate value $\AT{y}[\fprate][\fnrate]$ of type $Y$.
+
+We denote that the distribution of values over a type $X$ take on random approximations with $\AT{X}$.
+The type is still the same, only the \emph{values} are different with respect to some objective standard, e.g., if $\Fun{f}$ maps a value $a$ to $b$, then ...
+
+A \emph{type} is a set and the elements of the set are called the \emph{values} of the type.
+
+These \emph{values} are approximate values if, according to some objective function they should be $x$ but take on a range of possible values according to the random approximate value model.
+
+
+An \emph{abstract data type} is a type and a set of operations on 
+values of the type.
+For example, the \emph{integer} abstract data type is defined by the set of integers and standard operations like addition and subtraction.
+A \emph{data structure} is a particular way of organizing data and may implement one or more abstract data types.
+
+
+\end{document}\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+\section{Random approximate algebraic data types}
+%An algebraic data type is defined by a set of \emph{higher-order} operations on \emph{data types}.
+%In other words, operations on sets, like Cartesian product or disjoint union.
+Viewing a \emph{type} as a set, most programming languages have primitive types like \emph{integers}, \emph{Booleans}, and \emph{characters}.
+In C++, these are respectively denoted by \mintinline{c++}{int}, \mintinline{c++}{bool}, and \mintinline{c++}{char} with cardinalities given respectively by $2^{32}$, $2^8$, and $2^1$.
+Any type needs one or more \emph{value constructors} to construct objects that model values in that type.
+For instance, in C++ the value that denotes the Boolean value of \emph{true} is constructed with the syntax \mintinline{c++}{true}.
+
+The \emph{unit} type is special singleton set with a single value, i.e., a cardinality of $2^0$.
+In C++, the confusing notation of \mintinline{c++}{void} denotes the unit type (and the single value).
+\begin{remark}
+The \emph{absurd} type is a special type with zero values, i.e., the \emph{empty set}.
+Since there are no values in the absurd type, no values of this type can be constructed.
+There is no primitive absurd type in C++.
+\end{remark}
+
+A \emph{product type} is the $n$-fold Cartesian product of zero or more types where the zero-th product is the unit type.
+For instance, in C++, \mintinline{c++}{struct { char y, bool z }} is a \emph{named} product type and \mintinline{c++}{tuple<char,bool>}
+is the \emph{unamed} counterpart, where both are product types \mintinline{c++}{char} $\times$ \mintinline{c++}{bool}.
+The cardinality of this product type is $2^8 \cdot 2^1 = 512$.
+One way a particular value of this product type may be constructed is \mintinline{c++}{tuple<char,bool>('a', true)}.
+
+The values of a sum type are typically grouped into several classes, called variants.
+The set of all possible values of a sum type is the disjoint union of the sets of all possible values of its variants.
+For instance, in C++, \mintinline{c++}{variant<char,bool>}
+is the sum type \mintinline{c++}{char} $+$ \mintinline{c++}{bool}, which has a cardinality of $2^8 + 2^1 = 258$.
+One way a particular value of this sum type may be constructed is \mintinline{c++}{variant<char,bool>('1', true)}.
+A particularly useful type in C++ is \mintinline{c++}{optional<X>}, which conceptually models the sum type \mintinline{c++}{X} + \mintinline{c++}{void} where \mintinline{c++}{void} denotes the variant ``not a value of type \mintinline{c++}{X}.'
+\begin{remark}
+This is not valid C++ syntax, even though the unit type value should be first-class.
+\end{remark}
+The cardinality of the \mintinline{c++}{optional<X>} is the cardinality of \mintinline{c++}{X} plus $1$.
+We label the value in this singleton \emph{nothing} and may test whether a particular value is either \emph{nothing} or alternatively a value in \mintinline{c++}{X}.
+
+Exponential types are \emph{functions}.
+In C++, \mintinline{c++}{[](tuple<char,bool>) -> bool} is the set of functions \mintinline{c++}{char} $\times$ \mintinline{c++}{bool} $\mapsto$ \mintinline{c++}{bool}, which has a cardinality of $2^{512}$.
+Usually, a more convenient syntax is used, like \mintinline{c++}{[](char,bool) -> bool}.
+The constant \mintinline{c++}{true} function of the exponential type \mintinline{c++}{char} $\times$ \mintinline{c++}{bool} $\mapsto$ \mintinline{c++}{bool} may be constructed with the definition \mintinline{c++}{[](char,bool) -> bool { return true; }}.
+\begin{remark}
+The exponential type \mintinline{c++}{[](X x) -> void} is of little practical value and, in C++, usually denotes a \emph{procedure} that causes \emph{side-effects} like writing to IO.
+\end{remark}
+
+Recall that any subset of a set corresponds to a \emph{relation}. Types are \emph{subsets} of the algebraic types where subsets are defined by \emph{invariants}.
+We may compose primitive types to specify a variety of \emph{compound} types.
+\begin{example}
+\emph{Rationals} may be implemented as a product type of two integers,
+\begin{minted}{c++}
+  using Rational = tuple<int,int>,
+\end{minted}
+where the first and last elements of the tuple represent the numerator and denominator respectively.
+If the invariant is that the denominator is not $0$, then a \emph{value constructor} \mintinline{c++}{rational} $\colon$ \mintinline{c++}{int} $\times$ \mintinline{c++}{int} $\mapsto$ \mintinline{c++}{optional<Rational>} that takes a numerator and denominator and outputs either a rational or, if the invariants are violated, \emph{nothing}, is given by \cref{lst:valuector}.\footnote{Alternatively, the value constructor can be a \emph{partial function} \mintinline{c++}{rational} $\colon$ \mintinline{c++}{int} $\times$ \mintinline{c++}{int} $\pfun$ \mintinline{c++}{Rational} that is undefined for input $\Pair{x}{0}$ for any $x \in$ \mintinline{c++}{int}.}
+
+\begin{listing}[H]
+\begin{minted}
+[
+	mathescape=true,
+%	frame=single,
+%	frame=lines,
+	frame=leftline,
+	framesep=2mm,
+%	baselinestretch=.9,
+%	bgcolor=LightGray,
+%	fontsize=\footnotesize,
+%	linenos
+]{c++}
+optional<Rational> rational(int num, int denom)
+{
+  if (denom == 0)
+    return {}; // Return the value that denotes $\text{\emph{nothing}}$.  
+  return tuple<int,int>(num, denom);
+}.
+\end{minted}
+\caption{A value constructor for rationals.}
+\label{lst:valuector}
+\end{listing}
+
+The expected operators on rationals, like addition \mintinline{c++}{operator+(Rational,Rational) -> Rational}, may be implemented so that \mintinline{c++}{Rational} models the \emph{concept} of rationals.
+%As long as we use \emph{regular} functions over a regular syntax, we may substitute any rational implementation for any other to produce equivalent behavior on any algorithm.
+
+The \mintinline{c++}{Rational} type is a subset of the product type \mintinline{c++}{tuple<int,int>} and is thus
+a \emph{binary relation} on $\IntSet \times \IntSet$.
+\begin{remark}
+We implemented \mintinline{c++}{Rational} as a product type \mintinline{c++}{tuple<int,int>} and a value constructor \mintinline{c++}{rational} for pedagogical reasons, but generally programming structures like \emph{class} are utilized since they facilitate important concepts like \emph{encapsulation}.
+\end{remark}
+\end{example}
+
+Each of these types and operators has a corresponding random approximation, e.g., the exponential type is just a random approximate map, and the \emph{relations} that define types are just random approximate relations with \emph{deterministic} properties that model the invariants.
+
+The invariants may not be easy to satisfy, and so a random approximation relation of the corresponding type may not be practical.
+However, when the invariants can be satisfied, we may implement \emph{random approximate algebraic data types} of the \emph{algebraic data types}, e.g., we can compose random approximate algebraic data types as before to construct compound random approximate data types of the corresponding compound algebraic data type.
+
+This may not seem particularly useful, but it permits space-efficient representations and, moreover, concepts like \emph{oblivious algebraic data types} may be based on it with some notion of closure.
+\end{document}\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+\section{Random approximate algebraic data types}
+Suppose we have a function $\Fun{g} \colon \BitSet \mapsto \BitSet$.
+
+The random approximate value type $\AT{\BitSet}[\fprate][\fnrate]$ is a \emph{monad}.
+If we provide it as input to $\Fun{g}$, we git a random approximate value type as output.
+
+That is, the function $\Fun{g}$ is lifted to the function type $\AT{\BitSet}[\fprate][\fnrate] \mapsto \AT{\BitSet}$, denoted by $\APFun{g}$.
+The output $\AT{\BitSet}$ is a random variable, in particular, it is a first-order random approximate value type.
+
+To compute its false positive and false negative rates, we simply have to compute the following.
+
+Suppose it is given the true value is $0$.
+Then, by definition, $\AT{\BitSet}[\fprate][\fnrate]$ realizes $0$ with probability $1-\fnrate$ and $1$ with probability $\fnrate$.
+Since $\Fun{g}$ is a function of a random variable, it is also a random variable (unless it is constant).
+So, the output is $\Fun{g}(0)$ with probability $1-\fnrate$ and $\Fun{g}(1)$ with probability $\fnrate$.
+That is, it has a conditional probability mass function given by
+\begin{equation}
+\Fun{p}(b \Given 0) =
+\begin{cases}
+1-\fnrate 	& \text{if $b = \Fun{g}(0)$} \\
+\fnrate	 	& \text{if $b = \Fun{g}(1)$}\,.
+\end{cases}
+\end{equation}
+
+Alternatively, assume it is given true value is $1$.
+Then, by definition, $\AT{\BitSet}[\fprate][\fnrate]$ realizes $0$ with probability $\fprate$ and $1$ with probability $1-\fprate$ and therefore the output is a random variable $\RV{O}$ that models $\AT{\BitSet}$ that realizes $\Fun{g}(0)$ with probability $1-\fnrate$ and $\Fun{g}(1)$ with probability $\fnrate$ with the conditional probability mass function given by
+\begin{equation}
+\Fun{p}_{\RV{O}}(b \Given 1) =
+\begin{cases}
+\fprate 	& \text{if $b = \Fun{g}(0)$} \\
+1-\fprate	& \text{if $b = \Fun{g}(1)$}\,.
+\end{cases}
+\end{equation}
+
+The random approximate map is the \emph{exponential type}.
+
+Other types may be generated from this type.
+
+
+A \emph{type} is a set and the elements of the set are called the \emph{values} 
+of the type. In programming languages, \emph{composite} types are typically composed in two ways, the \emph{sum type} and the \emph{product type}. The product type is a Cartesian product of types (sets).
+
+For instance, a product type may the Cartesian product of integer and Boolean types, $\IntSet \times \{0,1\}$. In the C++ family of programming language, this product type may be represented by \emph{pair<int,bool>}.
+
+Since it may be inconvenient to refer to member types by their respective tuple indices, programming languages typically allow the indices to be \emph{labeled}. In C++, keywords like \emph{struct} and \emph{class} are commonly used to provide named product types.
+
+A data type may be thought of as a product type with \emph{invariants}, or \emph{constraints} on which values member types may be assigned. Thus, it may be thought of as a \emph{relation} or \emph{correspondence} over the product type. In many cases, this may make approximate relations unsuitable for representing data types, e.g., a tuple that violates one or more of the invariants may be generated from an objective value of the data type.
+
+However, if an approximate relation does violate the invariants, it can simply be considered invalid. In this case, we may pose questions like, what is the probability that an approximate data type generates an invalid result?
+
+\begin{equation}
+\Prob{\ASet{X_1}}
+\end{equation}
+
+
+
+An \emph{abstract data type} is a type and a set of operations on values of the type. For example, the \emph{integer} abstract data type is defined by the set of integers and standard operations like addition and subtraction.
+A \emph{data structure} is a particular way of organizing data and 
+may implement one or more abstract data types.
+
+
+
+\end{document}\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+\section{Primitive approximate \emph{values}}
+Here are a basic list of primitive algebraic data types and operations on types.
+
+These are \emph{first-order} approximate types since t
+
+\subsection{Void type}
+The most primitive type is the \emph{empty set} type, denoted by \Void.
+There are no elements in the empty set and therefore it is not possible to construct values of this type.
+There is only one function in the set $\Void \mapsto \Set{X}$, known as the \emph{absurd} function since it can never be invoked.
+Since \Void has no values, $\AT{\Void}$ is equivalent to \Void.
+
+$\AT{\Void}$ is necessary to complete the algebra of algebraic data types, but serves only a theoretical purpose.
+
+\subsection{Unit type}
+The \emph{unit} type, denoted by \Unit, is isomorphic to any set with only a single element, i.e., any \emph{singleton set}.
+The set $\Unit \mapsto \Set{X}$ has a cardinality $\Card{\Set{X}}$ and the set $\Set{X} \mapsto \Unit$ has a cardinality $1$.
+If we are talking about \emph{partial} functions, then $\Set{X} \pfun \Unit$ has cardinality $2^{\Set{X}}$.
+
+The set $\Unit \mapsto \Unit$ has a cardinality of $1$, which is the identity function $\IdFun \colon \Unit \mapsto \Unit$.
+
+The approximate unit type $\AT{\Unit}$ is necessary to complete the algebra, but given a void \Unit type, similar to the \Void type there is no uncertainty about its value, i.e., $\AT{\Unit}$ is equivalent to \Unit.
+
+In addition, if there is some function $\Fun{f} \colon \Unit \mapsto \Set{X}$ its approximate analog is $\APFun{f} \colon \Unit \mapsto \Set{X}$, which models an \emph{approximate} constant.
+
+\subsection{Sum types}
+
+A sum type $X + Y$ is the disjoint union of types $X$ and $Y$.
+The \emph{first-order} approximate sum type $\AT{\left(X + Y\right)}$ is an approximate of the type $X+Y$.
+
+The \emph{higher-order} sum type is different, e.g., $\AT{X} + \AT{Y}$ is a higher order sum type, as is $\AT{X} + Y$ and $\AT{\left(\AT{X} + \AT{Y}\right)}$ is even a higher order.
+
+If we replace $X$ and $Y$ by $\AT{X}$ and $\AT{Y}$, we have a sum type $\AT{X} + \AT{Y}$.
+
+Values of these types are naturally constructed from approximate maps that map to the type $X+Y$.
+
+\subsection{Product types}
+
+A product type $X \times Y$ is the Cartesian product of types $X$ and $Y$.
+If we replace $X$ and $Y$ by $\AT{X}$ and $\AT{Y}$, we have a product type $\AT{X} \times \AT{Y}$.
+
+Values of these types are naturally constructed from approximate maps that map to the type $X+Y$ and form a random approximate set over the type $X \times Y$.
+
+\subsection{Exponential types (functions)}
+
+These have already been discussed.
+Random approximate maps are the same thing as random approximate exponential types.
+	
+
+When we generate a set of approximate value types and a set of approximate functions over those value types and compose them together to generate a \emph{program}, we may consider this composition to be an \emph{approximate} program.
+
+TODO:
+A \emph{partial function} is not defined on entire domain.
+We allow elements not in the preimage, i.e., not defined by the partial function, to either correctly map to \emph{nothing} or, map to some other element in the codomain.
+The \emph{false mapping rate} $\fprate_{y}$ for element $y$ may be specified explicitly, i.e.,
+\begin{equation}
+\Prob{\Fun{f}(x) = y \Given x \notin \Dom(\Fun{f})} = \fprate_{y}\,,
+\end{equation}
+and the \emph{total} false mapping rate is
+\begin{equation}
+\sum_{y \in \Codom(\Fun{f})} \Prob{\Fun{f}(x) = y \Given x \notin \Dom(\Fun{f})} = \fprate\,,
+\end{equation}
+by the fact that each outcome is mutually exclusive (a function $\Fun{f}$ maps to only one element).
+Alternatively,
+\begin{equation}
+\sum_{y \in \Codom(\Fun{f})} \Prob{\Fun{f}(x) \neq y \Given x \notin \Dom(\Fun{f})} = 1-\fprate = \tnrate\,.
+\end{equation}
+
+\begin{example}
+	Suppose we have a predicate function $\Fun{f} \colon \Set{X} \mapsto \Bool$, i.e., set indicator.
+	Then, we may construct a partial function from $\Fun{f}$ with an \emph{approximate map} over those elements that return \True.
+	If we specify a false mapping rate $\fprate_{\False}$, this predicate is isomorphic to an approximate set over $\Set{X}$ with a false positive rate $\fprate = \fprate_{\False}$.
+	
+	An optimal approximate map obtains the information-theoretic lower-bound on the expected space complexity, $-1.44 \log_2 \fprate$ bits per positive element.
+	
+	While a random approximate set is in practice simpler to implement, theoretically an optimal approximate map is both fully generalized (for any function over any domain and codomain) and obtains the same space efficiency.
+	
+	The obfuscated approximate map has the same characteristics, and the optimal implementation is a black box that is able to increase obfuscation power for less space efficiency.
+	WORK THIS OUT EXACTly, and move all of this out of the example env of course.
+\end{example}
+
+\begin{remark}
+NOTE: Clarify: we call a value an approximate value when it should be $x$ but there is a probability it is something else due to the approximate map or some other noisy process.
+\end{remark}
+
+Most approximate maps are black boxes.
+They introduce an approximation error, and in addition, the inputs may also have an approximation error. At that point, the values being mapped to are higher-order random approximate values.
+
+\end{document}\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+
+\SetKwData{Nothing}{nothing}
+
+\begin{document}
+\section{C++ implementation}
+
+
+
+In programming languages, \emph{composite} types are typically composed in two ways, the \emph{sum type} and the \emph{product type}.
+The product type is a Cartesian product of types (sets).
+
+For instance, a product type may the Cartesian product of integer and Boolean types, $\IntSet \times \{0,1\}$. In the C++ family of programming language, this product type may be represented by \emph{pair<int,bool>}.
+
+Since it may be inconvenient to refer to member types by their respective tuple indices, programming languages typically allow the indices to be \emph{labeled}. In C++, keywords like \emph{struct} and \emph{class} are commonly used to provide named product types.
+
+A data type may be thought of as a product type with \emph{invariants}, or \emph{constraints} on which values member types may be assigned. Thus, it may be thought of as a \emph{relation} or \emph{correspondence} over the product type. In many cases, this may make approximate relations unsuitable for representing data types, e.g., a tuple that violates one or more of the invariants may be generated from an objective value of the data type.
+
+However, if an approximate relation does violate the invariants, it can simply be considered invalid. In this case, we may pose questions like, what is the probability that an approximate data type generates an invalid result?
+
+%An algebraic data type is defined by a set of \emph{higher-order} operations on \emph{data types}.
+%In other words, operations on sets, like Cartesian product or disjoint union.
+Viewing a \emph{type} as a set, most programming languages have primitive types like \emph{integers}, \emph{Booleans}, and \emph{characters}.
+In C++, these are respectively denoted by \mintinline{c++}{int}, \mintinline{c++}{bool}, and \mintinline{c++}{char} with cardinalities given respectively by $2^{32}$, $2^8$, and $2^1$.
+Any type needs one or more \emph{value constructors} to construct objects that model values in that type.
+For instance, in C++ the value that denotes the Boolean value of \emph{true} is constructed with the syntax \mintinline{c++}{true}.
+
+The \emph{unit} type is special singleton set with a single value, i.e., a cardinality of $2^0$.
+In C++, the confusing notation of \mintinline{c++}{void} denotes the unit type (and the single value).
+\begin{remark}
+	The \emph{absurd} type is a special type with zero values, i.e., the \emph{empty set}.
+	Since there are no values in the absurd type, no values of this type can be constructed.
+	There is no primitive absurd type in C++.
+\end{remark}
+
+A \emph{product type} is the $n$-fold Cartesian product of zero or more types where the zero-th product is the unit type.
+For instance, in C++, \mintinline{c++}{struct { char y, bool z }} is a \emph{named} product type and \mintinline{c++}{tuple<char,bool>}
+is the \emph{unamed} counterpart, where both are product types \mintinline{c++}{char} $\times$ \mintinline{c++}{bool}.
+The cardinality of this product type is $2^8 \cdot 2^1 = 512$.
+One way a particular value of this product type may be constructed is \mintinline{c++}{tuple<char,bool>('a', true)}.
+
+The values of a sum type are typically grouped into several classes, called variants.
+The set of all possible values of a sum type is the disjoint union of the sets of all possible values of its variants.
+For instance, in C++, \mintinline{c++}{variant<char,bool>}
+is the sum type \mintinline{c++}{char} $+$ \mintinline{c++}{bool}, which has a cardinality of $2^8 + 2^1 = 258$.
+One way a particular value of this sum type may be constructed is \mintinline{c++}{variant<char,bool>('1', true)}.
+A particularly useful type in C++ is \mintinline{c++}{optional<X>}, which conceptually models the sum type \mintinline{c++}{X} + \mintinline{c++}{void} where \mintinline{c++}{void} denotes the variant ``not a value of type \mintinline{c++}{X}.'
+\begin{remark}
+	This is not valid C++ syntax, even though the unit type value should be first-class.
+\end{remark}
+The cardinality of the \mintinline{c++}{optional<X>} is the cardinality of \mintinline{c++}{X} plus $1$.
+We label the value in this singleton \emph{nothing} and may test whether a particular value is either \emph{nothing} or alternatively a value in \mintinline{c++}{X}.
+
+Exponential types are \emph{functions}.
+In C++, \mintinline{c++}{[](tuple<char,bool>) -> bool} is the set of functions \mintinline{c++}{char} $\times$ \mintinline{c++}{bool} $\mapsto$ \mintinline{c++}{bool}, which has a cardinality of $2^{512}$.
+Usually, a more convenient syntax is used, like \mintinline{c++}{[](char,bool) -> bool}.
+The constant \mintinline{c++}{true} function of the exponential type \mintinline{c++}{char} $\times$ \mintinline{c++}{bool} $\mapsto$ \mintinline{c++}{bool} may be constructed with the definition \mintinline{c++}{[](char,bool) -> bool { return true; }}.
+\begin{remark}
+	The exponential type \mintinline{c++}{[](X x) -> void} is of little practical value and, in C++, usually denotes a \emph{procedure} that causes \emph{side-effects} like writing to IO.
+\end{remark}
+
+Recall that any subset of a set corresponds to a \emph{relation}. Types are \emph{subsets} of the algebraic types where subsets are defined by \emph{invariants}.
+We may compose primitive types to specify a variety of \emph{compound} types.
+\begin{example}
+	\emph{Rationals} may be implemented as a product type of two integers,
+	\begin{minted}{c++}
+		using Rational = tuple<int,int>,
+	\end{minted}
+	where the first and last elements of the tuple represent the numerator and denominator respectively.
+	If the invariant is that the denominator is not $0$, then a \emph{value constructor} \mintinline{c++}{rational} $\colon$ \mintinline{c++}{int} $\times$ \mintinline{c++}{int} $\mapsto$ \mintinline{c++}{optional<Rational>} that takes a numerator and denominator and outputs either a rational or, if the invariants are violated, \emph{nothing}, is given by \cref{lst:valuector}.\footnote{Alternatively, the value constructor can be a \emph{partial function} \mintinline{c++}{rational} $\colon$ \mintinline{c++}{int} $\times$ \mintinline{c++}{int} $\pfun$ \mintinline{c++}{Rational} that is undefined for input $\Pair{x}{0}$ for any $x \in$ \mintinline{c++}{int}.}
+	
+%\begin{listing}[H]
+\begin{minted}
+	[
+	mathescape=true,
+	%	frame=single,
+	%	frame=lines,
+	%frame=leftline,
+	framesep=2mm,
+	%	baselinestretch=.9,
+	%	bgcolor=LightGray,
+	%	fontsize=\footnotesize,
+	%	linenos
+	]{c++}
+optional<Rational> rational(int num, int denom)
+{
+	if (denom == 0)
+	return {}; // Return the value that denotes $\Nothing$.  
+	return tuple<int,int>(num, denom);
+}.
+\end{minted}
+%\caption{A value constructor for rationals.}
+%\label{lst:valuector}
+%\end{listing}
+
+	The expected operators on rationals, like addition \mintinline{c++}{operator+(Rational,Rational) -> Rational}, may be implemented so that \mintinline{c++}{Rational} models the \emph{concept} of rationals.
+	%As long as we use \emph{regular} functions over a regular syntax, we may substitute any rational implementation for any other to produce equivalent behavior on any algorithm.
+	
+	The \mintinline{c++}{Rational} type is a subset of the product type \mintinline{c++}{tuple<int,int>} and is thus
+	a \emph{binary relation} on $\IntSet \times \IntSet$.
+	\begin{remark}
+		We implemented \mintinline{c++}{Rational} as a product type \mintinline{c++}{tuple<int,int>} and a value constructor \mintinline{c++}{rational} for pedagogical reasons, but generally programming structures like \emph{class} are utilized since they facilitate important concepts like \emph{encapsulation}.
+	\end{remark}
+\end{example}
+
+Each of these types and operators has a corresponding random approximation, e.g., the exponential type is just a random approximate map, and the \emph{relations} that define types are just random approximate relations with \emph{deterministic} properties that model the invariants.
+
+The invariants may not be easy to satisfy, and so a random approximation relation of the corresponding type may not be practical.
+However, when the invariants can be satisfied, we may implement \emph{random approximate algebraic data types} of the \emph{algebraic data types}, e.g., we can compose random approximate algebraic data types as before to construct compound random approximate data types of the corresponding compound algebraic data type.
+
+This may not seem particularly useful, but it permits space-efficient representations and, moreover, concepts like \emph{oblivious algebraic data types} may be based on it with some notion of closure.
+
+\subsection{Approximate value monad}
+
+Talk about lifting functions.
+
+
+
+
+Suppose we have a function $\Fun{f} \colon X \mapsto Y$.
+
+
+
+ and we apply $\Fun{f}$ to an approximate value of type $X$, denoted by $\Fun{a}(X)$, 
+
+
+$\Fun{f}$  $\Fun{a}(\Fun{f}) \colon X \amapsto{\fprate}{\fnrate} Y$.
+
+The approximate value parameterized by $X$, denoted by $\mintinline{c++}{approx<X>}$, is a monad type similar to the \emph{maybe} monad discussed previously, except significantly more complicated if \emph{fully} implemented.\footnote{We may choose the trivial implementation that just tags it as an approximate value and let that bit of information carry through.}
+
+The general type of the approximate value monad is simply defined as
+\begin{minted}{c++}
+	template <typename X> struct approx<X> {}
+\end{minted}
+which has a computational basis given by the following overload set.
+
+Given an approximate value of type $X$, its \emph{false positive rate} is given by
+\begin{minted}{c++}
+	template <typename X>
+	auto fpr(approx<X> x)   { /* implementation */ },
+\end{minted}
+its \emph{false negative rate} is given by
+\begin{minted}{c++}
+	template <typename X>
+	auto fnr(approx<X> x)   { /* implementation */ },
+\end{minted}
+its value is given by
+\begin{minted}{c++}
+	template <typename X>
+	auto value(approx<X> x) { /* implementation */ },
+\end{minted}
+and its conditional probability mass function is given by
+\begin{minted}{c++}
+	template <typename X>
+	auto pmf(approx<X> x, X true_value) { /* implementation */ }.
+\end{minted}
+
+Note that the false positive and false negative rates are the result of using the distance function $\Fun{d}(a,a) = 0$ and otherwise $\Fun{d}(a,b) = 1$, $a \neq b$, to calculate the \emph{expected} loss given respectively the negative (where $\Fun{d}$ evaluates to $1$ with respect to some ground truth) and positive (where $\Fun{d}$ evaluates to $0$) subsets of $X$.
+
+If we give it a \emph{loss} function, we may estimate its loss.
+
+
+For particular value types, we specialize this template.
+\begin{minted}{c++}
+	template <> struct approx<bool>
+	{
+		double fpr;
+		double fnr;
+		bool value;
+	}
+\end{minted}
+which has a computational basis given by
+\begin{minted}{c++}
+	auto fpr(approx<bool> x)   { return x.fpr; },
+	auto fnr(approx<bool> x)   { return x.fnr; },
+	auto value(approx<bool> x) { return x.value; }.
+\end{minted}
+
+
+The function $\mintinline{c++}{fmap} \colon (\mintinline{c++}{bool} \mapsto \mintinline{c++}{bool}) \times \mintinline{c++}{approx<bool>} \mapsto \mintinline{c++}{approx<bool>}$ is defined as
+\begin{minted}{c++}
+auto amap(function<bool(bool)> f, approx<bool> x)
+{
+	auto fnr = f(true);
+	auto fpr = f(false);
+
+	return approx<bool> { fpr, fnr, f(value(x)) };
+}
+\end{minted}
+
+
+
+If we compose functions to construct an \emph{algorithm} (or program), then if some of the values (e.g., functions or Boolean values) are replaced by approximate values, the algorithm becomes (in general) an approximate algorithm and we may deduce its false positive and negative rates as we did previously through, say, function composition.
+
+If the algorithm includes \emph{branching}, the algorithm is still an approximate algorithm, but in order to infer the false positive and false negative rate, we must go down \emph{all} branches, which is in general not be tractable.
+However, we could estimate the result using \emph{Monte-carlo} simulation.
+
+
+
+
+
+The approximate Boolean value is straightforward since Boolean types are the natural predicate return type.
+More importantly, there are only two values of this type.
+
+
+%template<class A, class B>
+%optional<B> fmap(std::function<B(A)> f, %optional<A> opt) {
+%	if (!opt.isValid())
+%	return optional<B>{};
+%	else
+%	return optional<B>{ f(opt.val()) };
+%}
+
+	
+\subsection{Type-erasure}
+The fact that we are dealing with specific approximate types may be erased into some approximate type abstract data type that hides the concrete data type.
+It may be further erased to just a type, e.g., $\APFun{f}[\fprate][\fnrate]$ may be erased to $\APFun{f}$ which may be erased to $\Fun{f}$.
+TODO: convert to types not particular elements in the type
+	
+\end{document}
