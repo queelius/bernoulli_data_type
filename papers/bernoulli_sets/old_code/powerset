@@ -1,2 +1,0 @@
-#!/bin/bash
-cat $1 | sed -r 's/\\PowerSet[(]([^)]+)[)]/\\PS{\1}/g'

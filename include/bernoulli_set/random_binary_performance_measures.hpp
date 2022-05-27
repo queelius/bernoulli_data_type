@@ -5,9 +5,6 @@
 
 namespace bernoulli::set::random
 {
-    template <typename T>
-    struct set_indicator {};
-
     /**
      * The asymptotic distribution of the true positive rate.
      * The true positive rate is a random variable given an expected true
@@ -22,62 +19,61 @@ namespace bernoulli::set::random
      * bs.tpr(). Less realistically, as p -> 0, random_tpr(bs,p) converges in
      * distribution to an improper distribution with a uniform density.
      */
-    template <typename P, typename T>
-    auto random_tpr(bernoulli<first_order,T,set_indicator<T>> const & bs,
+    template <typename T,2>
+    auto random_tpr(bernoulli_set<T,2> const & s,
                     double p = 1)
     {
-        return normal(bs.tpr(),bs.tpr()*bs.fnr()/p);
+        return normal(s.tpr(),s.tpr()*s.fnr()/p);
     }
 
-    // The false positive rate.
-    template <typename P, typename T>
-    auto random_fpr(bernoulli<P,T,set_indicator<T>> const & bs, double n)
+    // The asymptotic distribution of the false positive rate.
+    template <typename T,2>
+    auto random_fpr(bernoulli_set<T,2> const & s, double n)
     {
-        return normal(bs.fpr(),bs.fpr()*bs.tnr()/n);
+        return normal(s.fpr(),s.fpr()*s.tnr()/n);
     }
     
-    // The false negative rate.
-    template <typename P, typename T>
-    auto random_fnr(bernoulli<P,T,set_indicator<T>> const & bs, double p)
+    // The asymptotic distribution fo teh false negative rate.
+    template <typename T,2>
+    auto random_fnr(bernoulli<T,2> const & s, double p)
     {
-        return normal(bs.fnr(),bs.tpr()*bs.fnr()/p);
+        return normal(s.fnr(),s.tpr()*s.fnr()/p);
     }
 
-    // The true negative rate.
-    template <typename X, typename R>
-    auto tnr(bernoulli<P,T,set_indicator<T>> const & bs, double n)
+    // The asymptotic distribution of the true negative rate.
+    template <typename T>
+    auto random_tnr(bernoulli<T,2> const & s, double n)
     {
-        return normal(bs.tnr(),bs.fpr()*bs.tnr()/n);
+        return normal(s.tnr(),s.fpr()*s.tnr()/n);
     }
 
     /**
-     * TPp / (p+n) + TNn / (p + n)
-     * N((p*tpr(a) + n*tnr(a))/(p+n)
+     * The asymtotic distribution of the accuracy.
      */
-    // The accuracy.
     template <typename T>
-    auto accuracy(approximate_set<T> const & rds, double p, double n)
+    auto random_accuracy(bernoulli_set<T,2> const & s, double p, double n)
     {
-        /*auto const & u = p + n;
-        auto mu = (p*tpr(a) + n*tnr(a)) / u;
-        auto var = (p*tpr(a)*(1.-tpr(a)) + (n*fpr(a)*(1.-fpr(a)))) / (u*u)
-        return alex::stats::normal<double>(mu, var);
-        */
-       return 1.;
+        auto u = p + n;
+        auto mu = (p*s.tpr() + n*s.tnr())/u;
+        auto var = (p*s.tpr()*(1-s.tpr()) + (n*s.fpr()*(1-s.fpr()))) / (u*u)
+        return normal(mu, var);
     };
-        
-    // The positive predictive value.
+    
+    // The asymptotic distribution of the positive predictive value (ppv).
     template <typename T>
-    auto ppv(approximate_set<T> const & a, real_interval lambda, double u)
+    auto random_ppv(bernoulli_set<T,2> const & a,
+             interval<double> lambda,
+             double u)
     {
-        return 1.;
-        //return pow(1. + tp(a,lambda*u) / fp(a,(1.-lambda)*u),-1.);
-    };
+        throw "not implemented yet"
+    }
 
-    // The negative predictive value.
+    // The asymptotic distribution of the negative predictive value (npv).
     template <typename T>
-    auto npv(approximate_set<T> const & a, real_interval lambda, double u)
+    auto random_npv(bernoulli_set<T,2> const & s,
+                    interval<double> lambda,
+                    double u)
     {
-        return 1.;
-    };
+        throw "not implemented yet"
+    }
 }
