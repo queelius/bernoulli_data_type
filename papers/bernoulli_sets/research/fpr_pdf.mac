@@ -1,0 +1,26 @@
+fpr_approx_density(x,e,n):=pdf_normal(x,e,sqrt(e*(1-e)/n));
+fpr_approx(x,e,n):=float(integrate(fpr_approx_density(y,e,n),y,x-1/(2*n),x+1/(2*n)));
+fpr(x,e,n):=binomial(n,x*n)*e^(x*n)*(1-e)^(n-x*n);
+
+n: 100;
+e: 5/100;
+lb: 0;
+ub: 20;
+
+xs: makelist(x/n,x,lb,ub);
+ys: makelist(fpr(x,e,n), x, lb, ub);
+ys_approx: makelist(fpr_approx(x,e,n), x, lb, ub);
+
+plot2d(
+    [
+        [discrete,xs,ys],
+        [discrete,xs,ys_approx] /* fpr_approx(x,e,n) */
+    ],
+    /* [x,lb,ub], */
+    [color,gray,black],
+    [point_type, asterisk],
+    [style,points,lines],
+    [legend,"exact discrete distribution","normal approximation"],
+    [xlabel, "false positive rate"],
+    [ylabel, "probability"]);
+

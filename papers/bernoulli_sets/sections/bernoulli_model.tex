@@ -1,0 +1,229 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+
+\newcommand{\ERR}{\Delta}
+
+\begin{document}
+\section{Bernoulli set model}
+%A random variable $\RV{W} \colon \Sigma \mapsto \PlainSet{Y}$ is a function that maps outcomes in the $\sigma$-algebra to a measurable space 
+%$\PlainSet{Y}$.
+%The probability that $\RV{W}$ realizes some measureable subset $\PlainSet{Z} \subseteq \PlainSet{Y}$ is given by $\Prob{\RV{W} \in 	\PlainSet{S}} = %\Prob{\{w \Given \RV{W}(w) \in \PlainSet{Z}\}}$.
+In the \emph{Bernoulli} set model, we describe the statistical properties of processes that \emph{generate} approximations of a certain kind that model many existing processes and generalizes to higher-order approximations under algebraic composition.
+
+In what follows, we specify the axioms of the Bernoulli set model.
+
+Theoretically, a process that generates approximations could exhibit correlations of any sort, but Bernoulli sets are constrained by the following axiom.
+\begin{axiom}
+Each element of a Bernoulli set has an independently distributed error rate,
+\begin{equation}
+\Prob{\SetIndicator{\ASet{A}[\sigma]}(x) \neq \SetIndicator{\Set{A}}(x) \Given \SetIndicator{\ASet{A}[\sigma]}(y) \neq \SetIndicator{\Set{A}}(y)} =
+	\Prob{\SetIndicator{\ASet{A}[\sigma]}(x) \neq \SetIndicator{\Set{A}}(x)}\,.
+\end{equation}
+\end{axiom}
+
+The complexity in the Bernoulli set model stems from the fact that different subsets of the universal set may exhibit different error rates.
+\begin{axiom}
+\label{asm:fpr_fnr_r_indep}
+An $n$-th order random approximate set with random errors $\ERR_1,\ldots,\ERR_n$ respectively for partition blocks $1,\ldots,n$ are conditionally independent given $\RV{R}$.
+\end{axiom}
+For instance, a positive-negative approximate set has random false positive rate $\FPR$ and a random false negative rate $\FNR$ that are conditionally independent given $\RV{R}$.
+
+
+There are two natural characteristics of the Bernoulli set model, the random false positive and false negative rates conditioned on $\RV{R} = \Set{A}$.
+They are respectively given by
+\begin{equation}
+	\FPR = \frac{1}{\Card{\SetComplement[\Set{A}]}} \sum_{x \in \SetComplement[\Set{A}]} \SetIndicator{\ASet{A}[\sigma]}(x)
+\end{equation}
+and
+\begin{equation}
+	\FNR = \frac{1}{\Card{\Set{A}}} \sum_{x \in \Set{A}} \SetIndicator{\ASet{A}[\sigma]}(x)\,.
+\end{equation}
+
+
+
+Since the random approximate set is \emph{random}, properties like its \emph{false positive rate} and \emph{false negative rate} are also random, respectively modeled by the random false positive rate $\FPR$ and false negative rate $\FNR$.
+
+We denote the \emph{first-order} random approximate set generative model by $\AT{\RV{R}}$.
+The joint distribution of $\AT{\RV{R}}$, $\FPR$, $\FNR$, and $\RV{R}$ given a unviersal set $\Set{U}$ has a probability density
+\begin{equation}
+\PDF{\Set{Y}, \fprate, \fnrate, \Set{X} \Given \Set{U}}[\AT{\RV{R}}, \FPR, \FNR, \RV{R}]\,.
+\end{equation}
+By the axioms of probability theory, this may be decomposed into
+\begin{equation}
+\PDF{\Set{Y},\fprate, \fnrate, \Set{X} \Given \Set{U}}[\AT{\RV{R}}, \FPR, \FNR, \RV{R}] =
+\PDF{\Set{Y} \Given \fprate, \fnrate, \Set{X} \Given \Set{U}}[\AT{\RV{R}} \Given \FPR, \FNR, \RV{R}]
+\PDF{\fprate, \fnrate \Given \Set{X}}[\FPR, \FNR \Given \RV{R}]
+\PDF{\Set{X} \Given \Set{U}}[\RV{R}]\,.
+\end{equation}
+We typically omit the explicit reference to $\Set{U}$, since it may usually be understood as implicit to the model.
+
+The object of central interest is the distribution of $\AT{\RV{R}}$ given $\RV{R}$.
+The conditional distribution of $\AT{\RV{R}}$ given $\RV{R} = \Set{X}$ is denote by $\ASet{X}$.
+By the axioms of probability,
+\begin{equation}
+\PDF{\Set{Y},\fprate, \fnrate}[\ASet{X}, \FPR, \FNR] =
+\PDF{\Set{Y} \Given \fprate, \fnrate}[\ASet{X} \Given \FPR, \FNR]
+\PDF{\fprate, \fnrate \Given \Set{X}}[\FPR, \FNR \Given \RV{R}]\,.
+\end{equation}
+
+
+
+There are a few natural partitions.
+
+
+
+
+
+
+
+If the rates happen to pick out a specific set in the support, then the result is a degenerate distribution, e.g., $\ASet{A}$ given $\FPR = 0$ and $\FNR = 0$ is degenerate where all probability mass is assigned to $\Set{A}$.
+
+We denote the distributions of $\ASet{X}$ given $\Expect{\FPR} = \fprate$ and $\ASet{X}$ given $\Expect{\FNR} = \fnrate$ respectively by $\ASet{X}[\fprate][-]$ and $\ASet{X}[+][\fnrate]$.
+An object of central interest is the distribution of $\ASet{X}$ given $\Expect{\FPR} = \fprate$ and $\Expect{\FNR} = \fnrate$, denoted by
+\begin{equation}
+\ASet{X}[\fprate][\fnrate]\,.
+\end{equation}
+
+If we \emph{sample} from $\ASet{A}[\fprate][\fnrate]$, some set $\Set{Y} \in \PS{\Set{U}}$ with false positive rate $a$ and false negative rate $b$ will be realized with probability $\PDF{\Set{Y} \Given a, b}[\ASet{A}[\fprate][\fnrate] \Given \FPR, \FNR]$.
+However, as the number of samples goes to infinity, the mean false positive and false negative rates go to $\fprate$ and $\fnrate$ respectively.
+
+Random \emph{positive} and \emph{negative} approximate sets are special cases respectively given by the following definitions.
+\begin{definition}
+\label{def:pos_approx_set}
+A random approximate set $\ASet{A}[0][+]$ is a random \emph{positive} approximate set denoted by $\PASet{A}$.
+\end{definition}
+\begin{definition}
+\label{def:neg_approx_set}
+A random approximate set $\ASet{A}[-][0]$ is a random \emph{negative} approximate set denoted by $\NASet{A}$.
+\end{definition}
+By these definitions, every realization of $\PASet{A}$ and $\NASet{A}$ are respectively \emph{supersets} or \emph{subsets} of $\Set{A}$.
+The complement of a random positive (negative) approximate set is a random negative (positive) approximate set.
+
+By \cref{asm:fpr_fnr_r_indep} and by the axioms of probability,
+\begin{equation}
+\PDF{\Set{Y},\fprate, \fnrate}[\ASet{X}, \FPR, \FNR] =
+\PDF{\Set{Y} \Given \fprate, \fnrate}[\ASet{X} \Given \FPR, \FNR]
+\PDF{\fprate \Given \Set{X}}[\FPR \Given \RV{R}] \PDF{\fnrate \Given \Set{X}}[\FNR \Given \RV{R}]\,.
+\end{equation}
+
+Every statistical property of the first-order random approximate set model is entailed by \cref{asm:fprate,asm:tprate}.
+Furthermore, these assumptions generally hold in practice, e.g., the Bloom filter\cite{bf} and Perfect hash filter\cite{phf} are two separate implementations\footnote{There may be a difference in that the algorithm may be deterministic; we address this point in \cref{dummyref}.} of the random positive approximate set in which these assumptions hold.
+
+Suppose the first-order random approximate sets are over the universal set $\Set{U}$.
+Compositions of first-order random approximate sets over the Boolean algebra $(\PS{\Set{U}},\SetUnion,\SetIntersection,\SetComplement,\EmptySet,\Set{U})$, or random approximate sets of random approximate sets, are not closed over the \emph{first-order} model.
+These subject is beyond the scope of this paper.
+
+\subsection{Probability space}
+\label{sec:prob_model}
+Suppose the universal set is $\Set{U}$ and we have some process that generates approximations of some objective set $\Set{A}$ that is compatible with the axioms of the random approximate set model.
+
+%TODO talk about approximate unions etc as generative models
+
+The process generates subsets of $\Set{U}$, or alternatively, the \emph{sample space} is $\Sigma = \PS{\Set{U}}$.
+A primary objective in \emph{probability modeling} is assigning \emph{probabilities} to \emph{events}.
+Suppose we have some \emph{probability function} $\ProbFn \colon \Sigma \mapsto [0,1]$.
+The \emph{probability} of some event $\Set{A} \in \Sigma$ is denoted by $\Prob{\Set{A}}$.
+
+
+These are the \emph{elementary events} of the probability space.
+The random approximate set model given $\RV{R} = \Set{Y}$ is given by the \emph{probability space}
+\begin{equation}
+\left(\Omega = \PS{\Set{U}}, \PS{\Omega}, \Fun{P}\right)\,,
+\end{equation}
+where $\Omega$ is the \emph{sample space}, $\PS{\Omega}$ is the set of all events, and $\Fun{P} \colon \PS{\Omega} \mapsto [0,1]$ is the probability set function.
+
+
+%The \emph{probability space} of random approximate sets given an 
+%objective set
+%$\Set{Y} \subset \Set{U}$ is given by the triple
+%\begin{equation}%
+%	\left(\vec{1}, \{0,1\}^u, \Prob{\;\cdot \Given \vec{y}}\right)
+%\end{equation}
+%The relative frequency of any event $\vec{x}$ in $\{0,1\}^u$ converges to $\Prob{\AVec{X} = \vec{x} \Given \OVec{y}}$ as the number of times the random approximate set of $\OVec{y}$ is generated goes to infinity.
+
+%%By \cref{def:bijection}, we use the Boolean algebras
+%%$\left(
+%%\PS{\Set{U}},\SetIntersection,\SetUnion,\SetComplement,\EmptySet,\Set{U}
+%%\right)$ and $(\{0,1\}^u,\land,\lor,\neg,\vec{0},\vec{1})$ interchangeably.
+
+Consider an objective set $\Set{A}$ and a random approximate set  and suppose we are uncertain about which elements are their respective members.
+We model the uncertainty of the elements of $\Set{A}$ by the Boolean random vector $\vec{A} = \Tuple{\RV{A_1},\ldots,\RV{A_u}}$ where $\RV{A_j} = \SetIndicator{\Set{A}}\left(x_{(j)}\right)$ for $j=1,\ldots,u$.
+Similarly, we model the uncertainty of the elements of $\ASet{A}$ by $\AVec{A}[\tprate][\fprate] = \Tuple{\AVecComp{A}[1],\ldots,\AVecComp{A}[u]}$.
+
+The joint probability that $\AVec{A}[\tprate][\fprate] = \vec{x}$ and $\vec{A} = \vec{y}$ is denoted by $\Prob{\AVec{A}[\tprate][\fprate] = \vec{x},\vec{A} = \vec{y}}$.
+By the axioms of probability, the joint probability may be rewritten as
+\begin{equation}
+    \Prob{\AVec{A}[\tprate][\fprate] = \vec{x},\vec{A} = \vec{y}} =
+        \Prob{\AVec{A}[\tprate][\fprate] = \vec{x} \Given \vec{A} = \vec{y}}
+        \Prob{\vec{A} = \vec{y}}\,.
+\end{equation}
+By \cref{asm:fprate,asm:tprate}, $\AVecComp{A}[j]$ is only dependent on 
+$\RV{A_j}$ for $j=1,\ldots,u$ and thus by the axioms of probability
+\begin{equation}
+    \Prob{\AVec{A}[\tprate][\fprate] = \vec{x},\vec{A} = \vec{y}} = 
+    \Prob{\vec{A} = \vec{y}} 
+        \prod_{j=1}^{u} \Prob{\AVecComp{A}[j] = x_j \Given \RV{A_j} = y_j}\,.
+\end{equation}
+If it is given that $\AVec{A}[\tprate][\fprate] = \vec{y}$, i.e., the elements in the 
+objective set are known, by the axioms of probability the conditional 
+probability is
+\begin{equation}
+    \Prob{\AVec{A}[\tprate][\fprate] = \vec{x} \Given \vec{A} = \vec{y}} = \prod_{j=1}^{u} 
+    \Prob{\AVecComp{A}[j] = x_j \Given \RV{A_j} = y_j}
+\end{equation}
+where $\fprate = \Prob{\AVecComp{A}[j]=1 \Given \RV{A_j}=0}$ and $\tprate = \Prob{\AVecComp{A}[j]=1 \Given \RV{A_j}=1}$.
+
+
+%TODO: incorporate probability space / Borel set:
+
+
+The relative frequency of any event $\vec{x}$ in $\{0,1\}^u$ converges to $\Prob{\AVec{X} = \vec{x} \Given \AVec{y}}$ as the number of times the random approximate set of $\AVec{y}$ is generated goes to infinity.
+
+%The relative frequency of any event $\vec{x}$ in $\{0,1\}^u$ converges to 
+%$\Prob{\AVec{X} = \vec{x} \Given \OVec{y}}$ as the number of times the 
+%algorithm is applied to the objective set $\OVec{y}$ is repeated goes to 
+%infinity.
+
+%The sample space (the set of mutually exclusive outcomes
+%that may be observed) is given by some subset of $\PS{\Set{U}}$. Sets of 
+%outcomes are denoted events where an event that contains one outcome is 
+%elementary event and the event containing all outcomes is the sample space 
+%$\PS{\Set{U}}$.
+
+%Suppose we an objective set $\Set{S}$ and $n$ approximations drawn from
+%$\ASet{S}(\fprate,\tprate)$, denoted by $\ASet{S}(\fprate = \fprateob_j,
+%\tprate = \tprateob_j)$ for $j=1,\ldots,n$.
+
+%The \emph{distribution} of false positive rates 
+%$\fprateob_1,\ldots,\fprateob_n$ for a sample of $n$ approximate sets 
+%$\ASet{S}[1],\ldots,\ASet{S}[n]$, where each is said to have an 
+%\emph{expected} false positive rate $\fprate$, has a central tendency 
+%around $\fprate$. The same is true for the true positive rate 
+%$\tprate$.
+
+
+Consider the following example.
+\begin{example}
+	Suppose the universal set is $\{ x_1,x_2 \}$ and consider the distribution of the first-order random approximate set $\AT{\{x_1\}}[\fprate][\fnrate]$.
+	The probability mass function $\Fun{p}_{\AT{\{x_1\}}[\fprate][\fnrate]}$ is given by
+	\begin{equation}
+	\Fun{p}_{\AT{\{x_1\}}[\fprate][\tprate]}(\Set{X}) =
+	\begin{cases} 
+	\fnrate (1-\fprate) & \Set{X} = \EmptySet\,,\\
+	\fnrate \fprate     & \Set{X} = \{x_2\}\,,\\
+	(1-\fnrate)(1-\fprate)     & \Set{X} = \{x_1\}\,,\\
+	(1-\fnrate)\fprate         & \Set{X} = \{x_1,x_2\}\,.
+	\end{cases}
+	\end{equation}
+\end{example}
+
+
+\subsection{Higher-order models}
+There are $k! / n_1! n_2! \ldots n_k!$ partitioning schemes in the $n$-th order model.
+
+
+
+, any of which may be realized by an appropriate composition of first-order and positive-negative approximations.
+
+
+\end{document}

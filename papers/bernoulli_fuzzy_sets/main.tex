@@ -1,0 +1,141 @@
+%\documentclass[10pt,journal,compsoc,hidelinks]{IEEEtran}
+\documentclass[10pt,journal,compsoc,hidelinks]{article}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\graphicspath{{img/}} 
+\usepackage{algorithm2e}
+\usepackage{caption}
+\usepackage{bbm}
+\usepackage{booktabs}
+\usepackage{mathtools}
+\usepackage{subfiles}
+\usepackage{commath}
+\usepackage{appendix}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{pgfplots}
+\usepackage{tabu}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usepackage{tikzscale}
+\usepackage[nopostdot,xindy,symbols,toc,acronym]{glossaries}
+\usepackage[square,numbers]{natbib}
+\usepackage{cleveref}
+\usepackage{siunitx}
+\usepackage[section]{placeins}
+\usepackage{geometry}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{xparse}
+\usepackage{backnaur}
+\usepackage[intoc,english]{nomencl}
+
+\usepackage[fancy]{setnotation}
+\usepackage{fuzzyset}
+
+\floatstyle{plain}
+\newfloat{floatbnf}{h}{bnf}
+\floatname{floatbnf}{BNF}
+
+\definecolor{ltgray}{rgb}{0.7,0.7,0.7}
+
+\lstset
+{
+    basicstyle=\footnotesize,               % print whole listing small
+    keywordstyle=\bfseries,
+    identifierstyle=,               % nothing happens
+    commentstyle=\itshape\color{ltgray},    % gray comments
+    %stringstyle=\ttfamily,          % typewriter type for strings
+    showstringspaces=false,         % no special string spaces
+    numbers=left,
+    numberstyle=\tiny,
+    stepnumber=1,
+    numbersep=5pt
+}
+
+\hypersetup{
+    pdftitle={The \emph{approximate fuzzy set} abstract data type},  % title
+    pdfauthor={Alexander Towell},               % author
+    pdfsubject={computer science},              % subject of the %document
+    pdfkeywords={
+        probabilistic data structure,
+        abstract data type,
+        approximate set,
+        bloom filter,
+        perfect hash function,
+        perfect hash filter},                 % keywords
+    colorlinks=false,                           % false: boxed links;
+    citecolor=green,                            % color of links to 
+    filecolor=magenta,                          % color of file links
+    urlcolor=green                              % color of external
+}
+
+\include{defs}
+
+\newcommand{\FuzzyDeg}{\operatorname{deg}}
+\newcommand{\Truth}{\operatorname{truth}}
+
+\newcounter{examplecounter}
+\newenvironment{example}
+{
+    \begin{quote}%
+        \refstepcounter{examplecounter}%
+        \textbf{Example \arabic{examplecounter}}%
+        \quad
+    }
+    {%
+    \end{quote}%
+}
+
+\newcounter{equationstore}
+\AtBeginEnvironment{proof}{\setcounter{equationstore}{\value{equation}}
+    \setcounter{equation}{0}\renewcommand{\theequation}{\alph{equation}}}
+\AtEndEnvironment{proof}{\setcounter{equation}{\value{equationstore}}}
+
+\newcounter{equationex}
+\AtBeginEnvironment{example}{\setcounter{equationex}{\value{equation}}
+    \setcounter{equation}{0}\renewcommand{\theequation}{\alph{equation}}}
+\AtEndEnvironment{example}{\setcounter{equation}{\value{equationex}}}
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+\newtheorem{definition}{Definition}
+
+\loadglsentries{gloss}
+
+
+\title
+{
+    The \emph{fuzzy approximate set} abstract data type
+}
+\author
+{
+    Alexander Towell\\
+    \texttt{atowell@siue.edu}
+}
+\date{}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+We define the semantics of the \gls*{gls-approxfuzzyset}, which is a fuzzy set that \emph{approximates} another fuzzy set with a false positive (non-zero degree-of-membership) rate $\varepsilon$ and false negative rate $\eta$. We derive several properties that follow from these semantics, such as the expected \emph{mean average precision} in information retrieval and closure under unions and intersections. Following from this, we introduce two complementary specializations, denoted \emph{positive} and \emph{negative} approximate fuzzy sets, and provide a full specification of the fuzzy approximate set-theoretic model. Finally, we demonstrate an application of fuzzy approximate sets especially relevant to \emph{Encrypted Search}, rank-ordered search.
+\end{abstract}
+
+\tableofcontents
+
+\listoffigures
+\listofalgorithms
+
+\subfile{sections/intro}
+\subfile{sections/perf}
+\subfile{sections/fuzzy_set_theory}
+\subfile{sections/application_approx_rs}
+\subfile{sections/appendix}
+\printglossary
+\bibliography{references}
+\end{document}

@@ -1,0 +1,364 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+\appendix
+\appendices
+\appendixpage
+\addappheadtotoc
+\section{Proof of Theorem~\ref{thm:union_fn_rate}}
+\label{sec:proof_union_fn_rate}
+According to \Cref{thm:union_fn_rate}, given approximate sets $\Sa_1$ and $\Sa_2$ respectively with false positive rates $\varepsilon_1$ and $\varepsilon_2$ and false negative rates $\eta_1$ and $\eta_2$, the union $\Sa_1 \cup \Sa_2$ is an approximate set with a false negative rate given by
+\begin{equation*}
+\begin{split}
+    \eta &=
+        \alpha_1 \left(\eta_1 + \eta_2 - \eta_1 \eta_2\right) + \alpha_2 \left(1 - \varepsilon_2 + \eta_1 \varepsilon_2\right)\\
+        &\qquad+ (1 - \alpha_1 - \alpha_2) \left(1 - \varepsilon_1 + \eta_2 \varepsilon_1\right)\,,
+\end{split}
+\tag{Eq. \ref{eq:union_fn_rate} revisited}
+\end{equation*}
+where
+\begin{equation*}
+    0 \leq \alpha_1 = \frac{\card{\St_1 \! \cap \St_2}}{\card{\St_1 \! \cup \St_2}}\,,0 \leq \alpha_2 = \frac{\card{\St_1 \! \setminus \St_2}}{\card{\St_1 \! \cup \St_2}}\,, \text{and} \; \alpha_1 + \alpha_2 \leq 1\,.
+\end{equation*}
+\begin{proof}
+The false negative rate is equivalent to ratio of the \emph{expected} number of false negatives to the total number of possible false negatives. The set of \emph{possible} false negatives are given by the set of positives, $\St_1 \! \cup \St_2$, which is given by the union of the disjoint sets
+\begin{equation}
+    \St_1 \! \cap \St_2\,,
+    \St_1 \! \setminus \St_2\,,\text{and}\;
+    \St_2 \! \setminus \St_1\,.
+\end{equation}
+Since they are disjoint, we may consider each independently to calculate the expected total number of false negatives.
+
+To be a false negative, an element that is a positive in $\St_1 \cup \St_2$ must be a negative in $\Sa_1 \cap \Sa_2$. Let $m_1 = \card{\St_1}$, $m_2 = \card{\St_2}$, and $m_{1 2} = \card{\St_1 \!\cap \St_2}$. By the rules of set theory, $\card{\St_1 \setminus \St_2} = m_1 - m_{1 2}$ and $\card{\St_2 \setminus \St_1} = m_2 - m_{1 2}$.
+
+We denote the events $\rv{X} \in \Sa_1$ by $A_1$, $\rv{X} \in \Sa_2$ by $A_2$, $\rv{X} \in \St_1$ by $B_1$, and $\rv{X} \in \St_2$ by $B_2$. Suppose we randomly select an element from $\St_1 \!\cap \St_2$. The probability that $\rv{X}$ is a negative in $\Sa_1 \cup \Sa_2$ given that it is positive in $\St_1 \cap \St_2$ is given by
+\begin{equation}
+    \Pr\!\left[A_1' \! \cup A_2' \given B_1 \! \cap B_2\right]\,.
+\end{equation}
+By De Morgan's law,
+\begin{equation}
+    \Pr\!\left[A_1' \! \cup A_2' \given B_1 \! \cap B_2\right] = \Pr\!\left[\left(A_1 \! \cap A_2\right)' \given B_1 \! \cap B_2\right]\,.
+\end{equation}
+By the rules of probability,
+\begin{equation}
+    \Pr\!\left[\left(A_1 \! \cap A_2\right)' \given B_1 \! \cap B_2\right] = 1 - \Pr\!\left[A_1 \! \cap A_2 \given B_1 \! \cap B_2\right]\,.
+\end{equation}
+Since $A_1$ and $A_2$ are independent events, by the rules of probability \begin{equation}
+    1 - \Pr\!\left[A_1 \! \cap A_2 \given B_1 \! \cap B_2\right] = 1 - \Pr\!\left[A_1 \given B_1 \cap B_2\right] \Pr\!\left[A_2 \given B_1 \cap B_2\right]\,.
+\end{equation}
+Since $A_1$ is independent of $B_2$ abd $A_2$ is independent of $B_2$, by the rules of probability
+\begin{equation}
+    1 - \Pr\!\left[A_1 \given B_1 \cap B_2\right] \Pr\!\left[A_2 \given B_1 \cap B_2\right] = 1 - \Pr\!\left[A_1 \given B_1\right] \Pr\!\left[A_2 \given B_2\right]\,.
+\end{equation}
+By definition, $\Pr[A_j \given B_j]$ is the true negative rate $1 - \eta_j$. Making this substitution yields
+\begin{equation}
+    1 - (1 - \eta_1)(1 - \eta_2) = \eta_2 + \eta_1 - \eta_1 \eta_2\,.
+\end{equation}
+There are $m_{1 2}$ elements in $\mathbb{A}_1$, where each is an independent Bernoulli trial. Thus, there are expected to be
+\begin{equation}
+\label{eq:proof_union_fn_1}
+    m_{1 2} \left(\eta_2 + \eta_1 - \eta_1 \eta_2\right)
+\end{equation}
+false negatives in $\St_1 \! \cap \St_2$
+
+Suppose we randomly select an element from $\St_1 \! \setminus \St_2$. Then, $\rv{X}$ is positive in $\St_1$ and negative in $\St_2$. The probability that $\rv{X}$ is a negative in either of the approximate sets is given by
+\begin{equation}
+    \Pr[A_1 \! \cup A_2 \given B_1 \! \cap B_2']\,.
+\end{equation}
+By \Cref{eq:proof_union_fp_1,eq:proof_union_fp_2,eq:proof_union_fp_3} in the proof of \Cref{thm:union_fp}, the above probability is equal to
+\begin{equation}
+    1 - \Pr[A_1 \! \cap A_2 \given B_1 \! \cap B_2']\,.
+\end{equation}
+Since $A_1$ and $A_2$ are independent events, this may be rewritten as
+\begin{equation}
+    1 - \Pr[A_1 \given B_1 \! \cap B_2'] \Pr[A_2 \given B_1 \cap B_2']\,.
+\end{equation}
+Since $A_1$ is independent of $B_2$ and $A_2$ is independent of $B_1$, this may be rewritten as
+\begin{equation}
+    1 - \Pr[A_1 \given B_1] \Pr[A_2 \given B_2']\,.
+\end{equation}
+By definition, $\Pr[A_1 \given B_1]$ is the true positive rate $1 - \eta_1$ and $\Pr[A_2 \given B_2']$ is the false positive rate $\varepsilon_2$. Thus, the probability is equal to
+\begin{equation}
+    1 - (1 - \eta_1) \varepsilon_2 = 1 - \varepsilon_2 + \eta_1 \varepsilon_2\,.
+\end{equation}
+There are $m_1 - m_{1 2}$ elements in $\mathbb{A}_2$, where each is an independent Bernoulli trial. Thus, there are expected to be
+\begin{equation}
+\label{eq:proof_union_fn_2}
+    (m_1 - m_{1 2}) \left(1 - \varepsilon_2 + \eta_1 \varepsilon_2\right)
+\end{equation}
+false negatives in $\St_1 \! \setminus \St_2$. A similar argument follows for $\St_2 \! \setminus \St_1$ where there are expected to be
+\begin{equation}
+\label{eq:proof_union_fn_3}
+    (m_2 - m_{1 2}) \left(1 - \varepsilon_1 + \eta_2 \varepsilon_1\right)
+\end{equation}
+false negatives.
+
+The false negative rate is given by the ratio of the total expected number of false negatives given by \Cref{eq:proof_union_fn_1,eq:proof_union_fn_2,eq:proof_union_fn_3} to the total number of possible false negatives $m_1 + m_2 - m_{1 2}$, which is given by
+\begin{equation}
+\label{eq:proof_union_fn_4}
+\begin{split}
+    \eta =
+        &\frac{m_{1 2}}{m_1 + m_2 - m_{1 2}} \left(\eta_1 + \eta_2 - \eta_1 \eta_2\right) +\\
+        &\frac{m_1 - m_{1 2}}{m_1 + m_2 - m_{1 2}} \left(1 - \varepsilon_2 + \eta_1 \varepsilon_2\right) +\\
+        &\frac{m_2 - m_{1 2}}{m_1 + m_2 - m_{1 2}} \left(1 - \varepsilon_1 + \eta_2 \varepsilon_1\right)\,.
+\end{split}
+\end{equation}
+If we let
+\begin{align}
+    \alpha_1 = \frac{m_{1 2}}{m_1 + m_2 - m_{1 2}}\; \text{and} \;
+    \alpha_2 = \frac{m_1 - m_{1 2}}{m_1 + m_2 - m_{1 2}}\,,
+\end{align}
+then
+\begin{equation}
+    1 - \alpha_1 - \alpha_2 = \frac{m_2 - m_{1 2}}{m_1 + m_2 - m_{1 2}}\,.
+\end{equation}
+Making these substitutions into \Cref{eq:proof_union_fn_4} yields the result
+\begin{equation}
+\begin{split}
+    \eta &=
+        \alpha_1 \left(\eta_1 + \eta_2 - \eta_1 \eta_2\right) + \alpha_2 \left(1 - \varepsilon_2 + \eta_1 \varepsilon_2\right)\\
+        &\qquad+ (1 - \alpha_1 - \alpha_2) \left(1 - \varepsilon_1 + \eta_2 \varepsilon_1\right)\,.
+\end{split}
+\end{equation}
+\end{proof}
+
+\section{Proof of Theorem~\ref{thm:intersect_fp_rate}}
+According to \Cref{thm:intersect_fp_rate}, given a universe of $u$ elements and approximate sets $\Sa_1$ and $\Sa_2$ respectively with false positive rates $\varepsilon_1$ and $\varepsilon_2$ and false negative rates $\eta_1$ and $\eta_2$, the intersection $\Sa_1 \! \cap \Sa_2$ is an approximate set with a false positive rate given by
+\begin{equation*}
+\begin{split}
+    \varepsilon &= \alpha_1 \varepsilon_1 \left(1 - \eta_2\right) + \alpha_2 \varepsilon_2 \left(1 - \eta_1\right) + \left(1 - \alpha_1 - \alpha_2\right) \varepsilon_1 \varepsilon_2
+\end{split}
+\tag{Eq.~\ref{eq:intersect_fn_rate} revisited}
+\end{equation*}
+where
+\begin{equation*}
+    0 \leq \alpha_1 = \frac{\card{\St_1 \setminus \St_2}}{u - \card{\St_1 \! \cap \St_2}}\,,
+    0 \leq \alpha_2 = \frac{\card{\St_2 \setminus \St_1}}{u - \card{\St_1 \! \cap \St_2}}\,,
+    \textrm{and} \; \alpha_1 + \alpha_2 \leq 1\,.
+\end{equation*}
+\begin{proof}
+The false positive rate is equivalent to the ratio of the \emph{expected} number of false positives to the total number of possible false positives. The set of \emph{possible} false positives are given by the are given by the disjoint sets
+\begin{equation}
+    \St_1 \setminus \St_2\,, \St_2 \setminus \St_1\,, \text{and} \; \mathbb{U} \setminus \St_1 \cup \St_2\,.
+\end{equation}
+Since they are disjoint, we may consider each independently to calculate the expected number false positives.
+
+Suppose we randomly select an element from the universe $\mathbb{U}$, denoted by $\rv{X}$. Given that $\rv{X} \in \mathbb{U} \setminus \St_1 \cup \St_2$, $\rv{X}$ is a negative in both $\St_1$ and $\St_2$, the probability that $\rv{X}$ is positive in both of the approximate sets $\Sa_1$ and $\Sa_2$ is given by
+\begin{equation}
+    \Pr[\rv{X} \in \Sa_1 \! \cap \rv{X} \in \Sa_2 \given \rv{X} \notin \St_1 \cap \rv{X} \notin \St_2]\,.
+\end{equation}
+Since these are independent events, the above probability is equivalent to
+\begin{equation}
+    \Pr[\rv{X} \in \Sa_1 \given \rv{X} \notin \St_1] \Pr[\rv{X} \in \Sa_2 \given \rv{X} \notin \St_2]\,.
+\end{equation}
+By definition, $\Pr[\rv{X} \in \Sa_j \given \rv{X} \notin \St_j]$ is the false positive rate $\varepsilon_j$ and thus the above probability is given by
+\begin{equation}
+    \varepsilon_1 \varepsilon_2\,.
+\end{equation}
+By the rules of set theory, there are $u - (m_1 + m_2 - m_{1 2})$ elements in $\mathbb{U} \setminus \St_1 \cup \St_2$, where each one is independent Bernoulli trial. Thus, there are expected to be
+\begin{equation}
+    (u - (m_1 + m_2 - m_{1 2})) \varepsilon_1 \varepsilon_2
+\end{equation}
+false positives in $\mathbb{U} \setminus \St_1 \cup \St_2$.
+
+The elements in $\St_2 \setminus \St_1$ are negatives in $\St_1$ and positives in $\St_2$. Therefore, the probability that $\rv{X}$ is a positive in both of the approximate sets $\Sa_1$ and $\Sa_2$ is given by
+\begin{equation}
+    \Pr[\rv{X} \in \Sa_1 \! \cap \rv{X} \in \Sa_2 \given \rv{X} \notin \St_1 \! \cap \rv{X} \in \St_2]\,.
+\end{equation}
+Since these are independent events, the above probability is equivalent to
+\begin{equation}
+    \Pr[\rv{X} \in \Sa_1 \given \rv{X} \notin \St_1] \Pr[\rv{X} \in \Sa_2 \given \rv{X} \in \St_2]\,.
+\end{equation}
+By definition, $\Pr[\rv{X} \in \Sa_1 \given \rv{X} \notin \St_1]$ is the false positive rate $\varepsilon_1$ and $\Pr[\rv{X} \in \Sa_2 \given \rv{X} \in \St_2]$ is the true positive rate $1 - \eta_2$ and thus the above probability is given by
+\begin{equation}
+    \varepsilon_1 (1 - \eta_2)\,.
+\end{equation}
+By the rules of set theory, there are $m_2 - m_{1 2}$ elements in $\St_2 \setminus \St_1$, where each one is an independent Bernoulli trial. Thus, there are expected to be
+\begin{equation}
+    (m_2 - m_{1 2}) \varepsilon_1 (1 - \eta_2)
+\end{equation}
+false positives in $\St_2 \setminus \St_1$. A similar argument follows for $\St_1 \setminus \St_2$ where there are expected to be
+\begin{equation}
+    (m_1 - m_{1 2}) \varepsilon_2 (1 - \eta_1) 
+\end{equation}
+false positives.
+
+Since we have computed the expected number of false positives over every possible false positive, the false positive rate $\varepsilon$ is given by
+\begin{equation}
+\begin{split}
+    \varepsilon =
+        & \left(\frac{m_2 - m_{1 2}}{u - m_{1 2}}\right) \varepsilon_1 \left(1 - \eta_2\right) + \left(\frac{m_1 - m_{1 2}}{u - m_{1 2}}\right) \varepsilon_2 \left(1 - \eta_1\right)\\
+        &\qquad+ \left(\frac{u - m_1 - m_2 + m_{1 2}}{u - m_{1 2}}\right) \varepsilon_1 \varepsilon_2\,.
+\end{split}
+\end{equation}
+\end{proof}
+
+\section{Proof of Corollary~\ref{cor:approx_expected_precision}}
+\label{sec:proof_approx_expected_precision}
+Given a universe of $u$ elements where $\alpha \cdot 100\%$ are positive, by \Cref{cor:approx_expected_precision} an approximate set with a false positive rate $\varepsilon$ and a false negative rate $\eta$ has an \emph{expected} precision given \emph{approximately} by
+\begin{equation*}
+    \gamma(\alpha, u, \eta, \varepsilon) \approx \frac{\overline{t}}{\overline{t} + \overline{f}} +
+    \frac{\overline{t} \sigma_{\!f}^2 - \overline{f} \sigma_{\!t}^2}{\left(\overline{t} + \overline{f}\right)^3}\,,
+    \tag{Eq. \ref{eq:cor_approx_expected_precision} revisited}
+\end{equation*}
+where $\overline{t} = u \alpha(1 - \eta)$ is the \emph{expected} number of \emph{true positives}, $\overline{f} =  u(1 - \alpha) \varepsilon$ is the \emph{expected} number of \emph{false positives}, $\sigma_{\!t}^2 = u \alpha (1 - \eta) \eta$ is the variance of the number of \emph{true positives}, and $\sigma_{\!f}^2 = u(1 - \alpha) \varepsilon(1-\varepsilon)$ is the variance of the number of \emph{false positives}.
+\begin{proof}
+Let the \emph{precision} be denoted by
+\begin{equation}
+    \operatorname{f}(t_p, f_p) = \frac{t_p}{t_p + f_p}\,,
+\end{equation}
+where $t_p$ is the number of true positives and $f_p$ is the number of false positives.
+
+We approximate this function with a second-order Taylor series. The gradient of $\operatorname{f}$ is given by
+\begin{equation}
+    \nabla{\operatorname{f}}(t_p,f_p) =
+    \frac{1}{(t_p + f_p)^2}
+    \begin{bmatrix}
+        f_p\\
+        -t_p\\
+    \end{bmatrix}
+\end{equation}
+and the Hessian of $\operatorname{f}$ is given by
+\begin{equation}
+    \mathcal{H}(t_p,f_p) =
+    \frac{1}{(t_p + f_p)^3}
+    \begin{bmatrix}
+        -2 f_p & t_p-f_p\\
+        t_p-f_p & 2 t_p \\
+    \end{bmatrix}\,.
+\end{equation}
+Thus, a linear approximation $\operatorname{g}$ that is reasonably accurate near the expected value of $\TP_m$, denoted by $\overline{t}$, and the expected value of $\FP_m$, denoted by $\overline{f}$, is given by
+\begin{equation}
+    \operatorname{g}(t_p,f_p) =
+    \operatorname{f}\left(\overline{t},\overline{f}\right) + \nabla{\operatorname{f}}(\overline{t},\overline{f}])^{\intercal}
+    \begin{bmatrix}
+        t_p - \overline{t}\\
+        f_p - \overline{f}\\
+    \end{bmatrix}
+    + \frac{1}{2}
+    \begin{bmatrix}
+        t_p - \overline{t}\\
+        f_p - \overline{f}\\
+    \end{bmatrix}^{\intercal}
+    \mathcal{H}(\overline{t},\overline{f})
+    \begin{bmatrix}
+        t_p - \overline{t}\\
+        f_p - \overline{f}\\
+    \end{bmatrix}\,.
+\end{equation}
+As a function of random variables $\TP_m$ and $\FP_m$, $\operatorname{g}\!\left(\TP_m,\FP_m\right)$ is a random variable. Since $\expectation[\TP_m - \overline{t}] = 0$ and $\expectation[\FP_m - \overline{f}] = 0$, we immediately simplify the expectation of $\operatorname{g}$ to
+\begin{equation}
+\label{eq:proof_hess1}
+\begin{split}
+    \expectation\!\left[\operatorname{g}(\TP_m,\FP_m)\right]
+    &= \frac{\overline{t}}{\overline{t}+\overline{f}} + \frac{1}{(\overline{t} + \overline{f})^3} \times\\
+    & \qquad \expectation\!\left[\frac{1}{2}
+    \begin{bmatrix}
+        \TP_m - \overline{t}\\
+        \FP_m - \overline{f}
+    \end{bmatrix}^{\intercal}
+    \begin{bmatrix}
+        -2 \overline{f} & \overline{t}-\overline{f}\\
+        \overline{t}-\overline{f} & 2 \overline{t}
+    \end{bmatrix}
+    \begin{bmatrix}
+        \TP_m - \overline{t}\\
+        \FP_m - \overline{f}
+    \end{bmatrix}
+    \right]\,.
+\end{split}
+\end{equation}
+Focusing on the inside part of the expectation in the above equation, we multiply the right column matrix by the Hessian matrix, resulting in
+\begin{equation}
+    \frac{1}{2}
+    \begin{bmatrix}
+        \TP_m - \overline{t}\\
+        \FP_m - \overline{f}
+    \end{bmatrix}^{\intercal}
+    \begin{bmatrix}
+        -2 \overline{f} \left(\TP_m - \overline{t}\right) + \left(\overline{t}-\overline{f}\right)\left(\FP_m - \overline{f}\right)\\
+        \left(\overline{t}-\overline{f}\right)\left(\TP_m - \overline{t}\right) + 2 \overline{t}\left(\FP_m - \overline{f}\right)
+    \end{bmatrix}
+\end{equation}
+Multiplying the left column matrix by the right column matrix and applying the expectation results in
+\begin{equation}
+\begin{split}
+    \expectation\biggl[-\overline{f} \left(\TP_m - \overline{t}\right)^2 + 
+    \left(\overline{t}-\overline{f}\right)\left(\TP_m - \overline{t}\right)\left(\FP_m - \overline{f}\right) + \overline{t}\left(\FP_m - \overline{f}\right)^2\biggr]\,.
+\end{split}
+\end{equation}
+As a linear operator, the above expectation simplifies to
+\begin{equation}
+    -\overline{f} \expectation\!\left[\TP_m - \overline{t}\right]^2 + \left(\overline{t}-\overline{f}\right)\expectation\!\left[\left(\FP_m - \overline{f}\right)\left(\TP_m - \overline{t}\right)\right] + \overline{t}\expectation\!\left[\FP_m - \overline{f}\right]^2\,.
+\end{equation}
+The expectation $\expectation[\TP_m - \overline{t}]^2$ is the variance of $\TP_m$, $\expectation[\FP_m - \overline{f}]^2$ is the variance of $\FP_m$, and $\expectation\!\left[\left(\FP_m - \overline{f}\right)\left(\TP_m - \overline{t}\right)\right]$ is the covariance of $\TP_m$ and $\FP_m$. The covariance is $0$ since they are independent, and thus the above equation simplifies to
+\begin{equation}
+    -\overline{f} \var\!\left[\TP_m\right] + \overline{t}\var\!\left[\FP_m\right]\,.
+\end{equation}
+Replacing the expectation in \Cref{eq:proof_hess1} with the above yields the result.
+\end{proof}
+
+\section{C++ implementation of approximate sets}
+\label{sec:impl}
+A C++ \emph{interface} of the static approximate set is given by \Cref{code:sas}.
+\lstinputlisting
+[
+    float,
+    language=c++,
+    frame=lines,
+    label={code:sas},
+    caption={The C++ interface of the \emph{static approximate set}} abstract data type
+]
+{code/approximate_set.h}
+
+\subsection{Set-theoretic operations: union, intersection, and complement}
+\label{sec:impl:set_theory}
+To implement any set-theoretic operation, only set-intersection and set-complement (or set-union and set-complement) need to be implemented. Any other set-theoretic operation may be implemented by composing these two operations as described in \Cref{}. For efficiency, however, other set-theoretic operations may be \emph{directly} implemented.
+
+Assuming the elements of an approximate set are \emph{non-iterable}, i.e., only membership tests may be performed using the \Contains interface, or the approximate set is \emph{countably infinite} (and thus it is not possible to iterate over all members), set-theoretic operations may only be implemented by composing the approximate sets together, e.g., if we are given two approximate sets $\Sa_1$ and $\Sa_2$, the union $\Sa_1 \cup \Sa_2$ is implemented by performing membership tests on both $\Sa_1$ and $\Sa_2$ and returning true if either test returns true, i.e.,
+\begin{equation}
+    \Contains(\Sa_1 \cup \Sa_2, x) = \Contains(\Sa_1, x) \lor \Contains(\Sa_2, x)\,.
+\end{equation}
+
+\lstinputlisting
+[
+    float,
+    language=c++,
+    frame=lines,
+    label={code:sas_union},
+    caption={The C++ implementation of the union of approximate sets}
+]
+{code/approximate_union_set.h}
+
+\lstinputlisting
+[
+    float,
+    language=c++,
+    frame=lines,
+    label={code:sas_intersect},
+    caption={The C++ implementation of the intersection of approximate sets}
+]
+{code/approximate_intersection_set.h}
+
+\lstinputlisting
+[
+    float,
+    language=c++,
+    frame=lines,
+    label={code:sas_comp},
+    caption={The C++ implementation of the complement of an approximate set}
+]
+{code/approximate_complement_set.h}
+
+For instance, set-difference may be implemented by \Cref{code:sas_diff}.
+\lstinputlisting
+[
+    float,
+    language=c++,
+    frame=lines,
+    label={code:sas_diff},
+    caption={The C++ implementation of the difference of approximate sets}
+]
+{code/approximate_difference_set.h}
+
+\end{document}

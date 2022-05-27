@@ -1,0 +1,72 @@
+\begin{figure}[ht]
+	\label{fig:prec_vs_fprate_and_fnrate}
+	\centering
+	\captionsetup{justification=centering}
+	\caption
+	{
+		False positive rate $\fprate$ and false negative rate $\fnrate$ vs 
+		precision $\ppv$ of an approximate set $\protect\ASet{S}$ where 
+		$\protect\Set{S}$ consists of $\lambda = 0.1$ elements from a universe 
+		of 
+		$u=10^4$ elements.
+	}
+	\begin{tikzpicture}
+	\begin{axis}
+	[
+	ymax=1,
+	ymin=0.25,
+	xmin=0,
+	xmax=.25,
+	xlabel={$\fprate$},
+	ylabel={$\ppv$},
+	legend style={nodes=right},
+	legend pos={north east},
+	]
+	
+	\addplot[
+	smooth,
+	dashed,
+	color=black] table [x index=0,y index=2,col sep=comma] 
+	{data/fpratefixedfnrate.csv};
+	\addlegendentry{$\ppv\!\left(\fprate,\fnrate=.05,\lambda=0.1,u=10^4\right)$}
+	
+	\addplot[
+	smooth,
+	dotted,
+	color=black] table [x index=0,y index=2,col sep=comma] 
+	{data/fpratefixedfnrate2.csv};
+	\addlegendentry{$\ppv\!\left(\fprate,\fnrate=.20,\lambda=0.1,u=10^4\right)$}
+	\end{axis}
+	\end{tikzpicture}
+\end{figure}
+
+\begin{figure}[ht]
+	\label{fig:prec_vs_fprate}
+	\centering
+	\captionsetup{justification=centering}
+	\caption
+	{
+		False positive rate $\fprate$ vs precision $\ppv$ of an approximate set 
+		$\protect\PASet{S}$ where $\protect\Set{S}$ consists of $m = \lambda 
+		\times 10^4$ elements from a universe of $u=10^4$ elements.
+	}
+	\begin{tikzpicture}
+	\begin{axis}
+	[
+	xmax=2e-2,
+	xlabel={$\fprate$},
+	ylabel={$\ppv$},
+	no markers,
+	cycle list={black}
+	legend style={nodes=right},
+	legend pos={south west}
+	]
+	\addlegendentry{$\ppv\!\left(\fprate,\lambda=10^{-3},u=10^4\right)$}
+	\addplot[dashed] table [col sep=comma] {data/prec_vs_fprate1.csv};
+	\addlegendentry{$\ppv\!\left(\fprate,\lambda=10^{-2},u=10^4\right)$}
+	\addplot[dotted] table [col sep=comma] {data/prec_vs_fprate2.csv};
+	\addlegendentry{$\ppv\!\left(\fprate,\lambda=10^{-1},u=10^4\right)$}
+	\addplot[solid] table [col sep=comma] {data/prec_vs_fprate3.csv};
+	\end{axis}
+	\end{tikzpicture}
+\end{figure}

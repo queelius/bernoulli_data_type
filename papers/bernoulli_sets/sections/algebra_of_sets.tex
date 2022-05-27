@@ -1,0 +1,151 @@
+\documentclass[../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+\section{Algebra of sets} 
+\label{sec:setalgebra}
+A \emph{set}\index{set} is an unordered collection of distinct elements.
+If we know the elements in a set, we may denote the set by these elements, e.g., $\{a,c,b\}$ denotes a set whose members are exactly $a$, $b$, and $c$.
+
+Two sets of particular importance are the empty set, denoted by $\EmptySet$, which has no members, and the \emph{universal set}, in which every element of interest is a member.
+
+A \emph{finite set} has a finite number of elements.
+For example, $\{ 1, 3, 5 \}$ is a finite set with three elements.
+When sets $\Set{A}$ and $\Set{B}$ are \emph{isomorphic}, denoted by $\Set{A} 
+\cong \Set{B}$, they can be put into a one-to-one correspondence (bijection), e.g., $\{b,a,c\} \cong \{1,2,3\}$.
+
+The cardinality of a finite set $\Set{A}$ is the number of elements in the set, denoted by $\Card{\Set{A}}$, e.g., $\Card{\left\{ 1, 3, 5\right\}} = 3$.
+A \emph{countably infinite set} is isomorphic to the set of \emph{natural numbers} $\NatSet \coloneqq \{1,2,3,4,5,\ldots\}$.
+
+
+Given two elements $a$ and $b$, an ordered pair of $a$ then $b$ is denoted by $\Pair{a}{b}$, where $\Pair{a}{b} = \Pair{c}{d}$ \emph{if and only if} $a = c$ and $b = d$.
+Ordered pairs are non-commutative and non-associative, i.e., $\Pair{a}{b} \neq \Pair{b}{a}$ if $a \neq b$ and $\Pair{a}{\Pair{b}{c}} \neq \Pair{\Pair{b}{a}}{c}$.
+
+Related to the ordered pair is the Cartesian product.
+\begin{definition}
+	The set $\Set{X} \times \Set{Y} \coloneqq \left\{\Pair{x}{y} \colon x \in 
+	\Set{X} \land y \in \Set{Y}\right\}$ is the Cartesian product of sets $\Set{X}$ 
+	and $\Set{Y}$.
+\end{definition}
+By the non-commutative and non-associative property of ordered pairs, the Cartesian product is non-commutative and non-associative.
+However, they are isomorphic, i.e., $\Set{X} \times \Set{Y} \cong \Set{Y} \times \Set{X}$.
+
+A \emph{tuple} is a generalization of order pairs which can consist of an arbitrary number of elements, e.g., $\Tuple{x_1,x_2,\ldots,x_n}$.
+\begin{definition}[$n$-fold Cartesian product]
+	The $n$-ary Cartesian product of sets $\Set{X}[1],\ldots,\Set{X}[n]$, is given by $\Set{X}[1] \times \cdots \times \Set{X}[n] = \left\{\Tuple{x_1,\ldots,x_n} \colon x_1 \in \Set{X}[1] \land \cdots \land x_n \in \Set{X}[n]\right\}$.
+\end{definition}
+Note that
+	$\Set{X}[1] \times \Set{X}[2] \times \Set{X}[3] \cong \Set{X}[1] \times \left(\Set{X}[2] \times \Set{X}[3]\right) \cong \left(\Set{X}[1] \times \Set{X}[2]\right) \times \Set{X}[3]$,
+thus we may implicitly convert between them without ambiguity.
+
+If each set in the $n$-ary Cartesian product is the same, the power notation may be used, e.g., $\Set{X}^3 \coloneqq \Set{X} \times \Set{X} \times \Set{X}$.
+As special cases, $\Set{X}^0 \coloneqq \{ \EmptySet \}$ and $\Set{X}^1 \coloneqq \Set{X}$.
+
+A \emph{binary relation} over sets $\Set{A}$ and $\Set{B}$ is any subset of $\Set{A} \times \Set{B}$.
+A fundamental relation is the member-of relation, where $\SetContains[x][\Set{A}]$ denotes that an object $x$ is a member of a set $\Set{A}$.
+A set $\Set{A}$ is a \emph{subset} of a set $\Set{B}$ if every member of $\Set{A}$ is a member $\Set{B}$, denoted by $\Set{A} \subseteq \Set{B}$.
+The subset relation forms a \emph{partial order}, i.e., if $\Set{A} \subseteq \Set{B}$ and $\Set{B} \subseteq \Set{C}$ then $\Set{A} \subseteq \Set{C}$ and 
+if $\Set{A} \subseteq \Set{B}$ and $\Set{B} \subseteq \Set{A}$ then $\Set{A}$ and $\Set{B}$ are \emph{equal}, denoted by $\Set{A} = \Set{B}$.
+
+
+\begin{definition}
+	Set builder notation
+\end{definition}
+
+
+\begin{definition}
+	A \emph{function} of type $\Set{X} \mapsto \Set{Y}$ is a binary relation on $\Set{X} \times \Set{Y}$ with the constraint that each $x \in \Set{X}$ is paired with exactly one $y \in \Set{Y}$.
+\end{definition}
+A function of type $\Set{X} \mapsto \Set{Y}$ has a domain $\Set{X}$ and a codomain $\Set{Y}$.
+Since every $x \in \Set{X}$, given a pair $\Pair{x}{y} \in \Fun{f}$, $y$ may also be denoted by $\Fun{f}(x)$.
+
+The \emph{power set} of a set $\Set{A}$, denoted by $\PS{\Set{A}}$, is the set of sets that contains all of the possible subsets of $\Set{A}$, e.g., $\PS{\{a, b\}}= \left\{ \EmptySet, \{a\}, \{b\}, \{a, b\} \right\}$.
+
+A predicate is a function that maps elements in its domain to true (denoted by $1$) or false (denoted by $0$).
+A predicate function of particular importance is the indicator function
+\begin{equation}
+	\SetIndicator{\Set{A}} \colon \Set{X} \mapsto \{0,1\}
+\end{equation}
+defined as
+\begin{equation}
+	\SetIndicator{\Set{A}}(x) \coloneqq
+	\begin{cases}
+		0 & \text{if $x \notin \Set{A}$}\,,\\
+		1 & \text{if $x \in \Set{A}$}\,.
+	\end{cases}
+\end{equation}
+
+The indicator function admits the construction of predicates for any relation, e.g., a binary predicate $\operatorname{P}$ for a binary relation $\Set{R} \subseteq \Set{A} \times \Set{B}$ is defined as $\operatorname{P}(x_1,x_2) \coloneqq \SetIndicator{\Set{R}}(\Pair{x_1}{x_2})$.
+Denoting the \emph{universal set} by $\Set{X}$, all the relations mentioned previously are \emph{binary predicates}, such as $\SetContains \colon \Set{X} \times \PS{\Set{X}} \mapsto \{0,1\}$ and $\subseteq \colon \PS{\Set{X}} \times \PS{\Set{X}} \mapsto \{0,1\}$.
+
+A few important operations on sets are \emph{set-union} $\SetUnion \colon \PS{\Set{X}} \times \PS{\Set{X}} \mapsto \PS{\Set{X}}$, \emph{set-intersection}, $\SetIntersection \colon \PS{\Set{X}} \times \PS{\Set{X}} \mapsto \PS{\Set{X}}$, and \emph{set-complement} $\SetComplement \colon \PS{\Set{X}} \mapsto \PS{\Set{X}}$, respectively defined as
+\begin{align}
+	\SetUnion[\Set{A}][\Set{B}]			&\coloneqq \SetBuilder{ x \in \Set{X}}{x \in \Set{A} \lor x \in \Set{B}}\,,\\
+	\SetIntersection[\Set{A}][\Set{B}]	&\coloneqq \SetBuilder{ x \in \Set{X}}{x \in \Set{A} \land x \in \Set{B}}\,,\,\text{and}\\
+	\SetComplement[\Set{A}]				&\coloneqq \SetBuilder{ x \in \Set{X}}{x \notin \Set{A}}\,.
+\end{align}
+where $\lor$ and $\land$ are respectively the logical-connectives \emph{or} and \emph{and}.
+If $\SetIntersection[\Set{A}][\Set{B}] = \EmptySet$, then we say $\Set{A}$ and $\Set{B}$ are \emph{disjoint} sets.
+
+\subsection{Approximate sets}
+\label{sec:asets}
+Given an objective set $\Set{A}$, any element that is a member of $\Set{A}$ is denoted a \emph{positive} (of $\Set{A})$ and otherwise the element is denoted a \emph{negative}.
+Suppose $\hat{\Set{A}}$ is used as an \emph{approximation} of $\Set{A}$.
+If the \emph{only} information we have about $\Set{A}$ is given by $\hat{\Set{A}}$, then we may perform membership tests on $\hat{\Set{A}}$ to make \emph{predictions} or \emph{estimations} about $\Set{A}$.
+
+There are two ways a binary prediction can be false.
+\begin{enumerate}
+	\item A \emph{false positive} occurs if a negative of the objective set is predicted to be a positive. False positives are also known as \emph{type I errors}.
+	The complement of false positives are \emph{true negatives}.
+	\item A \emph{false negative} occurs if a positive of the objective set is predicted to be a negative. False negatives are also known as \emph{type II errors}.
+	The complement of false negatives are \emph{true positives}.
+\end{enumerate} 
+
+If we denote the set of false positives by $\PlainSet{FP}$, true positives by $\PlainSet{TP}$, false negatives by $\PlainSet{FN}$, and true negatives by $\PlainSet{TN}$, then the objective set $\Set{A}=\SetUnion[\PlainSet{FN}][\Set{TP}]$ and the approximate set $\hat{\Set{A}}=\SetUnion[\PlainSet{TP}][\PlainSet{FP}]$.
+See \cref{fig:ex_approx_set} for an illustration.
+\begin{figure}[ht]
+	\caption{An approximate set $\hat{\Set{A}}$ of an objective set $\Set{A}$}
+	\label{fig:ex_approx_set}
+	\centering
+	\def\svgwidth{\columnwidth/4}
+	\input{img/aset_fp_fn.tex}
+\end{figure}
+
+If we only have access to the approximation $\hat{\Set{A}}$, we do not have the ability to partition the universe into the disjoint sets $\PlainSet{FP}$, $\PlainSet{TP}$, $\PlainSet{FN}$, and $\PlainSet{TN}$ as demonstrated in \cref{fig:ex_approx_set}.
+However, we can quantify the degree of \emph{uncertainty} about the elements that it predicts to be positive or negative.
+The false positive and true negative rates are given by the following.
+\begin{definition}
+	\label{def:fprate}
+	The \emph{false positive rate} is the proportion of predictions that are \emph{false positives} as given by
+	\begin{equation}
+	\hat{\fprate} = \frac{\Card{\PlainSet{FP}}}{\Card{\PlainSet{FP}} + \Card{\PlainSet{TN}}}
+	\end{equation}
+	and the \emph{true negative rate} is given by $\hat{\tnrate} = 1 - \hat{\fprate}$.
+\end{definition}
+The true positive and false negative rates are given by the following.
+\begin{definition}
+	The \emph{true positive rate} is the proportion of predictions that are \emph{true positives} as given by
+	\begin{equation}
+	\hat{\tprate} = \frac{\Card{\PlainSet{TP}}}{\Card{\PlainSet{TP}} + \Card{\PlainSet{FN}}}
+	\end{equation}
+	and the \emph{false negative rate} is given by $\hat{\fnrate} = 1 - \hat{\tprate}$.
+\end{definition}
+
+The \emph{probabilities} of the four possible predictive outcomes are given by 
+\cref{tbl:contingency_table}.
+\begin{table}[ht]
+	\centering
+	\begin{tabular}{@{} l l l @{}}
+		\toprule
+		& \textbf{positive} & \textbf{negative}\\
+		\midrule
+		\textbf{predict positive} & $\hat{\tprate}=1-\hat{\fnrate}$ & 
+		$\hat{\fprate}=1-\hat{\tnrate}$\\
+		\textbf{predict negative} & $\hat{\fnrate}=1-\hat{\tprate}$ & 
+		$\hat{\tnrate}=1-\hat{\fprate}$\\
+		\bottomrule
+	\end{tabular}
+	\caption{The $2 \times 2$ contingency table of outcomes for approximate sets.}
+	\label{tbl:contingency_table}        
+\end{table}
+
+\end{document}

@@ -1,0 +1,100 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+\section{The \emph{random} approximate relation model}
+A random approximate relation $\ARelation{R}$ is a \emph{random approximate set}\cite{aset} of a relation $\Relation{R}$.
+All the results of random approximate sets apply to random approximate relations.
+
+We say that a \emph{positive} tuple is a \emph{correlation} and a \emph{negative} tuple is a \emph{complementary correlation}.
+For instance, consider the binary relation $\leq \subset \Set{X}^2$ given by $x \leq y \implies \Pair{x}{y} \in \, \leq$.
+The complement of $\leq$, denoted by $>$, is thus given by $x > y \implies \Pair{x}{y} \in >$.
+
+We use $\ARelation{R}$ to make \emph{predictions} about relations modeled by $\Relation{R}$.
+The outcome of a prediction may be classified as a \emph{true correspondence}, \emph{false correspondence}, \emph{true complementary correspondence}, and \emph{false complementary correspondence}.
+
+A \emph{type} is a set and the elements of the set are called the \emph{values} of the type.
+An \emph{abstract data type} is a type and a set of operations on values of the type.
+For example, the \emph{integer} abstract data type is defined by the set of integers and standard operations like addition and subtraction.
+A \emph{data structure} is a particular way of organizing data and may implement one or more abstract data types.
+
+The abstract data type of the approximate relation is given by the following definition.
+\begin{definition}
+\label{def:approx_rel}
+Given a relation $\Relation{R} \subseteq \Set{X}[1] \times \cdots \times 
+\Set{X}[n]$, we denote a random approximate relation of $\Relation{R}$ by $\ARelation{R}$.
+A random approximate relation $\ARelation{R}$ is a member of $\PS{\Set{X}[1] \times 
+\cdots \times \Set{X}[n]}$.
+At a minimum, the relation $\ARelation{R}$ has an \emph{is-relation} operator
+\begin{equation}
+    \ARelation{R} \colon \Set{X}[1] \times \cdots \times \Set{X}[n] \mapsto \{ 
+    0, 1 \}\,.
+\end{equation}
+
+Let a tuple that is selected uniformly at random from the universe $\Set{X}[1] 
+\times \cdots \times \Set{X}[n]$ be denoted by $\Tuple{\RV{X_1}, \ldots, 
+\RV{X_n}}$.
+The relation $\ARelation{R}[\fnrate][\fprate]$ is an approximate relation of $\Relation{R}$ 
+with a false relation rate $\fprate$ and false complementary relation rate 
+$\fnrate$ if the following conditions hold:
+\begin{enumerate}[(i)]
+    \item If $\Tuple{\RV{X_1}, \ldots, \RV{X_n}}$ is in the relation $\Relation{R}$, then it is not in the random approximate relation $\ARelation{R}[\fnrate][\fprate]$ with probability $\fnrate$,
+    \begin{equation}
+        \Prob{\AT{\SetComplement[\Relation{R}]}[\fnrate][\fprate](\RV{X_1}, \cdots, \RV{X_n}) \Given 
+        \Relation{R}(\RV{X_1}, \cdots, \RV{X_n})} = \fnrate\,.
+    \end{equation}
+    
+    \item If $\Tuple{\RV{X_1}, \ldots, \RV{X_n}}$ is in the complementary relation of $\Relation{R}$ then it is in the random approximate relation $\ARelation{R}[\fnrate][\fprate]$ with a probability $\fprate$,
+    \begin{equation}
+        \Prob{\ARelation{R}[\fnrate][\fprate](\RV{X_1}, \cdots, \RV{X_n}) \Given \SetComplement[\Relation{R}](\RV{X_1}, \cdots, \RV{X_n})} = \fprate\,.
+    \end{equation}
+\end{enumerate}
+\end{definition}
+
+\subsection{Probabilistic model}
+\label{sec:prob_model}
+Since \emph{relations} are \emph{sets} of \emph{tuples}, a random approximate relation $\ARelation{R} \subseteq \Set{X}[1] \times \cdots \times \Set{X}[n]$ is a random approximate set\cite{aset} over the universe $\Set{X}[1] \times \cdots \times \Set{X}[n]$
+
+We make the following set of assumptions.
+\begin{assumption}
+	\label{asm:ber_trial}
+	The outcome of an \emph{related} test on any tuple in the complementary set is an independent and identically distributed Bernoulli trial with a mean $\fprate$.
+	The outcome of an \emph{is-not-relation} test on any tuple in the relation is an independent and identically distributed Bernoulli trial with a mean $\fnrate$.
+\end{assumption}
+This assumption is not unrealistic as it is common for implementations of approximate sets to exhibit this assumed behavior, like Bloom filters\cite{bf} and Perfect hash filters\cite{phf}.
+
+The uncertain number of false positives is given by the following theorem.
+\begin{theorem}
+	\label{thm:fpbinom}
+	Given $\n$ negatives, the number of \emph{false positives} in an approximate set with a false positive rate $\fprate$ is a random variable denoted by $\FP_\n$ with a distribution given by
+	\begin{equation}
+		\FP_\n \sim \bindist\!\left(\n, \fprate\right)\,.
+	\end{equation}
+\end{theorem}
+\begin{proof}
+	By \cref{asm:ber_trial}, the uncertain outcome that a negative element \emph{tests} as positive is a Bernoulli trial with a mean $\fprate$. Since there are $\n$ such independent and identically distributed trials, the number of false positives is binomially distributed with a mean $\n \fprate$.
+\end{proof}
+
+The false positive rate $\fprate$ is an \emph{expectation}. However, the false positive rate of a random approximate relation $\ARelation{R}[\fnrate][\fprate]$ is \emph{uncertain}.
+\begin{theorem}
+	\label{thm:fpr}
+	The false positive rate realizes an uncertain value as given by
+	\begin{equation}
+		\FPR_\n = \frac{\FP_\n}{\n}
+	\end{equation}
+	with a support $\SetBuilder{ j / \n}{j = 0,\ldots,\n}$, an expectation $\fprate$, and a variance $\fprate(1-\fprate) / \n$. By the central limit theorem, $\FPR_\n \xrightarrow{d} \normdist\!\left(\fprate, \fprate(1-\fprate) / \n\right)$ as $\n \to \infty$.
+\end{theorem}
+\begin{proof}
+	The expected false positive rate is
+	\begin{equation}
+		\Expect{\FPR_\n} = \Expect{\frac{\FP_\n}{\n}} = \frac{1}{\n}\Expect{\FP_\n} = \fprate
+	\end{equation}
+	and the variance of the false positive rate is
+	\begin{equation}
+		\Var{\FPR_\n} = \Var{\frac{\FP_\n}{\n}} = \frac{1}{\n^2}\Var{\FP} = \frac{\fprate(1-\fprate)}{\n}\,.
+	\end{equation}
+\end{proof}
+By \cref{thm:fpr}, the more negatives there are, the lower the variance.
+
+
+
+\end{document}

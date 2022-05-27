@@ -1,0 +1,19 @@
+[2019-11-12 03:41] start with a measurable space (U,2^U) then in two parts, consider a measure space (U,sigma(generated),u) for the deterministic generator that doesn't cover 2^U, and the random model (U,2^U,P) where P is known as sums on P({x}) where x is an element of U.
+
+[2019-11-12 03:41] note: more of this in What Makes Variables Random
+
+[2019-11-26 10:49] concepts: set of axioms satisfied by a data type and a set of operations on it a concept.
+this is what an approximate set is.
+
+[2019-11-26 10:51] two countably infinite sets are equal if same representation.
+if diff. representations, they are not equal.
+
+[2019-11-26 10:51] this holds even if generator of asets is non-deterministic.
+
+[2019-11-26 10:56] two finite approx sets are equal if same rep, but due to finiteness non-rep eq doesn't mean non-equality.
+probabilistic. for large universal sets, this is minor.
+
+[2019-11-26 10:56] new function: probability_models(A+,B) computes prob.
+that A+ is a model of B (generated from B) given fpr and such.
+
+[2019-11-26 10:58] equality is most function in computational basis of a data type, tells us that two objects of type T mean the same thing.

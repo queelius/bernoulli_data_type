@@ -1,0 +1,162 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+\section{Relational algebra}
+\label{sec:relations}
+integrate:::
+Suppose we have a partial function $\Fun{f} \colon X_1 \times \cdots \times X_m \pfun Y_1 \times \cdots \times Y_n$.
+This is a special kind of relation where the projection $\Proj$
+Experience shows that it is awkward to deal with multi-valued functions and that it is best to treat them as relations (or to change the output domain to be a power set, which is equivalent to view the function as a relation).
+:::
+
+
+
+The concept of a \emph{relation} is dependent upon the concept of a \emph{set}.
+\begin{definition}
+A set is an unordered collection of distinct elements from a universe of elements.
+\end{definition}
+A countable set is a \emph{finite set} or a \emph{countably infinite set}. A \emph{finite set} has a finite number of elements. For example,
+\[
+    \Set{S} = \{ 1, 3, 5 \}
+\]
+is a finite set with three elements. A \emph{countably infinite set} can be put in one-to-one correspondence with the set of natural numbers.
+
+The cardinality of a set $\Set{S}$ is a measure of the number of elements in the set, denoted by
+\begin{equation}
+    \Card{\Set{S}}\,.
+\end{equation}
+The cardinality of a \emph{finite set} is a non-negative integer and counts the number of elements in the set, e.g.,
+\[
+    \Card{\left\{ 1, 3, 5\right\}} = 3\,.
+\]
+
+Given two sets $\Set{A}$ and $\Set{B}$, a basic construction in set theory is the formation of an ordered pair $\Pair{a}{b}$, where $a \in \Set{A}$ and $b \in \Set{B}$, and whose main property is that $\Pair{a}{b} = \Pair{c}{d}$ \emph{if and only if} $a = c$ and $b = d$.\footnote{This is a non-commutative property, i.e., $\Pair{a}{b}$ does not necessarily equal $\Pair{b}{a}$.} A \emph{tuple} is a generalization of pairs which can consist of an arbitrary number of elements, e.g., $\Tuple{x_1,x_2,\ldots,x_n}$.
+
+\begin{definition}[Cartesian product]
+Let $\Set{X}[1], \ldots, \Set{X}[n]$ be $n$ sets. The $n$-fold Cartesian product of $\Set{X}[1],\ldots,\Set{X}[n]$ is given by $\SetBuilder{\Tuple{x_1,\ldots,x_n}}{x_1 \in \Set{X}[1] \land \cdots \land x_n \in \Set{X}[n]}$ and is denoted by the cross product $\Set{X}[1] \times \cdots \times \Set{X}[n]$.
+\end{definition}
+
+We are now ready to define the concept of a relation.
+\begin{definition}[Relation]
+Let $\Set{X}[1],\ldots,\Set{X}[n]$ be sets. A \emph{relation} is any subset of $\Set{X}[1] \times \cdots \times \Set{X}[n]$.
+\end{definition}
+%In a relation $\Relation{R} \subseteq \Set{X}[1] \times \cdots \times \Set{X}[n]$, the domain of the relation is each $\Set{X}[j]$, $1 \leq j %\leq n$, a domain of the relation. 
+We denote that a particular tuple $\Tuple{x_1,\ldots,x_n}$ is in a relation $\Relation{R}$ using either notation $\Relation{R}(x_1,\ldots,x_n)$ or $\Tuple{x_1,\ldots,x_n} \in \Set{R}$. If the relation is \emph{binary}, then may denote that two elements $x$ and $y$ are related by $x \Relation{R} y$.
+
+The set of possible relations over $\Set{X}[1],\ldots,\Set{X}[n]$ is the \emph{power set} $\PS{\Set{X}[1] \times \cdots \times \Set{X}[n]}$, which has a cardinality of $2^{\Card{\Set{X}[1]} \cdots \Card{\Set{X}[n]}}$. As a \emph{base case}, we have \emph{unitary} relations, e.g., $\Relation{R} \subseteq \Set{X}$.
+
+Suppose we have a relation $\Relation{R} \subseteq \Set{X} \times \Set{Y} \times \Set{Z}$.
+The \emph{domain} (or type) of the relation is $\Set{X} \times \Set{Y} \times \Set{Z}$.
+We identify the component of a particular tuple in the relation by its \emph{index} position, e.g., the $\nth{2}$ component of $\Tuple{x,y,z}$ is $y$ whose \emph{domain} is $\Set{Y}$.
+
+Tables are a convenient way to represent relations. When a relation $\Relation{R}$ is viewed as a table, there are several important observations to keep in mind:
+\begin{enumerate}
+\item Each row of the table represents a tuple of $\Relation{R}$.
+\item The row order is unimportant.\footnote{That is, given a table representing $\Relation{R}$, if we exchange any two rows the table still represents $\Relation{R}$.}
+\item The multipicity of a row is unimportant.\footnote{That is, given a table representing $\Relation{R}$, if we duplicate any row the table still represents $\Relation{R}$.}
+\item The column order is important.\footnote{The set of values in the $j$-th column correspond to the set of values of the $j$-th component of each tuple.}
+\end{enumerate}
+
+\subsection{Relational operations}
+Relations are sets, therefore relations over identical domains may participate in operations on sets, like unions and differences.
+
+Moreover, due to the structure of relations as subsets of Cartesian products over domains (sets), additional operations can meaningfully be defined.
+
+First, we revisit the Cartesian product. The Cartesian product is associative and commutative \emph{up to isomorphism} only. Thus, when we take the Cartesian product of two relations, we are pairing every \emph{tuple} in one with every \emph{tuple} in the other.
+
+
+
+The \emph{join} operator\footnote{Sometimes denoted the \emph{natural join}.} in relational algebra is the counter-part to the \emph{logical-and} operator in Boolean algebra.
+\begin{definition}
+Suppose $\Relation{A} \subseteq \Set{X}[1] \times \cdots \Set{X}[n]$ and $\Relation{B} \subseteq \Set{X}[k] \times \cdots \times \Set{X}[n+p]$, where $0 < k \leq n$ and $p \geq 0$.\footnote{The order of the domains in a relation may be changed so that the common domains are in the right place.} The \emph{join} of $\Relation{A}$ and $\Relation{B}$ is the relation defined by
+\begin{equation}
+    \Relation{A} \Join \Relation{B} = \SetBuilder{ \Tuple{x_1,\ldots,x_{n+p}} }{ \Tuple{x_1,\ldots,x_n} \in \Relation{A} \land \Tuple{x_k,\ldots,x_{n+p}} \in \Relation{B}}\,.
+\end{equation}
+\end{definition}
+
+The \emph{projection} operator decreases the dimensionality of the relation, i.e., dropping columns from the relation.
+\begin{definition}
+The projection of $\Relation{R} \subseteq \Set{X}[1] \times \cdots \times \Set{X}[n]$ onto $\Set{X}[j_1] \times \cdots \times \Set{X}[j_k]$ where $j_i \leq n$ for $i=1,\ldots,k$, is defined by
+\begin{equation}
+   \Proj_{\Set{X}[j_1] \times \cdots \times \Set{X}[j_k]}\!(\Relation{R}) = \SetBuilder
+   {\Tuple{x_{j_1},\ldots,x_{j_k}}}{\Relation{R}(x_1,\ldots,x_n)}\,.
+\end{equation}
+\end{definition}
+
+The \emph{composition} operator is a function of a join and a projection.
+\begin{definition}
+The composition of $\Relation{A} \subseteq \Set{X}[1] \times \cdots \times \Set{X}[n]$ and $\Relation{B} \subseteq \Set{X}[k] \times \cdots \times \Set{X}[n+p]$ is defined by
+\begin{equation}
+    \Relation{A} \circ \Relation{B} = \Proj_{\Set{X}[1] \times \cdots \Set{X}[k-1] \times \Set{X}[n+1] \times \cdots \times \Set{X}[n+p]}\left(
+        \Relation{A} \Join \Relation{B}
+    \right)\,.
+\end{equation}
+\end{definition}
+
+We illustrate the above results with the following example.
+\begin{example}
+Consider the relations $\Relation{A}$ and $\Relation{B}$ given respectively by \cref{tbl:ex_r1,tbl:ex_r2}. The \emph{join} of relations $\Relation{A}$ and $\Relation{B}$ is given by \cref{tbl:ex_join}. The projection of $\Relation{A} \Join \Relation{B}$ onto $\Set{X}[1] \times \Set{X}[2] \times \Set{X}[5]$ is given by \cref{tbl:ex_proj}.
+
+\begin{table}[h]
+\centering
+\caption{Relations}
+\begin{subtable}[h]{.4\linewidth}
+\centering
+\begin{tabular}{llll}
+\toprule
+$\Set{X}[1]$ & $\Set{X}[2]$ & $\Set{X}[3]$ & $\Set{X}[4]$\\
+\midrule
+$a$ & $b$ & $a$ & $c$\\
+$a$ & $a$ & $a$ & $a$\\
+$a$ & $c$ & $c$ & $d$\\
+\bottomrule
+\end{tabular}
+\caption{$\Relation{A}$}
+\label{tbl:ex_r1}
+\end{subtable}
+\begin{subtable}[h]{.4\linewidth}
+\centering
+\begin{tabular}{lll} 
+\toprule
+$\Set{X}[3]$ & $\Set{X}[4]$ & $\Set{X}[5]$\\
+\midrule
+$a$ & $c$ & $a$\\
+$c$ & $d$ & $b$\\
+$e$ & $f$ & $c$\\
+$c$ & $d$ & $d$\\
+\bottomrule
+\end{tabular}
+\caption{$\Relation{B}$}
+\label{tbl:ex_r2}
+\end{subtable}\\
+\begin{subtable}[h]{.4\linewidth}
+\centering
+\begin{tabular}{lllll}
+\toprule
+$\Set{X}[1]$ & $\Set{X}[2]$ & $\Set{X}[3]$ & $\Set{X}[4]$ & $\Set{X}[5]$\\
+\midrule
+$a$ & $b$ & $a$ & $c$ & $a$\\
+$a$ & $c$ & $c$ & $d$ & $b$\\
+$a$ & $c$ & $c$ & $d$ & $d$\\
+\bottomrule
+\end{tabular}
+\caption{$\Relation{A} \Join \Relation{B}$}
+\label{tbl:ex_join}
+\end{subtable}
+\begin{subtable}[h]{.4\linewidth}
+\centering
+\begin{tabular}{lll}
+\toprule
+$\Set{X}[1]$ & $\Set{X}[2]$ & $\Set{X}[5]$\\
+\midrule
+$a$ & $b$ & $a$\\
+$a$ & $c$ & $b$\\
+$a$ & $c$ & $d$\\
+\bottomrule
+\end{tabular}
+\caption{$\Proj_{\Set{X}[1] \times \Set{X}[2] \times \Set{X}[5]}(\Relation{A} \Join \Relation{B})$.}
+\label{tbl:ex_proj}
+\end{subtable}
+\end{table}
+\end{example}
+\end{document}

@@ -1,0 +1,95 @@
+/**
+ * This maxima batch file defines several functions relating to the power set of a random approximate set.
+ */
+
+
+define (binomial_pdf(n,p,x),
+    block(
+        binomial(n,x)*p^x*(1-p)^(n-x)
+    )
+);
+
+define (tp_pdf(p,t),
+    block(
+        binomial_pdf(p,t)
+    )
+);
+
+define (fp_pdf(n,e),
+    block(
+        binomial_pdf(n,e)
+    )
+);
+
+define (expect(g,pdf,lower,upper),
+    block(
+        sum(g(x)*pdf(p,x),x,lower,upper)
+    )
+);
+
+/**
+ * computes the expectation E[g(TPp)].
+ * if g is the identity, then computes E[TPp]=pt where t
+ * is the true positive rate and p is the number of positives
+ * with respect to the objective set being approximated.
+ */
+define (tp(g,p,t),
+    block(
+	expect(g,tp_pdf,0,p)
+    )
+);
+
+/**
+ * computes the expectation E[g(FPn)].
+ * if g is the identity, then computes E[FPn]=ne where e
+ * is the false positive rate and n is the number of negatives
+ * with respect to the objective set being approximated.
+ */
+define (fp(g,n,e),
+    block(
+	expect(g,fp_pdf,0,n)
+    )
+);
+
+/**
+ * ps_neg computes the number of negative elements with
+ * respect to an objective set with p positives and n negatives.
+ */
+define (ps_neg(p,n),
+    block(
+        2^p*(2^n-1)
+    )
+);
+
+
+define (ps_neg_helper(x),
+    block(
+        if x=0 then 0
+        else 2^x
+    )
+);
+
+define (approx_ps_fp(p,t,n,e),
+    block(
+        (2^(p*t)+(log(2))^2/2*p*t*(1-t))*(2^(n*e)+(log(2))^2/2*n*e*(1-e)-1)
+    )
+);
+
+define (ps_fp(p,t,n,e),
+    block(
+        tp(f,p,t)*(fp(f,n,e)-1)
+    )
+);
+
+define (approx_ps_fpr(p,t,n,e),
+    block(
+        approx_ps_fp(p,t,n,e)/ps_neg(p,n)
+    )
+);
+
+define (ps_fpr(p,t,n,e),
+    block(
+        ps_fp(p,t,n,e)/ps_neg(p,n)
+    )
+);
+

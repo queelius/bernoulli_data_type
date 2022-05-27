@@ -1,0 +1,189 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+
+\newcommand{\ctor}[2]{\APFun{F}[#1][#2]}
+
+\begin{document}
+\section{Data types that model random approximate sets}
+\label{sec:adt}
+%A \emph{data structure} is a concrete representation of a data type. A popular implementation of \emph{random positive approximate sets} is the \emph{Bloom filter}.
+
+%We call the set of axioms satisfied by a type and a set of functions on it a \emph{concept}.
+%The \emph{concept} of the \emph{random approximate set} is given by the following set of axioms.
+
+
+A \emph{data type} is a set and the elements of the set are called the \emph{values} of the data type.
+We impose a \emph{structure} on sets (data types) by defining morphisms between them, such as operations like \emph{intersection} or relations like \emph{subset}.
+Morphisms are also types.
+Any data type needs one or more \emph{value constructors}, functions that map to values of the type.
+
+%An \emph{abstract data type} is a set of objects whose behavior is defined by a set of values and a set of morphisms, where behavior is defined with respect to axiomatic semantics or operational semantics of an abstract machine.
+%The abstract data type of the \emph{random approximate set} has an axiomatic specification.
+
+The random approximate set is an abstract data type that models a \emph{set} with an additional set of \emph{probabilistic} axioms described in \cref{sec:asets}.
+Suppose $T$ is a data type that overloads the \emph{member-of} predicate $\SetContains \colon \Set{U} \times T \mapsto \{0,1\}$ and has a \emph{value constructor} $\ctor{\fprate}{\tprate}$ that is a \emph{conditional probability distribution} over values of $T$ given elements of type $\PS{\Set{U}}$.
+Data type $T$ \emph{models} the abstract data type of the random approximate set over elements in $\Set{U}$ with a false positive rate $\fprate$ and true positive rate $\tprate$ if \cref{asm:fprate,asm:tprate} are satisfied, i.e.,
+\begin{equation}
+	\Prob{\SetContains[x][\ctor{\fprate}{\tprate}(\Set{S})] \Given \SetNotContains[x][\Set{S}]} = \fprate
+\end{equation}
+and
+\begin{equation}
+	\Prob{\SetContains[x][\ctor{\fprate}{\tprate}(\Set{S})] \Given \SetContains[x][\Set{S}]} = \tprate\,.
+\end{equation}
+An instance of $T$ also models a classic set by its membership predicate, i.e., two sets are \emph{equal} if and only if they have the same members. We denote that an instance of $T$ models a set $\Set{A}$ by $T(\Set{A})$.
+
+Normally, two different data types that model an abstract data type are \emph{exchangable} over a set of \emph{regular functions} without changing the result.
+However, random approximate sets are \emph{probabilistic} so this strict definition of exchangability does not capture the intended meaning.
+The random approximate set model is a \emph{frequentistic probability} model where an event's probability is defined as the \emph{limit} of its relative frequency in a large number of trials.
+Thus, we relax the definition of exchangability and conclude that two data types that model random approximate sets (or any other probabilistic abstract data type) should produce the same \emph{limit} of the relative frequency of results in a large number of \emph{independent runs}.
+
+An important distinction must be made with respect to \emph{independent runs}.
+The most straightforward meaning is, given any set $\Set{A} \in \PS{\Set{U}}$, at the limit, repeated applications of $\ctor{\fprate}{\tprate}(\Set{A})$ generates a sample that converges in distribution to $\ASet{A}[\fprate][\tprate]$.
+However, we also wish to allow for \emph{deterministic} value constructors.\footnote{Deterministic algorithms compatible with the random approximate set model are common but frequently have an auxiliary seed which indexes a particular approximation in a family.}
+
+\subsection{Deterministic value constructors}
+Value constructors compatible with the random approximate set model may come in many forms.
+
+%Suppose we have a value constructor $\ctor \colon \PS{\Set{U}} \mapsto T$ where $T$ models random approximate sets over $\PS{\Set{U}}$ with true and false positive rates $\tprate$ and $\fprate$ respectively.
+%For instance, in \cref{sec:bool_search}, even if the Boolean search indexes are based on \emph{non-deterministic} value %constructors, the resulting \emph{approximate result sets} that queries map to are \emph{deterministic} given these search %indexes.
+
+Suppose $\ctor{\fprate}{\fprate} \colon \PS{\Set{U}} \mapsto T$ (i.e., a deterministic total function) maps sets in $\PS{\Set{U}}$ to objects of type $T$ that model random approximate sets over the input.
+Since $T$ models the abstract data type of the set, there is a unique bijection between $T$ and $\PS{\Set{{U}}}$, i.e., every value in $T$ models a specific subset of $\Set{U}$.
+Thus, we may view $\ctor{\fprate}{\fprate}$ as a function $\ctor{\fprate}{\tprate} \colon \PS{\Set{U}} \mapsto \PS{\Set{U}}$ with an \emph{image}
+\begin{equation}
+\Image(\ctor{\fprate}{\tprate}) = \SetBuilder{\ctor{\fprate}{\tprate}(\Set{A})}{\Set{A} \in \PS{\Set{U}}} \subseteq \PS{\Set{U}}\,.
+\end{equation}
+Since the value constructor $\ctor{\fprate}{\tprate}$ may map multiple input sets to the same output set and some sets in the codomain may not be mapped to by any set in the domain, $\ctor{\fprate}{\tprate}$ is (possibly) a non-surjective, non-injective function.
+
+%\subsection{Algebraic properties}
+%The only thing we can say with certainty \emph{a priori}\footnote{A priori knowledge is independent of experience.} about the image of $\ctor{\fprate}{\tprate}$ is that its members are subsets of $\Set{U}$ and it contains the empty set $\EmptySet$ and universal set $\Set{U}$.
+
+\begin{remark}
+It is often trivial to implement a family of deterministic value constructors $\PS{\Set{U}} \mapsto T = \{\operatorname{f_1},\ldots,\operatorname{f_n}\}$ with distinct $\sigma$-algebras where $T$ models random approximate sets over $\PS{\Set{U}}$.
+Additionally, assuming each time an approximate set is constructed, a ``random'' value constructor from $\PS{\Set{U}} \mapsto T$ is invoked, then repeated invocations on some set $\Set{A} \in \PS{\Set{U}}$ generates a frequency distribution of sets that converges to $\ASet{A}$ as $n \to \infty$, e.g., ``randomly'' seeding a Bloom filter's hash function.
+\end{remark}
+
+How do we reconcile a deterministic value constructor $\ctor{\fprate}{\tprate} \colon \PS{\Set{U}} \mapsto T$ with the \emph{probabilistic model}?
+In this context, the notion of \emph{probability} quantifies our \emph{ignorance}:
+\begin{enumerate}
+\item Given a set $\Set{S}$, we do not have complete \emph{a priori} knowledge about the set the value constructor maps to.
+The approximate set model only provides \emph{a priori} knowledge about the probability distribution $\ASet{S}$.
+We acquire \emph{a posterior} knowledge\footnote{A posteriori knowledge is dependent on experience.} by observing $\ctor{\fprate}{\tprate}(\Set{S})$.
+
+\item Given $T(\Set{S})$, we do not have complete \emph{a priori} knowledge about $\Set{S}$.
+According to the probabilistic model, the only \emph{a priori} knowledge we have is given by the specified \emph{expected} false positive and false negative rates.
+
+We may acquire \emph{a posteriori} knowledge by evaluating $\ctor{\fprate}{\tprate}(\Set{A})$ for each $\Set{A} \in \PS{\Set{U}}$ and remembering the sets that map to $T(\Set{S})$.\footnote{If the approximate set is the result of the union, intersection, and complement of two or more approximate sets, then we must consider the closure.}
+However, since $\ctor{\fprate}{\tprate}$ is (possibly) non-injective, one or more sets may map to $T(\Set{S})$ and thus this process may not completely eliminate uncertainty.
+Additionally, the domain $\PS{\Set{U}}$ has a cardinality $2^{\Card{\Set{U}}}$ and thus exhaustive searches are impractical to compute even for relatively small domains.\footnote{In the case of \emph{countably infinite} domains, it is not even theoretically possible.}
+%However, we may still reduce our uncertainty by mapping some subset of interest.
+\end{enumerate}
+
+Suppose $\Set{U}$ is finite. The set of deterministic value constructors $\PS{\Set{U}} \mapsto \PS{\Set{U}}$ has a cardinality $(2^u)^(2^u)$, and in a sense they are all compatible with the random approximate set model.
+
+For instance, a Bloom filter (positive approximate set) may have a family of hash function that, for a particular binary coding of the elements of a given universal set, maps \emph{every} element in the universal set to the same hash.
+Thus, for instance, no matter the objective set $\Set{X} \subseteq \Set{U}$, it will map to $\Set{U}$.
+The Bloom filter had a theoretically sound implementation, but only after empirical evidence was it discovered that it was not suitable.
+This is an extremely unlikely outcome in the case of large universal sets, but as the cardinality of the universal set decreases, the probability of such an outcome increases.
+Indeed, at $\Card{U} = 2$, the probability of this outcome is $?$.
+
+Thus, \emph{a priori} knowledge, e.g., a theoretically sound algorithm, is not in practice sufficient (although for large universal sets, the probability is negligible).
+The suitability of an algorithm can only be determined by acquring \emph{a posterior} knowledge.
+
+We could explore the space of functions in the family and only choose those which, on some sample of objective sets of interest, generates the desired expectations for the false positive and false negative rates with the desired variances.
+Most of them will if constructed in the right sort of way.
+
+A family of functions that are compatible with the probabilistic model is given by observing a particular realization $\Set{X} = \ASet{S}$ and outputting 
+$\Set{X}$ on subsequent inputs of $\Set{S}$, i.e., caching the output of a \emph{non-deterministic} process that conforms to the probabilistic model.
+This is essentially how well-known implementations like the Bloom filter work, where the pseudo-randomness comes from mechanical devices like hash functions that approximate random oracles.
+
+The false positive rate of $\ctor{\fprate}{\tprate}(\Set{X})$ is by definition
+\begin{equation}
+    \fprateob(\Set{X}) \coloneqq \frac{1}{\n} \sum_{x \in \SetComplement[\Set{X}]} \SetIndicator{\ctor{\fprate}{\tprate}(\Set{X})}(x)\,,
+\end{equation}
+where $\n = \Card{\SetComplement[\Set{X}]}$.
+
+Let $\Set{U}_p$ denote the set of objective sets with cardinality $\p$.
+The \emph{mean} false positive rate,
+\begin{equation}
+    \overline{\fprate} = \frac{1}{\Card{\Set{U}_p}}
+        \sum_{\Set{X} \in \Set{U}_p} \fprateob(\Set{X})\,,
+\end{equation}
+is an unbiased estimator of $\fprate$ and the population variance
+\begin{equation}
+    s^2_\fprate = \frac{1}{\Card{\Set{U}_p}}
+        \sum_{\Set{X} \in \Set{U}_p} \fprateob(\Set{X})\,,
+\end{equation}
+is an unbiased estimator of $\Var{\FPR_\n} = \fprate(1-\fprate)/\n$.
+\begin{proof}
+We imagine that the function $\ctor{\fprate}{\tprate}$ caches the output of a \emph{non-deterministic} process that conforms to the probabilistic model.
+Thus, each time the function maps an objective set $\Set{X}$ of cardinality $\p$ to its approximation, the algorithm \emph{observes} a realization of 
+$\FPR_\n = \fprateob$.
+Thus,
+\begin{align}
+    \overline{\fprate}
+        &= \frac{1}{\Card{\Set{U}[p]}} 
+            \sum_{\Set{X}[i] \in \Set{U}[p]} \fprateob(\Set{X}[i])\\
+        &= \frac{1}{\Card{\Set{U}_p}} 
+            \sum_{\Set{X}[i] \in \Set{U}[p]} \Expect{\FPR_\n^{(i)}} = \fprate\,.
+\end{align}
+\end{proof}
+
+\subsection{Space complexity}
+\label{sec:space_comp}
+If the finite cardinality of a universe is $u$ and the set is \emph{dense} (and the approximation is also dense, i.e., the false negative rate is relatively 
+small), then
+\begin{equation}
+    \mathcal{O}(u) \; \si{bits}
+\end{equation}
+are needed to code the set, which is independent of $\p$, the false positive rate, and the false negative rate.
+
+The lower-bound on the \emph{expected} space complexity of a data structure that models the \emph{random approximate set} where the elements are over a \emph{countably infinite} universe is given by the following postulate.
+\begin{postulate}
+\label{pst:approx_l_b}
+The \emph{information-theoretic lower-bound}\index{information-theoretic lower-bound} of a data structure that implements the countably infinite \emph{random approximate set} abstract data type has an \emph{expected} bit length given by
+\begin{equation}
+    -\tprate \log_2 \fprate \; \si{bits \per element}\,,
+\end{equation}
+where $\fprate > 0$ is the false positive rate\index{false positive rate} and $\tprate$ is the true positive\index{true positive rate}.
+\end{postulate}
+
+The \emph{relative space efficiency}\index{relative space efficiency} of a data structure\index{data structure} $X$ to a data structure $Y$ is some value greater than $0$ and is given by the ratio of the bit length of $Y$ to the bit length of $X$,
+\begin{equation}
+    \RE(X,Y) = \frac{\BL(Y)}{\BL{X}}\,,
+\end{equation}
+where $\BL$ is the bit length function.
+If $\RE(X,Y) < 1$, $X$ is less efficient than $Y$, if $\RE(X,Y) > 1$, $X$ is more efficient than $Y$, and if $\RE(X,Y) = 1$, $X$ and $Y$ are equally efficient.
+The absolute space efficiency is given by the following definition.
+\begin{definition}
+The absolute space efficiency of a data structure $X$, denoted by \AbsoluteEfficiency{$X$}, is some value between $0$ and $1$ and is given by the ratio of the bit length of the theoretical lower-bound to the bit length of $X$,
+\begin{equation}
+    \AbsoluteEfficiency(X) = \frac{\theta}{\BL(X)}\,,
+\end{equation}
+where $\BL(X)$ denotes the bit length of $X$ and $\theta$ denotes the bit length of the information-theoretic lower-bound.
+The closer $\AbsoluteEfficiency(X)$ is to $1$, the more space-efficient the data structure.
+A data structure that obtains an efficiency of $1$ is \emph{optimal}.\footnote{Sometimes, a data structure may only obtain the information-theoretic lower-bound with respect to the limit of some parameter, in which case the data structure \emph{asymptotically} obtains the lower-bound with respect to said parameter, the number of positives $\p$ being the most obvious parameter.}
+\end{definition}
+
+The \emph{absolute} space efficiency of a data structure $X$ implementing a random approximate set of an objective set with $\p$ elements with a false positive rate $\fprate$ and true positive rate $\tprate$ is given by
+\begin{equation}
+    \AbsoluteEfficiency(X) = \frac{-\p \tprate \log_2 \fprate}{\BL(X)}\,.
+\end{equation}
+
+A well-known implementation of countably infinite \emph{positive approximate set} is the Bloom filter\cite{bf} which has an expected space complexity given 
+by
+\begin{equation}
+    -\frac{1}{\ln 2} \log_2 \fprate \; \si{bits \per element}\,,
+\end{equation}
+thus the absolute efficiency of the Bloom filter is $\ln 2 \approx 0.69$.
+A practical implementation of the \emph{positive random approximate set} is given by the \emph{Perfect Hash Filter}\cite{phf}, which compares favorably to the Bloom filter in may circumstances.\footnote{The \emph{Singular Hash Set}\cite{shs} is an example of a data structure that obtains optimality using \emph{brute-force} search, so it is not practical for even relatively small objective sets. However, its primary purpose is analytic tractability.}
+
+In \cref{dummyref}, given an approximate set sampled from $\ASet{A}[\fprate][\fnrate]$, we claimed that the method of moments estimator for $\p = \Card{\Set{A}}$ is undefined for countably infinite universes.
+Suppose we have a data structure $X$ that \emph{models} random approximate sets with an \emph{expected} space complexity proportional to $\p$, i.e., $\p \cdot \Fun{b}(\tprate,\fprate)$ bits, where $\Fun{b}$ is the expected bits per \emph{positive} element given a false positive rate $\fprate$ and true positive rate $\tprate$.
+Then, given an object $x$ of type $X$, an estimator of $\p$ is
+\begin{equation}
+	\widehat{\p} = \frac{\BL(x)}{\Fun{b}(\tprate,\fprate)}\,,
+\end{equation}
+were $\BL$ is the bit length function.
+An expected \emph{upper-bound} on the cardinality is obtained by plugging in the information-theoretic lower-bound $\Fun{b}^{*}(\tprate,\fprate) = -\tprate \log_2 \fprate$ bits per element.
+\end{document}

@@ -1,0 +1,47 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+\section{Predicate functions}
+\label{sec:pred}
+
+
+
+\subsection{Indicator functions (unary predicate functions)}
+The indicator function of a set $\Set{A}$ over a universal set $\Set{U}$ is denoted by $\SetIndicator{\Set{A}} \colon \Set{X} \mapsto \BitSet$.
+A \emph{first-order} random approximate set of $\Set{A}$ with a false positive rate $\fprate$ and false negative rate $\fnrate$ is denoted by $\ASet{A}[\fprate][\fnrate]$, which may be modeled by a \emph{first-order} random approximate map $\APFun{\SetIndicator{\Set{A}}}[\fprate][\fnrate] \colon \Set{X} \mapsto \BitSet$.
+More generally, functions of type $\Set{X} \ATOverUnder{\mapsto}[\fprate][\text{\raisebox{3pt}{$\fnrate$}}] \BitSet$ model first-order random approximate subsets of the universal set $\Set{X}$.
+This may also be indicated by $\AT{\RV{R}}[\fprate][\fnrate]$ given that $\RV{R}$ may realize any element in $\PS{\Set{X}}$.
+
+
+\subsection{Relations as $n$-ary predicates}
+
+A $k$-ary predicate function is a $k$-ary \emph{relation}. For the $k$-ary predicate on $k$ oblivious types, we may use either \emph{approximate relations} or perfect relations. However, a perfect relation for oblivious types requires a bit length that is a function of the total possible number of $k$-relations on the types whereas the approximate relation on oblivious types only requires a bit length that is a function of the the number of relations in the exact relation.
+Except for very small types, the approximate relation is the only practical option.
+
+TODO: mention how the oblivious relation can be also oblivious to the \emph{arity} of the relation.
+Could be a unitary relation, could be a $k$-ary relation where $k$ is arbitrary large. This is good for preventing random ``searches'' over tuples from effectively determining actual relations.
+
+TODO: need to flesh out the oblivious relation (approximate relation) paper.
+Then, a $k$-ary predicate is a $k$-ary relation. It's not necessarily a function, it's only asking if a given $k$ tuples are \emph{related}. For instance, an ordered set answers questions like $a \leq b$ if $(a,b)$ is in the binary relation.
+
+A $k$-ary predicate satisfying the \emph{regular function} concept, $\Fun{f} \colon T_1 \times \cdots \times T_k \mapsto \Bool$, maps $k$-tuples of type $(T_1,\ldots,T_k)$ to \True or \False.
+
+
+
+
+Higher-order may result from many sources.
+
+Suppose we have two binary predicates $\Fun{f} \colon \Set{X} \times \Set{Y} \mapsto \BitSet$ and $\Fun{g} \colon \Set{Y} \times \Set{Z} \mapsto \BitSet$.
+To model a $k$-ary predicate, we might chain the tests, e.g., a $3$-ary predicate is approximated by $\Fun{w} \colon \Set{X} \times \Set{Y} \times \Set{Z} \mapsto \BitSet$ with a definition
+\begin{equation}
+	\Fun{w}(x,y,z) \coloneqq \Fun{f}(x,y) \land \Fun{g}(y,z)\,.
+\end{equation}
+
+
+\Cref{thm:fpr,thm:fnr} is the \emph{ideal probabilistic model} for $k$-ary predicates over \emph{oblivious types}.
+If some subsets of $[T_1] \times \cdots \times [T_k]$ are more likely to have false positives, and therefore some subsets are less likely to have false positives (and likewise for false negatives), then for instance, determining the probability that a particular tuple is a false positive or a true positive may be done with greater probability than given by \cref{dummyref}.
+
+\subsubsection{Total orders}
+Less-than predicates
+
+\end{document}

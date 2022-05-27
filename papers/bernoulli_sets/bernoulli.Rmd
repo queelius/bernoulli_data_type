@@ -1,0 +1,915 @@
+---
+title: "Bernoulli Sets"
+author: "Alex Towell"
+#date: "1/22/2022"
+output:
+  #bookdown::pdf_document2:
+  #  extra_dependencies: ["amsthm","amsmath"]
+  pdf_document:
+    toc: yes
+    toc_depth: 2
+    number_sections: true
+    extra_dependencies: ["amsthm","amsmath"]
+---
+
+\newtheorem{definition}{Definition}
+\newcommand{\FN}{\operatorname{FN}}
+\newcommand{\TN}{\operatorname{TN}}
+\newcommand{\FP}{\operatorname{FP}}
+\newcommand{\TP}{\operatorname{TP}}
+\newcommand{\ERR}{\Delta}
+
+# Introduction
+Conceptually, an *approximate set* is a set that approximates some other set that is of objective interest.
+That is to say, the approximation has *errors* with respect to its *member-of* relations.
+Ideally, no errors would occur, but typically, we either apply lossy data compression techniques to reduce bit rate (or bit length), which introduce errors (rate-distortion), or apply data redundancy techniques to reduce errors caused by noise, which increases bit rate (or bit length).
+
+%It is *approximate* because with respect to the objective set, there are two types of errors, *false positives* and *false negatives*.
+The *Bloom filter* is a popular example of a data structure and algorithm that models the concept of generating approximate sets that only includes *false positives* due to *rate distortion*.
+
+In \ref{sec:setalgebra}, we define the algebra of sets.
+
+In \ref{sec:asets}, we provide a formal definition of the *Bernoulli set* model, in which the error rates, such as false positive or false negative rates, are *expectations*.
+
+We describe the axioms of the Bernoulli set model such that, if satisfied, also satisfy the axioms of the approximate algebra of sets.
+
+We further derive the probability distribution of Bernoulli sets entailed by the axioms.
+
+In \ref{sec:characteristics}, we derive the random variables that are fundamental to the Bernoulli set model.
+
+In \ref{sec:func_rand_asets}, we provide a detailed treatment on distributions
+that are induced by functions that depend on random approximate sets, e.g., in
+Section \ref{sec:set_theory} we derive the probability distribution of random
+approximate sets that are generated from arbitrary set-theoretic operations on
+random approximate sets and in Section \ref{sec:perf} we derive several well-known
+binary classification performance measures of random approximate sets as a
+function of their error rates, such as *positive predictive value*.
+
+In \ref{sec:intervals}, we provide the probabilistic model for random approximate sets with *uncertain* rate distortions, such as an uncertain false positive rate.
+
+In \ref{sec:adt}, we provide a treatment on the random approximate set model as an abstract data type and show how that, if the generative algorithm of an approximate set model is deterministic, the random approximate set model quantifies our ignorance or uncertainty.
+
+Finally, in \ref{sec:bool_search}, we consider Encrypted Search with secure indexes based on random approximate sets.
+To prove various properties of this model, such as expected precision, we only need to show that the *result sets* are approximate sets of the *objective* results and all the results immediately follow.
+
+# Algebra of sets {#sec:setalgebra}
+A *set* is an unordered collection of distinct elements.
+If we know the elements in a set, we may denote the set by these elements, e.g., $\{a,c,b\}$ denotes a set whose members are exactly $a$, $b$, and $c$.
+
+Two sets of particular importance are the empty set, denoted by $\emptyset$, which has no members, and the *universal set*, in which every element of interest is a member.
+
+A *finite set* has a finite number of elements.
+For example, $\{ 1, 3, 5 \}$ is a finite set with three elements.
+When sets $A$ and $B$ are *isomorphic* they can be put into a one-to-one correspondence (bijection), e.g., $\{b,a,c\}$ is isomorphic
+to $\{1,2,3\}$.
+
+The cardinality of a finite set $A$ is the number of elements in the set, denoted b $|A|$, e.g., $|\{ 1, 3, 5\}| = 3$.
+A *countably infinite set* is isomorphic to the set of *natural numbers* $\mathbb{N} : \{1,2,3,4,5,\ldots\}$.
+
+
+Given two elements $a$ and $b$, an ordered pair of $a$ then $b$ is denoted by $(a,b)$, where $(a,b) = (c,d)$ *if and only if* $a = c$ and $b = d$.
+Ordered pairs are non-commutative and non-associative, i.e., $(a,b) \neq (b,a)$ if $a \neq b$ and $(a,(b,c)) \neq ((b,a),c)$.
+
+Related to the ordered pair is the Cartesian product.
+\begin{definition}
+	The set $X \times Y : \left\{(x,y) : x \in 
+	X \land y \in Y\right\}$ is the Cartesian product of sets $X$ 
+	and $Y$.
+\end{definition}
+By the non-commutative and non-associative property of ordered pairs, the Cartesian product is non-commutative and non-associative.
+However, they are isomorphic, i.e., $X \times Y \cong Y \times X$.
+
+A *tuple* is a generalization of order pairs which can consist of an arbitrary number of elements, e.g., $(x_1,x_2,\ldots,x_n)$.
+\begin{definition}[$n$-fold Cartesian product]
+	The $n$-ary Cartesian product of sets $X_1,\ldots,X_n$, is given by $X_1 \times \cdots \times X_n = \left\{(x_1,\ldots,x_n) : x_1 \in X_1 \land \cdots \land x_n \in X_n\right\}$.
+\end{definition}
+Note that
+	$X_1 \times X_2 \times X_3$ is isomoprhic to $X_1 \times \left(X_2 \times X_3\right)$ and $\left(X_1 \times X_2\right) \times X_3$,
+thus we may implicitly convert between them without ambiguity.
+
+If each set in the $n$-ary Cartesian product is the same, the power notation may be used, e.g., $X^3 : X \times X \times X$.
+As special cases, $X^0 : \{ \emptyset \}$ and $X^1 : X$.
+
+A *binary relation* over sets $A$ and $B$ is any subset of $A \times B$.
+A fundamental relation is the member-of relation, where $x \in A$ denotes that an object $x$ is a member of a set $A$.
+A set $A$ is a *subset* of a set $B$ if every member of $A$ is a member $B$, denoted by $A \subseteq B$.
+The subset relation forms a *partial order*, i.e., if $A \subseteq B$ and $B \subseteq C$ then $A \subseteq C$ and 
+if $A \subseteq B$ and $B \subseteq A$ then $A$ and $B$ are *equal*, denoted by $A = B$.
+
+\begin{definition}
+	A *function* of type $X \mapsto Y$ is a binary relation on $X \times Y$ with the constraint that each $x \in X$ is paired with exactly one $y \in Y$.
+\end{definition}
+A function of type $X \mapsto Y$ has a domain $X$ and a codomain $Y$.
+Since every $x \in X$, given a pair $(x,y) \in f$, $y$ may also be denoted by
+$f(x)$.
+
+The *power set* of a set $A$, denoted by $2^A$, is the set of sets that contains
+all of the possible subsets of $A$, e.g.,
+$2^{\{a, b\}} = \left\{ \emptyset, \{a\}, \{b\}, \{a, b\} \right\}$.
+A predicate is a function that maps elements in its domain to true
+(denoted by $1$) or false (denoted by $0$).
+A predicate function of particular importance is the indicator function
+\begin{equation}
+	1_A : X \mapsto \{0,1\}
+\end{equation}
+defined as
+\begin{equation}
+	1_A(x) :
+	\begin{cases}
+		0 & \text{if $x \notin A$},\\
+		1 & \text{if $x \in A$}.
+	\end{cases}
+\end{equation}
+
+The indicator function admits the construction of predicates for any relation,
+e.g., a binary predicate $\operatorname{P}$ for a binary relation
+$R \subseteq A \times B$ is defined as
+$\operatorname{P}(x_1,x_2) : 1_{R}((x_1,x_2))$.
+Denoting the *universal set* by $X$, all the relations mentioned previously are
+*binary predicates*, such as $\in : X \times 2^X \mapsto \{0,1\}$ and
+$\subseteq : 2^X \times 2^X \mapsto \{0,1\}$.
+
+A few important operations on sets are *set-union*
+$\cup : 2^X \times 2^X \mapsto 2^X$, *set-intersection*,
+$\cap : 2^X \times 2^X \mapsto 2^X$, and *set-complement*
+$` : 2^X \mapsto 2^X$, respectively defined as
+\begin{align}
+	A \cup B	&= \{ x \in X : x \in A \lor x \in B\},\\
+	A \cap B	&= \{ x \in X : x \in A \land x \in B\},\;\text{and}\\
+	A'			&= \{ x \in X : x \notin A\}.
+\end{align}
+where $\lor$ and $\land$ are respectively the logical-connectives *or* and *and*.
+If $A \cap B = \emptyset$, then we say $A$ and $B$ are *disjoint* sets.
+
+## Approximate sets {#sec:asets}
+Given an objective set $A$, any element that is a member of $A$ is denoted a
+*positive* (of $A)$ and otherwise the element is denoted a *negative*.
+Suppose $\hat{A}$ is used as an *approximation* of $A$.
+If the *only* information we have about $A$ is given by $\hat{A}$, then we may
+perform membership tests on $\hat{A}$ to make *predictions* or *estimations*
+about $A$.
+
+There are two ways a binary prediction can be false.
+
+    - A *false positive* occurs if a negative of the objective set is predicted
+    to be a positive. False positives are also known as *type I errors*.
+    The complement of false positives are *true negatives*.
+	
+	- A *false negative* occurs if a positive of the objective set is predicted
+	to be a negative. False negatives are also known as *type II errors*.
+	The complement of false negatives are *true positives*.
+
+If we denote the set of false positives by $\FP$, true positives by $\TP$, false
+negatives by $\FN$, and true negatives by $\TN$, then the objective set
+$A=\FN \cup \TP$ and the approximate set $\hat{A}=\TP \cup \FP$.
+See Figure \ref{fig:ex_approx_set} for an illustration.
+\begin{figure}[ht]
+	\caption{An approximate set $\hat{A}$ of an objective set $A$}
+	\label{fig:ex_approx_set}
+	\centering
+	\def\svgwidth{\columnwidth/4}
+	\input{img/aset_fp_fn.tex}
+\end{figure}
+
+If we only have access to the approximation $\hat{A}$, we do not have the
+ability to partition the universe into the disjoint sets $FP$, $TP$, $FN$, and
+$TN$ as demonstrated in Figure \ref{fig:ex_approx_set}.
+However, we can quantify the degree of *uncertainty* about the elements that it
+predicts to be positive or negative.
+The false positive and true negative rates are given by the following.
+\begin{definition}
+\label{def:fprate}
+The *false positive rate* is the proportion of predictions that are *false positives* as given by
+$$
+\hat{\fprate} = \frac{|\FP|}{|\FP| + |\TP|}
+$$
+and the *true negative rate* is given by $\hat{\tnrate} = 1 - \hat{\fprate}$.
+\end{definition}
+
+The true positive and false negative rates are given by the following.
+\begin{definition}
+The *true positive rate* is the proportion of predictions that are
+*true positives* as given by
+$$
+\hat{\tprate} = \frac{|\TP|}{|\TP| + |\FN|}
+$$
+and the *false negative rate* is given by $\hat{\fnrate} = 1 - \hat{\tprate}$.
+\end{definition}
+
+The *probabilities* of the four possible predictive outcomes are given by 
+Table \ref{tbl:contingency_table}.
+\begin{table}[ht]
+	\centering
+	\begin{tabular}{@{} l l l @{}}
+		\toprule
+		& \textbf{positive} & \textbf{negative}\\
+		\midrule
+		\textbf{predict positive} & $\hat{\tprate}=1-\hat{\fnrate}$ & 
+		$\hat{\fprate}=1-\hat{\tnrate}$\\
+		\textbf{predict negative} & $\hat{\fnrate}=1-\hat{\tprate}$ & 
+		$\hat{\tnrate}=1-\hat{\fprate}$\\
+		\bottomrule
+	\end{tabular}
+	\caption{The $2 \times 2$ contingency table of outcomes for approximate sets.}
+	\label{tbl:contingency_table}        
+\end{table}
+
+# Bernoulli set model
+In the *Bernoulli* set model, we describe the statistical properties of
+processes that *generate* approximations of a certain kind that model many
+existing processes and generalizes to higher-order approximations under
+algebraic composition.
+Theoretically, a process that generates approximations could exhibit
+correlations of any sort, but each element of a Bernoulli set has an
+independently distributed error rate,
+$$
+\Pr\{1_{\hat A}(x) \neq 1_{A}(x) | 1_{\hat A}(y) \neq 1_{A}(y)\} =
+	\Pr\{1_{\hat A}(x) \neq 1_{A}(x)\}.
+$$
+
+The complexity in the Bernoulli set model stems from the fact that different
+subsets of the universal set may exhibit different error rates.
+An $n$-th order Bernoulli set with random errors $\ERR_1,\ldots,\ERR_n$
+respectively for partition blocks $1,\ldots,n$ are conditionally independent
+given $R$.
+For instance, a positive-negative approximate set has random false positive rate $\FPR$ and a random false negative rate $\FNR$ that are conditionally independent given $R$.
+
+There are two natural characteristics of the Bernoulli set model, the random
+false positive and false negative rates conditioned on $R = A$.
+They are respectively given by
+$$
+	\FPR = \frac{1}{|A'|} \sum_{x \in A'} 1_{\hat A}(x)
+$$
+and
+$$
+	\FNR = \frac{1}{|A|} \sum_{x \in A} 1_{\hat A}(x).
+$$
+
+
+
+Since the random approximate set is *random*, properties like its *false positive rate* and *false negative rate* are also random, respectively modeled by the random false positive rate $\FPR$ and false negative rate $\FNR$.
+
+We denote the *first-order* random approximate set generative model by $\AT{R}$.
+The joint distribution of $\AT{R}$, $\FPR$, $\FNR$, and $R$ given a unviersal set $U$ has a probability density
+$$
+f(Y, \fprate, \fnrate, X | U}.
+$$
+By the axioms of probability theory, this may be decomposed into
+$$
+f(Y,\fprate, \fnrate, X | U} = f(Y | \fprate, \fnrate, X, U} f(\fprate,\fnrate|X} f(X|U}.
+$$
+We typically omit the explicit reference to $U$, since it may usually be understood as implicit to the model.
+
+The object of central interest is the distribution of $\AT{R}$ given $R$.
+The conditional distribution of $\AT{R}$ given $R = X$ is denote by $\hat X$.
+By the axioms of probability,
+$$
+f(Y,\fprate,\fnrate} = f{Y | \fprate, \fnrate} f{\fprate, \fnrate | X}.
+$$
+
+There are a few natural partitions.
+
+If the rates happen to pick out a specific set in the support, then the result
+is a degenerate distribution, e.g., $\hat A$ given $\FPR = 0$ and $\FNR = 0$ is
+degenerate where all probability mass is assigned to $A$.
+
+We denote the distributions of $\hat X$ given $E(\FPR) = \fprate$ and $\hat X$
+given $E(\FNR) = \fnrate$ respectively by $\hat X[\fprate][-]$ and
+$\hat X[+][\fnrate]$.
+An object of central interest is the distribution of $\hat X$ given
+$E(\FPR) = \fprate$ and $E(\FNR) = \fnrate$, denoted by
+$$
+\hat X[\fprate][\fnrate].
+$$
+
+If we *sample* from $A^{\fprate}_{\fnrate}$, some set $\hat A \in 2^U$ with
+false positive rate $a$ and false negative rate $b$ will be realized with
+probability $f(\hat A,a,b|\fprate,\fnrate)$.
+However, as the number of samples goes to infinity, the mean false positive and
+false negative rates go to $\fprate$ and $\fnrate$ respectively.
+
+Random *positive* and *negative* approximate sets are special cases respectively given by the following definitions.
+\begin{definition}
+\label{def:pos_approx_set}
+A random approximate set $\hat A^0_+$ is a random *positive* approximate set.
+\end{definition}
+\begin{definition}
+\label{def:neg_approx_set}
+A random approximate set $\hat{A}^-_0$ is a random *negative* approximate set.
+\end{definition}
+By these definitions, every realization of $\PASet{A}$ and $\NASet{A}$ are respectively *supersets* or *subsets* of $A$.
+The complement of a random positive (negative) approximate set is a random negative (positive) approximate set.
+
+By Assumption \ref{asm:fpr_fnr_r_indep} and by the axioms of probability,
+$$
+f(\hat Y,\fprate, \fnrate) = f(\hatY | \fprate, \fnrate) f(\fprate | X} f(\fnrate)
+$$
+
+Every statistical property of the first-order random approximate set model is
+entailed by Assumption \ref{asm:fprate,asm:tprate}.
+Furthermore, these assumptions generally hold in practice, e.g., the Bloom
+filter\cite{bf} and Perfect hash filter\cite{phf} are two separate
+implementations\footnote{There may be a difference in that the algorithm may be
+deterministic; we address this point in \ref{dummyref}.} of the random positive
+approximate set in which these assumptions hold.
+
+Suppose the first-order random approximate sets are over the universal set $U$.
+Compositions of first-order random approximate sets over the Boolean algebra
+$(2^U,\cup,\cap,`\emptyset,U)$, or random approximate sets of random approximate
+sets, are not closed over the *first-order* model.
+These subject is beyond the scope of this paper.
+
+## Probability space {#sec:prob_model}
+Suppose the universal set is $U$ and we have some process that generates approximations of some objective set $A$ that is compatible with the axioms of the random approximate set model.
+
+%TODO talk about approximate unions etc as generative models
+
+The process generates subsets of $U$, or alternatively, the *sample space* is $\Sigma = 2^U$.
+A primary objective in *probability modeling* is assigning *probabilities* to *events*.
+Suppose we have some *probability function* $\Pr : \Sigma \mapsto [0,1]$.
+The *probability* of some event $A \in \Sigma$ is denoted by $\Pr\{A\}$.
+
+These are the *elementary events* of the probability space.
+The random approximate set model given $R = Y$ is given by the
+*probability space*
+$$
+    (\Omega = 2^U, 2^\Omega, P),
+$$
+where $\Omega$ is the *sample space*, $2^\Omega$ is the set of all events, and
+$P : 2^\Omega \mapsto [0,1]$ is the probability set function.
+
+By Definition \ref{def:bijection}, we use the Boolean algebras
+$\left(2^U,\cap,\cup,',\emptyset,U\right)$ and
+$(\{0,1\}^u,\land,\lor,\neg,0,1)$ interchangeably.
+
+Consider an objective set $A$ and a random approximate set  and suppose we are uncertain about which elements are their respective members.
+We model the uncertainty of the elements of $A$ by the Boolean random vector $A = (A_1,\ldots,A_u)$ where $A_j = 1_{A}\left(x_{(j)}\right)$ for $j=1,\ldots,u$.
+Similarly, we model the uncertainty of the elements of $\hat A$ by $A_{\tprate}^{\fprate} = \Tuple{\AVecComp{A}[1],\ldots,\AVecComp{A}[u]}$.
+
+The joint probability that $A_{\tprate}^{\fprate} = x$ and $A = y$ is denoted by $\Prob{A_{\tprate}^{\fprate} = x,A = y}$.
+By the axioms of probability, the joint probability may be rewritten as
+$$
+\Pr\{A_{\tprate}^{\fprate} = x,A = y\} =
+    \Pr\{A_{\tprate}^{\fprate} = x | A = y\}
+    \Pr\{A = y\}.
+$$
+By Assumption \ref{asm:fprate,asm:tprate}, $A_j$ is only dependent on 
+$A_j$ for $j=1,\ldots,u$ and thus by the axioms of probability
+\begin{equation}
+    \Prob{A_{\tprate}^{\fprate} = x,A = y} = 
+    \Prob{A = y} 
+        \prod_{j=1}^{u} \Prob{A_j = x_j | A_j = y_j}.
+\end{equation}
+If it is given that $A_{\tprate}^{\fprate} = y$, i.e., the elements in the 
+objective set are known, by the axioms of probability the conditional 
+probability is
+\begin{equation}
+    \Prob{A_{\tprate}^{\fprate} = x | A = y} = \prod_{j=1}^{u} 
+    \Prob{\AVecComp{A}[j] = x_j | A_j = y_j}
+\end{equation}
+where $\fprate = \Prob{\AVecComp{A}[j]=1 | A_j=0}$ and $\tprate = \Prob{\AVecComp{A}[j]=1 | A_j=1}$.
+
+The relative frequency of any event $x$ in $\{0,1\}^u$ converges to $\Prob{\AVec{X} = x | \AVec{y}}$ as the number of times the random approximate set of $\AVec{y}$ is generated goes to infinity.
+
+Consider the following example.
+\begin{example}
+	Suppose the universal set is $\{ x_1,x_2 \}$ and consider the distribution of the first-order random approximate set $\AT{\{x_1\}}[\fprate][\fnrate]$.
+	The probability mass function $p_{\AT{\{x_1\}}[\fprate][\fnrate]}$ is given by
+	\begin{equation}
+	p_{\AT{\{x_1\}}[\fprate][\tprate]}(X) =
+	\begin{cases} 
+	\fnrate (1-\fprate) & X = \EmptySet,\\
+	\fnrate \fprate     & X = \{x_2\},\\
+	(1-\fnrate)(1-\fprate)     & X = \{x_1\},\\
+	(1-\fnrate)\fprate         & X = \{x_1,x_2\}.
+	\end{cases}
+	\end{equation}
+\end{example}
+
+
+## Higher-order models
+There are $k! / n_1! n_2! \ldots n_k!$ partitioning schemes in the $n$-th order model.
+
+, any of which may be realized by an appropriate composition of first-order and positive-negative approximations.
+
+
+In the first-order model with error rate $\epsilon$, the error rate is $\epsilon$ over every subset.
+
+
+The *first-order* model has only one partition possible, a single block consisting of the universal set.
+
+In the second-order model, the universal set may be partitioned into two subsets $A$ and $B$ with non-identical error rates $\epsilon_A$ and $\epsilon_B$.
+If the subset of interest is a subset of $A$, then the error rate over that subset is Bernoulli distributed with error rate $\epsilon_A$ and similarly if it is a subset of $B$.
+For example, in the positive-negative random (PNR) approximate set model, the error rate over the positives is $\fnrate$, denoted the *false negative rate*, and the error rate over the negatives is $\fprate$, denoted the *false positive rate*.
+Thus, if either the positives or negatives (or their respective subsets) are of interest, the error rates are completely characterized by either $\fnrate$ or $\fprate$.
+
+
+
+
+The second-order model has $2^k$ partitioning schemes, where $k$ is the cardinality of the universal set.
+
+One could imagine, say, a *guarded approximate model* which, say, ensures that some special subset of elements have a reduced error rate $\epsilon_1$ and the rest have some error rate $\epsilon_2 > \epsilon_1$.
+
+A natural set to guard is the positive set with respect to some objective input set.
+We denote this second-order model the *positive-negative* approximate set model.
+
+It is isomorphic to the binary symmetric channel model.
+Suppose we have a communications channel over which we transmit $1$s and $0$s
+and due to *noise* or *rate-distortion* flips $0$s and $1$s respectively with
+probabilities $\fnrate$ and $\fprate$.
+
+If we serialize a set as a bit string where the $j$-th bit is $1$ if the $j$-th
+element is a member of the set and otherwise $0$, then the channel induces a
+*positive-negative* approximation of any such set transmitted over the channel.
+
+Typically, the communications channel is a storage medium and $\fnrate$ and
+$\fprate$ are rate distortions caused by *lossy* compression *algorithms* that
+construct approximations of input sets.
+Data structures like the Bloom filter are a practical example which models the
+concept of a *positive* approximate set, where $\fprate > 0$ and $\fprate = 0$.
+If we take the *complement* of a positive approximate set with a false positive
+rate $\fprate$, the result is a *negative* approximate set with a false negative
+rate $\fnrate = \fprate$.
+
+Positive-negative approximate sets may be conditioned on $E(\FPR) = \fprate$ or
+$E(\FNR) = \fnrate$, which results in an approximations that are expected to
+obtain the indicated false positive and false negative rates.
+
+# Distributions of binary classification measures {#sec:characteristics}
+The error rate on some identically distributed subset is an *expectation*.
+However, some *error measures* span multiple subsets, such as positives and negatives.
+Any such error measure may be modeled as a *Bernoulli mixture*.
+
+We are typically interested in the error rates of *special* subsets.
+For example, if we have a universal set $X$ and with probability $P(x)$ an
+element $x \in X$ is tested for membership in a collection of sets over $X$,
+then to reduce the expected error rate on membership tests elements with higher
+probability of begin tested should be assigned smaller error rates.
+
+The first-order random approximate sets are *parameterized* by the *expected*
+rates of two types of error, false negative and false positive rates.
+In this section, we derive the distribution for these rates.
+
+\begin{definition}
+The uncertain number of *negatives* is a random variable denoted by $N$ and is
+statistically dependent on $R$, $N : |R'|$.
+\end{definition}
+
+\begin{definition}
+The uncertain number of false positives is a random variable denoted by $\FP$
+and is statistically dependent on $N$ and $\FPR$, $\FP : N \FPR$.
+\end{definition}
+
+The number of false positives given a specific number of negatives is given by
+the following theorem.
+\begin{theorem}
+\label{thm:fpbinom}
+The random number of false positives $\FP$ given $N = n$ in the first-order
+random approximate set $\AT{R}[\fprate]$ is given by $\FP_n : n \FPR$ with a
+distribution given by $\FP_n \sim \bindist(n, \fprate)$.
+\end{theorem}
+\begin{proof}
+By Assumption \ref{asm:fprate}, the uncertain outcome that a negative element *tests* as
+positive is a Bernoulli trial with a mean $\fprate$.
+Since there are $n$ such independent and identically distributed trials, the
+number of false positives is binomially distributed with a mean $n \fprate$.
+\end{proof}
+
+The false positive rate $\fprate$ is an *expectation*.
+However, the false positive rate of a realization of a random approximate set $\hat S[\fprate]$ is *uncertain*.
+\begin{theorem}
+\label{thm:fpr}
+The random false positive rate $\FPR$ conditioned on $R = n$ is denoted by $\FPR_n$ and has a distribution given by
+\begin{equation}
+    \FPR_n = \frac{\FP_n}{n},
+\end{equation}
+with an expectation $\fprate$, variance $\fprate(1-\fprate) / n$, and probability mass function
+$$
+	f(\hat\fprate|\fprate} = f_{\FP_n}(\hat\fprate n | \fprate).
+$$
+over the support $\left\{ \frac{j}{n} \in \mathbb{Q} : j \in \{0,\ldots,n\}\right\}$.
+\end{theorem}
+\begin{proof}
+By Definition \ref{def:fprate}, the false positive rate is given by the ratio of
+the number of false positives to the total number of negatives.
+By Theorem \ref{thm:fpbinom}, given that there are $n$ negatives, the number of
+false positives is a random variable denoted by $\FP_n$.
+Therefore, the false positive rate, as a function of $\FP_n$, is the random
+variable $\frac{\FP_n}{n}$.
+The *expected* false positive rate is
+$$
+    E(\frac{\FP_n){n}} = \frac{1}{n}E(\FP_n) = \fprate
+$$
+and its variance is
+$$
+    \Var{\frac{\FP_n}{n}} = \frac{1}{n^2}\Var{\FP_n} = \frac{\fprate(1-\fprate)}{n}.
+$$
+Finally, $\FPR_n = \FP_n / n$ is a *scaled* transformation of the binomial distribution.
+Thus, since $\FP_n = n \FPR_n$,
+$$
+f(\fprate) = f_{\FP_n}(n \fprate).
+$$
+\end{proof}
+The following corollary immediately follows.
+\begin{corollary}
+	\label{cor:tnbinom}
+	Given $n$ negatives, the number of *true negatives* in a random approximate
+	set with a false positive rate $\fprate$ is a random variable denoted by
+	$\TN_n$ with a distribution given by
+	$$
+	\TN_n = n - \FP_n \sim \operatorname{BIN}(n, 1-\fprate).
+	$$
+	By definition, the *true negative rate* $\TNR_n = \TN_n / n = 1 - \FPR_n$.
+\end{corollary}
+
+By Theorem \ref{thm:fpr}, the more negatives there are, the lower the variance.
+\begin{corollary}
+\label{cor:fpr_as_vareps}
+	Given *countably infinite* negatives, a random approximate set with a false positive rate $\fprate$ is *certain* to obtain $\fprate$.
+\end{corollary}
+\begin{proof}
+We know that the *expected* value for each of the random variables in this
+sequence is $\fprate$ and the variance is $\fprate(1-\fprate)/n$.
+Immediately, we see that as $n$ increases, the distribution of false positives
+must become more concentrated around $\fprate$.
+As $n \to \infty$, the variance goes to $0$, i.e., the distribution becomes
+degenerate with all of the probability mass assigned to the mean.
+See Appendix \ref{app:cor_fpr_as_vareps} for a more rigorous proof.
+\end{proof}
+
+The fewer negatives, the greater the variance.
+The maximum possible variance, when $n=1$ and $\fprate = 0.5$, is $0.25$, may be
+used as the most *pessimistic* estimate given a situation where we have no
+information about the false positive rate $\fprate$ and the cardinality of the
+universal set.
+
+A degenerate case is given by letting $n = 0$, corresponding to a random approximate set of the universal set which has no negative elements that can be tested.
+Respectively, only random *negative* or *positive* approximate sets may be generated for the universal set or empty set.
+
+The number of false negatives is given by the following theorem.
+\begin{theorem}
+\label{thm:fnbinom}
+Given $p$ positives, the uncertain number of *false negatives* in random approximate sets with a false negative rate $\fnrate$ is modeled as a binomial distributed random variable denoted by $\FP_p$,
+$$
+	\FN_p \sim \operatorname{BIN}(p, \fnrate).
+$$
+\end{theorem}
+\begin{proof}
+The probability that a positive element *tests* as negative is $\fnrate$.
+Thus, each test is a Bernoulli trial.
+Since there are $p = |S|$ such independent and identically distributed trials
+with a probability of ``success'' $\fnrate$, the number of false negatives is
+binomially distributed.
+\end{proof}
+
+The false negative rate $\fnrate$ is an *expectation*.
+However, the false false negative rate of an approximate set $\hat S$ parameterized by $\fnrate$ is *uncertain*.
+\begin{theorem}
+\label{thm:fnr}
+The false negative rate realizes an uncertain value as given by
+$$
+\FNR_p = \frac{\FN_p}{p}
+$$
+with a support $\{j / n : j = 0,\ldots,p\}$, an expectation 
+$\fnrate$, 
+and a variance $\fnrate(1-\fnrate) / p$.
+\end{theorem}
+The proof follows the same logic as the proof for Theorem \ref{thm:fpr}, except we 
+replace *negatives* with *positives*.
+
+In Section \ref{sec:set_theory}, we consider set-theoretic operations like 
+*complements*. The *complement* operator applied to an approximate set of a set
+with countably infinite negatives is an approximate set of a set with countably
+infinite positives.
+\begin{corollary}
+An approximate set of a set with countably infinite positives has a false 
+negative rate that is *certain* to obtain $\fnrate$.
+\end{corollary}
+The proof follows the same logic as the proof for Corollary \ref{cor:fpr_as_vareps}, 
+except we replace *negatives* with *positives*.
+
+The number of true positives is given by the following corollary.
+\begin{corollary}
+\label{cor:tpbinom}
+Given $p$ positives, the number of *true positives* in an approximate set 
+with a false negative rate $\fnrate$ is a random variable denoted by $\TP_p$
+with a distribution given by 
+$$
+    \TP_p \sim \bindist(p, \tprate).
+$$
+By definition, the *true positive rate* is given by $\TPR_p = 1 - \FNR_p$.
+\end{corollary}
+The proof follows the same logic as the proof for Theorem \ref{thm:fpr}.
+
+Many other properties of random approximate sets follow from these distributions.
+For instance, the distribution of $|\hat A[\fprate][\tprate]|$ given $p$ positives is
+\begin{equation}
+	|\hat A[\fprate][\tprate]| = \TP_p + \FP_{u - p}
+\end{equation}
+where $u$ is the cardinality of the universal set has an expectation of $(u - p) \fprate + p \tprate$ and variance of $(u - p) \fprate(1-\fprate) + p \tprate(1-\tprate)$, which is the generalization of the binomial distribution known as the *Poisson binomial distribution*.
+
+If we do not know the number of positives $p$, the cardinality $A$, but have observed $\hat A[\fprate][\tprate] = B$, then $B$ has a cardinality that tends to be centered around $u \fprate + p (\tprate - \fprate)$.
+Solving for $p$ yields a method of moments estimator
+\begin{equation}
+	\hat p = \frac{|B| - u \fprate}{\tprate - \fprate}.
+\end{equation}
+If the universal set $U$ is infinite, then this estimator is undefined.
+
+\subsection{Asymptotic limits}
+\label{sec:asymtotic}
+The false positive and false negative rates are a function of the cardinality of the objective and universal sets.
+The limiting distributions for the false positive and true positive rates are given by the following theorems.
+\begin{theorem}
+\label{thm:approxfpr}
+    By Theorem \ref{thm:fpr}, the uncertain false positive rate $\hat\fprate$ converges in
+    distribution to the normal distribution with a mean $\fprate$ and a 
+    variance $\fprate(1-\fprate)/n$, written
+    \begin{equation}
+    \label{eq:approxfpr}
+	    \hat\fprate \xrightarrow{d} N(\fprate, \fprate(1-\fprate) / n).
+    \end{equation}
+    Similarly, by Corollary \ref{cor:tpr}, the uncertain true positive rate of an approximate  set of $p$ positives, denoted by $\TPR_p$, converges in distribution to the normal distribution with a mean $\tprate$ and a variance $\tprate(1-\tprate)/p$, written
+    \begin{equation}
+    \label{eq:approxtpr}
+    	\hat\tprate \xrightarrow{d} N(\tprate, \tprate(1-\tprate) / p).
+    \end{equation}
+\end{theorem}
+\begin{proof}
+By Equation \ref{eq:proof_fpr_as_vareps} in the proof of Corrolary \ref{cor:fpr_as_vareps}, 
+given 
+$n$ negatives, the false positive rate is
+$$
+	\epsilon_n = \frac{X_1}{n} + \cdots + \frac{X_n}{n},
+$$
+where $X_1,\ldots,X_n$ are $n$ independent Bernoulli trials each with a mean $\fprate$ and a variance $\fprate(1-\fprate)$.
+Therefore, by the central limit theorem, $\FPR_n$ converges in distribution to a normal distribution with a mean $\fprate$  and a variance $\fprate(1-\fprate)/n$.
+The proof for the true positive rate follows the same logic.
+\end{proof}
+
+By Equation \ref{eq:approxfpr},
+$$
+\TNR_n \xrightarrow{d} N(1-\fprate, \fprate(1-\fprate) / n),
+$$
+and by Equation \ref{eq:approxtpr},
+$$
+\FNR_n \xrightarrow{d} N(1-\tprate, \tprate(1-\tprate) / p).
+$$
+The Bernoulli set model is the *maximum entropy* probability distribution for
+the indicated false positive and true positive rates, e.g., any estimated
+$\alpha$-confidence intervals are the largest intervals possible for the
+indicated $\alpha$ and therefore represent a worst-case uncertainty.
+
+If we generate an approximate set, the uncertain false positive and true positive rates realize certain values, i.e., $\FPR_n = \fprateob$ and $\TPR_p = \tprateob$.
+If the sample space is countably infinite, the distribution is degenerate, e.g., $\FPR_n = \fprate$ with probability $1$. 
+However, for finite sample spaces, the outcomes are uncertain.
+If these outcomes can be *observed*, e.g., it is not too costly to compute, the exact values $\fprateob$ and $\tprateob$ may be recorded.
+If these outcomes cannot be observed, e.g., it is too costly to compute or the information to compute $\fprateob$ or $\tprateob$ is not available, we may use the probabilistic model to inform us about the distribution of false positive rates.
+
+*Confidence intervals* that contain the true false positive rate $\fprate$ and
+the true true positive rate $\tprate$ are given by the following corollaries.
+\begin{theorem}
+Given a random approximate set parameterized by $\fprate$ and $\tprate$,
+asymptotic $\alpha \cdot 100\%$ confidence intervals for the false positive rate
+and true positive rate are respectively
+\begin{equation}
+\label{eq:conf_fpr}
+\fprate \pm \sqrt{\frac{\fprate(1-\fprate)}{n}} \Phi^{-1}(\alpha/2)
+\end{equation}
+and
+\begin{equation}
+\label{eq:conf_tpr}
+\tprate \pm \sqrt{\frac{\tprate(1-\tprate)}{p}} \Phi^{-1}(\alpha/2),
+\end{equation}
+where $\Phi^{-1} : [0,1] \mapsto \mathbb{R}$ is the inverse cdf of the standard
+normal.
+\end{theorem}
+As a worst-case (maximum uncertainty), we may let $n = p = 1$ in
+Equation \ref{eq:conf_fpr,eq:conf_tpr}.
+
+## Other binary performance measures {#sec:perf}
+Suppose we have some other function $g : 2^X \mapsto Y$ that is not a *constant*, then the composition $\Fun{g} \circ \APFun{id}[\fprate][\tprate]$ is some probability distribution over the codomain $Y$.
+That is, $\left(g \circ \APFun{id}[\fprate][\tprate]\right)(A)$ is a *random variable*.
+\begin{example}
+	Let $f : 2^\{0,1\} \mapsto \{0,1\}$ be defined as
+	\begin{equation}
+	\Fun{f}(A) :
+	\begin{cases}
+	1 & A \in \left\{\{1\},\{0,1\}\right\},\\
+	0 & \text{otherwise.}
+	\end{cases}
+	\end{equation}
+	The composition $f \circ \APFun{id}[\mathsmaller{.25}][\mathsmaller{.75}]$ generates Bernoulli distribution random variables, e.g., $\left(\Fun{f} \circ \APFun{id}[\mathsmaller{.25}][\mathsmaller{.75}]\right)(\{0\}) \sim \berdist(0.25)$.
+\end{example}
+
+We consider several classes of functions and the distributions induced by replacing the inputs with random approximate sets, e.g., binary performance measures like positive predictive value.
+
+In the approximate set model, the distribution of random variables like the false positive, false negatives, true positives, and true negative rates are given respectively by parameters $\fprate$, $\fnrate$, $\tprate$, and $\tnrate$.
+These parameters belong to a more general class of *binary performance measures*.
+
+The above parameters are statements about the distribution of random approximate sets given corresponding objective sets of interest, e.g.,
+\begin{equation}
+\Prob{1_{\hat A[\fprate][\tprate]}(x) | 
+	1_{A}(x)} = \tprate.
+\end{equation}
+
+The accuracy of *predictions* about objective sets given a corresponding approximate set is usually the more relevant performance measure.
+The *positive predictive value* is given by the following definition.
+\begin{definition}
+	The *positive predictive value* is a performance measure defined as
+	\begin{equation}
+	\ppv = \frac{t_p}{t_p + f_p}
+	\end{equation}
+	where $t_p$ is the number of *true positives* and $f_p$ is the number of *false positives*.
+\end{definition}
+
+The positive predictive value of random approximate sets is a random variable given by the following theorem.
+\begin{theorem}
+\label{thm:approx_expected_precision}
+Given $\n$ negatives, $\p$ positives, and a random approximate set with false positive and true positive rates $\fprate$ and $\tprate$ respectively, the *positive predictive value* is a random variable
+$$
+\PPV = \frac{\TP_p}{\TP_p + \FP_n}
+$$
+with an *expectation* given *approximately* by
+\begin{equation}
+\label{eq:approx_expected_precision}
+\ppv(\tprate, \fprate,p,n) \approx 
+\frac{\overline{t}_p}{\overline{t}_p + \overline{f}_p} +
+\frac{\overline{t}_p \sigma_{\!f_p}^2 - \overline{f}_p 
+\sigma_{\!t_p}^2}{\left(\overline{t}_p + \overline{f}_p\right)^3},
+\end{equation}
+where $\overline{t}_p = p \tprate$ is the expected *true positive* frequency,
+$\overline{f}_p =  n \fprate$ is the expected *false positive* frequency,
+$\sigma_{\!t_p}^2 = (1-\tprate) \overline{t}_p$ is the variance of the
+*true positive* frequency, and $\sigma_{\!f_p}^2 = (1-\fprate) \overline{t}_p$
+is the variance of *false positive* frequency.
+\end{theorem}
+
+See Section \ref{sec:proof_approx_expected_precision} for a proof of Theorem
+\ref{thm:approx_expected_precision}.
+
+\begin{figure}
+	\def\svgwidth{\columnwidth/2}
+	%\def\svgscale{0.75}
+	\centering
+	\captionsetup{justification=centering}
+	\caption
+	{
+		Relative frequency of positive predicitive values for several different parameterizations of the false positive and true positive rates given $n = 900$ negatives and $\p=100$ positives.
+	}    
+	\input{img/out.pdf_tex}
+	\label{fig:prec_vs_fprate_and_fnrate}
+\end{figure}
+
+We make the following observations about Equation
+\ref{eq:approx_expected_precision}:
+
+- For sufficiently large approximate sets,
+  $\ppv \approx \overline{t}_p / (\overline{t}_p + \overline{f}_\p)$.
+- If $\fprate \neq 0$, as $n \to \infty$, $\ppv \to 0$.
+- As $\fprate \to 0$, $\ppv \to 1$.
+
+*Accuracy* is given by the following definition.
+\begin{definition}
+The *accuracy* is the proportion of true results (both *true 
+positives* and *true negatives*) in the universe of positives and 
+negatives, $(t_p + t_n)/(p+n)$, where $t_p$, $t_n$, $p$, and $n$ are 
+respectively the number of *true positives*, *true negatives*, 
+*positives*, and *negatives*.
+\end{definition}
+
+The *expected* accuracy is given by the following theorem.
+\begin{theorem}
+\label{thm:approx_expected_accuracy}
+Given $p$ positives and $n$ negatives, a random approximate set with an 
+*expected* false positive rate $\fprate$ and an *expected* true 
+positive rate $\tprate$ is a random variable given by
+$$
+\ACC_{p+n} = \lambda \TPR_p + (1 - \lambda) \TNR_n.
+$$
+has an *expected* accuracy
+\begin{equation}
+\label{eq:approx_expected_accuracy}
+\acc(\tprate,\fprate,n,p) = \lambda \tprate + (1-\lambda) \tnrate
+\end{equation}
+with a variance
+$$
+\frac{\lambda \fnrate \tprate + (1-\lambda)\fprate \tnrate}{p+n},   
+$$
+where $\lambda = p/(p+n)$.
+\end{theorem}
+\begin{proof}
+Suppose there the $u$ elements in the universe can be partitioned into $p$ 
+positives and $n$ negatives. An approximate set $\hat S$ with a false 
+positive rate $\fprate$ and false negative rate $\fnrate$ has an uncertain 
+accuracy
+$$
+\ACC_{p+n} = \frac{\TP_p + \TN_n}{p+n}.
+$$
+The expected accuracy is given by the expectation
+\begin{align}
+	E(\ACC_{p+n)}
+	&= E(\frac{\TP_p + \TN_n){p+n}}\\
+	&= \frac{p (1 - \fnrate) + n (1 - \fprate)}{p+n}.
+\end{align}
+
+Noting that $n/(p+n) = 1-p/(p+n)$ and letting $\lambda = p/(p+n)$,
+$$
+E(\ACC_{p+n)} = \lambda (1-\fnrate) + (1-\lambda) (1-\fprate).
+$$
+The variance
+\begin{align}
+\Var{\ACC_{p+n}} &= \Var{\frac{\TP_p}{p+n}} + \Var{\frac{\TN_n}{p + n}}\\
+    &= \frac{1}{(p + n)^2}\Var{\TP_p} + \frac{1}{(p + \n)^2}\Var{\TN_n}\\
+	&= \frac{p \fnrate (1 - \fnrate)}{(p + n)^2} + \frac{n \fprate (1 - 
+		\fprate)}{(p + n)^2}\\
+	&= \frac{\lambda \fnrate \tprate + (1 - \lambda)\fprate 
+		\tnrate}{p+n}.
+\end{align}
+\end{proof}
+
+*Negative predictive value* is given by the following definition.
+\begin{definition}
+$$
+\npv = \frac{t_n}{t_n + f_n}
+$$
+where $t_n$ and $f_n$ are respectively he number of *true negatives* 
+and *false negatives* 
+\end{definition}
+
+The expected negative predictive value is given by the following theorem.
+\begin{theorem}
+\label{thm:npv_approx}
+Given $p$ positives, $n$ negatives, and a Bernoulli set with false positive and
+true positive rates $\fprate$ and $\tprate$ respectively, the negative
+predictive value is a *random variable*
+$$
+\NPV = \frac{\TN_n}{\TN_n + \FN_p}
+$$
+with an *expectation* given approximately by
+\begin{equation}
+\label{eq:npv_approx}
+\npv(\tprate, \fprate,p,n) \approx 
+\frac{\overline{t}_n}{\overline{t}_n + \overline{f}_{\!n}} +
+\frac{\overline{t}_n \sigma_{\!f_n}^2 - \overline{f}_{\!n} 
+	\sigma_{\!t_n}^2}{\left(\overline{t}_n + \overline{f}_{\!n}\right)^3},
+\end{equation}
+where $\overline{t}_n = n(1-\fprate)$ is the expected *true negative*
+frequency, $\overline{f}_n =  \p(1-\tprate)$ is the expected
+*false negative* frequency, $\sigma_{\!t_n}^2 = \fprate \overline{t}_n$ is the
+variance of the *true negative* frequency, and
+$\sigma_{\!f_n}^2 = \tprate\overline{f}_n$ is the variance of the
+*false negative* frequency.
+\end{theorem}
+The proof for Theorem \ref{thm:npv_approx} follows the same pattern as the proof
+for Theorem \ref{thm:approx_expected_precision}.
+
+Youden's $J$ statistic is a measure of the performance of a binary test, defined as
+\begin{equation}
+J = \frac{t_p}{t_p + f_n} + \frac{t_n}{t_n + f_p} - 1,
+\end{equation}
+with a range $[0,1]$.
+In the case of the random approximate set model, $J$ is a random variable
+\begin{equation}
+J = \TPR_p - \FPR_n,
+\end{equation}
+which has an *expectation*
+\begin{equation}
+E(J) = \tprate - \fprate.
+\end{equation}
+
+\begin{table}
+	\centering
+	\caption{Various *expected* performance measures.}
+	\label{tbl:perf_sum}    
+	\begin{tabular}{@{} l l l @{}}
+		\toprule
+		\textbf{measure} & \textbf{parameter} & \textbf{expected value}\\
+		\midrule
+		true positive rate & $\tpr(\tprate)$ & $\tprate$\\
+		false positive rate & $\fpr(\fprate)$ & $\fprate$\\
+		false negative rate & $\fnr(\tprate)$ & $1-\tprate$\\
+		true negative rate & $\tnr(\fprate)$ & $1-\fprate$\\
+		accuracy & $\acc$ & Equation \ref{eq:approx_expected_accuracy}\\        
+		positive predictive value & $\ppv$ & Equation \ref{eq:approx_expected_precision}\\
+		negative predictive value & $\npv$ & Equation \ref{eq:npv_approx}\\        
+		false discovery rate & $\fdr$ & $1-\ppv$\\
+		false omission rate & $\forFn$ & $1-\npv$\\
+		\bottomrule
+	\end{tabular}
+\end{table}
+Table \ref{tbl:perf_sum} may be used to reparameterize an approximate set.
+\begin{example}
+Suppose we seek a *positive approximate set* with an expected accuracy 
+$\gamma$. By Table \ref{tbl:perf_sum},
+$$
+\gamma = \acc(\fprate,\fnrate=0,\lambda) = 1 - \fprate(1 - \lambda).
+$$
+Solving for $\fprate$ in terms of $\gamma$ yields the result
+$$
+\fprate(\gamma, \lambda) = \frac{1 - \gamma}{1 - \lambda}\
+$$
+subject to $0 \leq \lambda \leq \gamma \leq 1$ and $\lambda < 1$.
+Under this parameterization of the 	positive approximate set, $\lambda$ 
+must be known (or estimated).
+Note that if $\lambda = 1$ then $\fprate(\gamma, \lambda=1)$ is undefined as expected, but as $\lambda$ goes to $1$, $\fprate(\cdot; \lambda)$ goes to $1$ and $\gamma$ goes to $1$, which logically follows since if there are no negatives, there can be no false positives.
+\end{example}

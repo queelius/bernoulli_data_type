@@ -1,0 +1,297 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+\section{Random approximate maps}
+The set of functions of type $\Set{X} \mapsto \Set{Y}$ has cardinality $\Card{\Set{Y}}^{\Card{\Set{X}}}$.
+We may also denote functions of this type by $\Set{Y}^{\Set{X}}$.
+Given a function $\Fun{f} \colon \Set{X} \mapsto \Set{Y}$, a randomly chosen function $\Fun{g} \colon \Set{X} \mapsto \Set{Y}$ equals $\Fun{f}$ when applied to $x \in \Set{X}$ with probability $\frac{1}{\Card{\Set{Y}}}$ and therefore $\Fun{g} = \Fun{f}$ with probability $\Card{\Set{Y}}^{-\Card{\Set{X}}}$.
+%More generally, the number of elements in the domain $\Set{X}$ where $\Fun{g}$ and $\Fun{f}$ match is a binomially distributed random variable.
+
+We generalize this result and consider \emph{random approximate maps}.
+
+\begin{definition}
+The Iverson bracket, denoted by $\llbracket \, \rrbracket \colon \{\True,\False\} \mapsto \BitSet$, maps a predicate to $1$ if true and otherwise $0$.
+\end{definition}
+For example, $\llbracket a<b \rrbracket = 1$ if $a<b$ is \True.
+
+Let $\RV{Y}_{x} \coloneqq \llbracket\Fun{f}(x)=\APFun{f}(x)\rrbracket$ be a Boolean random variable.
+The probability that for all $x$ in $\Set{X}$, $\RV{Y}_{x} = 1$ is given by
+\begin{equation}
+	\Prob{\cap_{x \in \Set{X}} \RV{Y}_{x}=1}\,.
+\end{equation}
+If we assume independence,
+\begin{equation}
+	\Prob{\cap_{x \in \Set{X}} \RV{Y}_{x}=1} = \prod_{x \in \Set{X}} \Prob{\RV{Y}_{x}=1}\,.
+\end{equation}
+Since $\RV{Y}_{x}$ for each $x \in \Set{X}$ denote independent Boolean random variables, they are \emph{Bernoulli} distributed.
+
+\begin{definition}
+TODO: talk about independence.
+The \emph{order} of a random approximate map corresponds to the minimum number of partitions in which every element of a given partition is identically and independently Bernoulli distributed random variables.
+We model $\Fun{f} \colon \Set{X} \mapsto \Maybe{\Set{Y}}$ by a \emph{random} approximate function denoted by $\Fun{\AT{f}}$.
+That is, $\Fun{\AT{f}}$ is a random function.
+\end{definition}
+
+We denote a $k$-th order random approximate map of $\Fun{f}$ by $\Fun{f}[k][\pm]$ or, if we know and wish to emphasize the partitions, $\Fun{f}[\Set{X}[1],\ldots,\Set{X}[k]][\pm]$ or the Bernoulli probabilities corresponding to each partition, $\Fun{f}[p_1,\ldots,\p_k][\pm]$.
+
+
+
+Since each partition consists of some number of Bernoulli distributed random variables, that means each partition has a \emph{binomially distributed} number of $1$'s.
+
+
+
+%\begin{remark}
+%	NOTE: Is a first-order model plausible? Suppose we have variable length codes? If we condition on $\PlainSet{N}$ for instance, then $\Fun{\ell}_{\RV{X} %\Given \PlainSet{N}}(\Fun{f}, \APFun{f}[\fprate][\fnrate]) = \fprate$, but $\Prob{\APFun{f}[\fprate][\fnrate](\RV{X}) \neq \Nothing \Given \RV{X} \in %\PlainSet{N}} = \fprate$ does seem to be a Bernoulli trial $\berdist(\fprate)$.
+%\end{remark}
+
+
+
+In the random approximate map model, we assume that $\RV{X}$ is uniformly distributed.
+
+
+\subsection{Approximate set-indicator function}
+We may view a set $\Set{A}$ with respect to its \emph{indicator} function $\SetIndicator{\Set{A}} \colon \Set{X} \mapsto \BitSet$.
+
+The set indicator function partitions $\Set{X}$ into two parts, $\PlainSet{P} \coloneqq \SetBuilder{x \in \Set{X}}{\SetIndicator{\Set{A}}(x) = 1}$ and $\PlainSet{N} \coloneqq \SetBuilder{x \in \Set{X}}{\SetIndicator{\Set{A}}(x) = 0}$.
+
+
+
+%One in particular is defined as $\Fun{d}(a,a) = 1$ for any $a$ and otherwise $0$, in which case $\Fun{\ell}_{\RV{X} \Given \FancySet{A}}(\Fun{g} \Given \Fun{f})$ is the probability that $\Fun{f}(\RV{X}) \neq \Fun{g}(\RV{X})$ given that $\RV{X} \in \FancySet{A}$.
+%Conditioning on different subsets of $\Set{X}$ yields different \emph{binary performance measures}.
+
+\begin{definition}
+\label{def:fpr}
+The \emph{false positive rate}, denoted by $\hat{\fprate}$, is defined as the expectation $\Fun{\ell}_{\RV{X} \Given \PlainSet{N}}(\Fun{g} \Given \Fun{f})$ and the \emph{true negative rate}, denoted by $\hat{\tnrate}$, is defined as the probability $1-\hat{\fprate}$.
+\end{definition}
+
+\begin{definition}
+	\label{def:fnr}
+	The \emph{false negative rate}, denoted by $\hat{\fnrate}$, is defined as the expectation $\Fun{\ell}_{\RV{X} \Given \PlainSet{P}}(\Fun{g} \Given \Fun{f})$ and the \emph{true positive rate}, denoted by $\hat{\tprate}$, is defined as the probability $1-\hat{\tprate}$.
+\end{definition}
+
+\begin{remark}
+	If $\PlainSet{P}$ is a priori known, we can ignore elements not in the domain of definition of $\Fun{f}$ and thus discard $\hat{\fprate}$.
+\end{remark}
+
+
+By \cref{eq:disj_loss,def:fpr,def:fnr}, the expected loss over the entire domain is given by
+\begin{equation}
+\Fun{\ell}_{\RV{X}}(\Fun{g} \Given \Fun{f}) = \Fun{\ell}_{\RV{X} \Given \PlainSet{N}}(\Fun{g} \Given \Fun{f}) \Fun{p}_{\RV{X}}(\PlainSet{N}) + \Fun{\ell}_{\RV{X} \Given \PlainSet{P}}(\Fun{g} \Given \Fun{f}) \Fun{p}_{\RV{X}}(\PlainSet{P}) = \hat{\fprate} (1-\Fun{p}_{\RV{X}}(\PlainSet{P})) + \hat{\fnrate} \Fun{p}_{\RV{X}}(\PlainSet{P})\,.
+\end{equation}
+
+
+
+
+The false negative rate is given by $\fnrate = \Fun{\ell}_{\RV{X} \Given \PlainSet{P}}(\Fun{f}, \Fun{\AT{f}})$.
+
+The false positive rate is given by $\fprate = \Fun{\ell}_{\RV{X} \Given \PlainSet{N}}(\Fun{f}, \Fun{\AT{f}})$.
+
+Each element in $\PlainSet{N}$ is a false positive with probability $\fprate$.
+That is, it is a Bernoulli trial with $p = \fprate$.
+If a false positive occurs, then it randomly chooses a \emph{representation} in the prefix-free codes for $\Set{Y}$ or an undefined code, which we map to \Nothing.
+
+If the values in $\Set{Y}$ are uniquely represented, then it randomly (uniformly) chooses a value in $\Set{Y}$.
+
+It may hash to an undefined code.
+Two possibilities to consider:
+\begin{enumerate}
+	\item The hash to undefined code that is not a prefix of any other code.
+	\item If the codes are variable-length, it may hash to a prefix of one or more codes.
+\end{enumerate}
+
+If the values in $\Set{Y}$ are uniquely represented, then it randomly (uniformly) chooses a value in $\Set{Y}$.
+
+
+
+
+
+
+
+
+\subsection{Probability model}
+
+TODO 3:
+
+
+\COMMENT{
+\begin{example}
+	Suppose we have two functions, $\Fun{f} \colon \{a,b,c\} \mapsto \{0,1,2\}$ and $\Fun{g} \colon \{0,1,2\} \mapsto \{\triangle,\mathlg{\diamond},\square\}$ defined respectively as
+	\begin{multicols}{2}
+	\noindent
+	\begin{equation}
+		\Fun{f}(x) \coloneqq
+		\begin{cases}
+		1	&	x = a\,,\\
+		2	&	x = b\,,\\
+		0	&	x = c\,.		
+		\end{cases}
+	\end{equation}
+	\begin{equation}
+		\Fun{g}(y) \coloneqq
+		\begin{cases}
+		\triangle			&	y = 0\,,\\
+		\mathlg{\diamond}	&	y = 1\,,\\
+		\square				&	y = 2\,.
+		\end{cases}
+	\end{equation}
+	\end{multicols}
+	
+	We approximate $\Fun{f}$ with $\Fun{f}[\PAT{\{a,b\}}] \colon \{a,b,c\} \mapsto \{0,1,2\}$ and $\Fun{g}$ with $\Fun{g}[\PAT{\{0\}}] \colon \{0,1,2\} \mapsto \{\triangle,\mathlg{\diamond},\square\}$ respectively with the probability mass functions defined as
+	\begin{multicols}{2}
+		\noindent
+		\begin{equation}
+			\Fun{f}[\PAT{\{a,b\}}](x) =
+			\begin{cases}
+			0													&	x = a\,,\\
+			2													&	x = b\,,\\
+			\RV{Y} \sim \Fun{p}[\RV{Y} \Given x \notin \{a,b\}]	&	x = c\,.
+			\end{cases}
+		\end{equation}
+		\begin{equation}
+			\Fun{p}(x \Given x \in \{a,b\}) =
+			\begin{cases}
+			0	&	7/8\,,\\
+			1	&	1/16\,,\\
+			2	&	1/16
+			\end{cases}
+		\end{equation}
+	\end{multicols}
+
+	\begin{multicols}{2}
+		\noindent
+		\begin{equation}
+		\Fun{p}(x \Given x \in \{a,b\}) =
+		\begin{cases}
+		0	&	7/8\,,\\
+		1	&	1/16\,,\\
+		2	&	1/16
+		\end{cases}
+		\end{equation}
+		\begin{equation}
+		\Fun{p}(x \Given x \in \{0\}) =
+		\begin{cases}
+		\triangle			&	1/2\,,\\
+		\mathlg{\diamond}	&	1/3\,,\\
+		\square				&	1/6\,.
+		\end{cases}
+		\end{equation}
+	\end{multicols}
+
+	
+	The composition $\Fun{f} \circ \Fun{g} \colon \{a,b,c\} \mapsto \{\triangle,\mathlg{\diamond},\square\}$ and its probability mass are respectively given by
+	\begin{equation}
+	(\Fun{f} \circ \Fun{g})(x) \coloneqq
+	\begin{cases}
+	\mathlg{\diamond}	&	x = a\,,\\
+	\square				&	x = b\,,\\
+	\triangle			&	x = c\,.
+	\end{cases}
+	\end{equation}
+	
+\end{example}
+}
+
+
+
+
+
+
+
+
+
+General first-order random approximate map model is given by the following definition.
+\begin{definition}
+A function $\Fun{f}[\PAT{\Set{A}}] \colon \Set{X} \mapsto \Set{Y}$, $\Set{A} \subseteq \Set{X}$, is a \emph{first-order} random approximate map of $\Fun{f} \colon \Set{X} \mapsto \Set{Y}$ if the following conditions are satisfied:
+\begin{equation}
+\Fun{f}[\AT{\Set{A}}](x) \coloneqq
+	\begin{cases}
+		\RV{Y^{+}}		&	x \notin \Set{A}\,,\\
+		\RV{Y_{-}}		&	x \in \Set{A}\,.
+	\end{cases}
+\end{equation}
+where $\RV{Y^{+}}$ is a random variable with a support that is a subset of $\Set{Y}$ (including being equal to $\Set{Y}$).
+\end{definition}
+
+If we have a first-order rate-distorted map, then $\RV{Y^{+}}$ has a probability mass function that is given by
+\begin{equation}
+	\Fun{p}_{\RV{Y^{+}}}(y) = \sum_{b \in \Encode_{\Set{Y}}(y)} 2^{-\BL(b)}\,,
+\end{equation}
+where $\Encode_{\Set{Y}}$ is a prefix-free encoder for values in $\Set{Y}$.
+
+An optimal encoder may be found by computing the frequency of each element in $\Set{Y}$ when we apply $\Fun{f}$ to every element in $\Set{A}$ or $\Set{X}$\footnote{The latter may be chosen if we care about the approximation error over $\SetDiff[\Set{X}][\Set{A}]$.} and generating a Huffman code for it.
+
+However, since encoding the Huffman code may require a relatively large amount of memory, especially if the image of $\Fun{f}$ is large, this approach may not be practical.
+Alternatively, there are many well-known algorithms to generate prefix codes for specific distributions, or families of distributions.
+Universal codes may be appropriate when the image of $\Fun{f}$ is very large.
+If all else fails, there is always the uniform distribution.
+
+\begin{example}
+The first-order positive random approximate set $\PASet{A}[\fprate]$ is a first-order random approximate map of $\SetIndicator{\Set{A}} \colon \Set{X} \mapsto \BitSet$ where, conditioning on $\Set{A}$, $\sum_{b \in \Encode_{\BitSet}(1)} 2^{-\BL(b)} = \fprate$ and $\sum_{b \in \Encode_{\BitSet}(0)} 2^{-\BL(b)} = 1-\fprate$.
+\end{example}
+
+
+
+If there are constraints, such as the space of bijective functions $\Set{X} \mapsto \Set{X}$, then there are $\Card{\Set{X}}!$ such functions and the probability that, given a bijective function $\Fun{f}$, a randomly chosen bijective function $\Fun{g}$ is equal to $\Fun{f}$ with probability $\frac{1}{\Card{\Set{X}}!}$.
+
+
+
+
+TODO -1:
+
+The distance function $\Fun{d}(a,a) = 0$ and otherwise $1$ combined with $\Fun{\ell}$ counts the proportion of values mapped correctly.
+
+TODO 0:
+
+The \emph{zero-th} order approximation? Maybe we say that its uniformly distributed, i.e., just a random variable with a sample space $\Set{Y}$.
+
+What is first order then? Partition into $k$ subsets, and elements in partition $j$ are identically distributed.
+
+What is second order? Partition into $k$ subsets, and when we condition on a subset ...
+
+TODO .5: 
+Is 1st order actually 4th order model? Partions $\Set{X}$ into $\Set{A}$ and $\SetComplement[\Set{A}]$. Then, it partitions $\SetComplement[\Set{A}]$ into $\{y^*\}$ and $\SetComplement{\Set{A}} - \{y^*\}$ and it partitions $\Set{A}$ given $x \in \Set{A}$ into $\{\Fun{f}(x)\}$ and $\Set{Y} - \{\Fun{f}(x)\}$. That makes 4 partitions, each element in which has a different conditional probability.
+
+We shouldn't overcomplicate though. Maybe just say these are random approximate maps, sometimes difficult to quantify distributions, but in some cases we can provide a well-understood model, e.g., the set-indicator function has a first-order model that's straight-forward. Even higher-order models are somewhat understandable. Boolean algebra types in general, including $\{0,1\}$, all have this easily understood first-order model?
+
+
+
+TODO 1:
+
+Revised first-order model: $\Fun{f}_{\AT{A}} \colon \Set{X} \mapsto \Set{Y}$ has the property that if $x \in \Set{A}$ then $\RV{Y} = \Fun{f}_{\AT{\Set{A}}}(x)$ realizes $\Fun{f}(x)$ with probability $1-r$ and is uniformly distributed over sample space $\Set{Y} - \{\Fun{f}(x)\}$ otherwise, i.e., realizes any value in $\Set{Y} - \{\Fun{f}(x)\}$ with probability $r / (\Card{\Set{Y}}-1)$.
+
+For each $x \notin \Set{A}$, $\RV{Y} = \Fun{f}_{\AT{\Set{A}}}(x)$ is independently and identically distributed where it realizes some default value $y^*$ with probability $1-\fprate$ and is uniformly distributed over $\Set{Y} - \{y^*\}$ otherwise.
+
+TODO 1.5:
+
+Don't necessarily mention rate distortion except in passing, and then talk about, say, SHM as generating errors due to rate distortion.
+
+
+TODO 2:
+
+Given a function $\Fun{f} \colon X \mapsto Y$, $\Fun{f}[\AT{Q}[\fprate][\fnrate]][q] \colon X \mapsto Y_q$ approximately models $\Fun{f} \restriction_{Q} \colon X \mapsto Y$ where elements not in $Q \subseteq X$ are mapped by $\Fun{f} \restriction_{\AT{Q}}$ to $Y$ with probability $\fprate$ and to some \emph{default} value $q$ with probability $1-\fprate$.
+
+The \emph{first-order random approximate set}, $\ASet{A}[\fprate][\fnrate]$, may be modeled by the approximate map of the characteristic function, $\Fun{f}[\ASet{A}[\fprate][\fnrate]][0] \colon \Set{U} \mapsto \BitSet$.
+
+If we wish to speak of the \emph{type}, we may move the notation to the arrow, i.e., $X \amapsto{\fprate}{\fnrate} Y$.
+
+The default value may be disjoint from $Y$, e.g., the sum type $Y + q$.
+
+If we do not know the rates, or they are unimportant, we may instead denote it by $\Fun{f}[\AT{Q}] \colon X \mapsto Y$.
+
+
+$\Fun{f} \colon X \mapsto Y$, $\Fun{f}[\AT{Q}[\fprate][\fnrate]] \colon X \mapsto Y$
+
+We say that is of type 
+$\Fun{f} \colon X \mapsto Y$, $\Fun{f}[\AT{Q}[\fprate][\fnrate]] \colon X \mapsto Y$
+
+
+Additionally, elements in $Q$ are not mapped by $\Fun{f}_{\restriction_{\AT{Q}}}$.
+
+
+
+TODO: revisit false negative and false positive rate. False positive rate should probably just be about what the approximate map is conditioned on, i.e., if f : X -> Y and we build amap(f,A) then we have fA : A -> m(Y). If fA(x) != Nothing when x not in A, then that is a false positive. Simplify this result. Now we can focus more on false negatives. A false negative is when fA(x) != f(x) when x in A. In other words, we want to look at the restriction of the original function f to A -> m(Y) (partial) and compare it to fA.
+
+Now, for the approx boolean, fA : bool -> bool (or m(bool)), we typically let A = {0,1}. So, in that case, there are no "negatives" and so no false positives, there is only a rate distortion on the positives. Only two positives, 0 and 1. If fA(false) maps to Nothing, that's a false negative... but shouldn't really happen in this case the function is so simple. Now we must also talk about the mabye monad though... because a approx(bool) is {0,1,nothing} with some prob. distribution over the elements, P[fA(true) = nothing] is false negative rate. P[fA(true) != nothing] is 1-fnr. Rate distortion on positives that don't map to Nothing are a different matter. Now we're talking about 
+
+
+\end{document}

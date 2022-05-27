@@ -1,0 +1,114 @@
+%
+%
+%
+%
+
+
+\NeedsTeXFormat{LaTeX2e}[1994/06/01]
+\ProvidesPackage{setnotation}[2018/01/01 alex towell's set notation (style) for his various papers]
+
+\RequirePackage{xparse}
+\RequirePackage{bm}
+\RequirePackage{bbm}
+\RequirePackage{amssymb}
+\RequirePackage{mathtools}
+
+\newcommand{\blackboardfuzzysetstyle}[1]{\mathbbm{#1}}
+\newcommand{\blackboardfuzzysetsubstyle}[1]{\pmb{#1}}
+\newcommand{\blackboardfuzzysetsupstyle}[1]{\pmb{#1}}
+
+\newcommand{\boldfuzzysetstyle}[1]{\pmb{\mathsf{#1}}}
+\newcommand{\boldfuzzysetsubstyle}[1]{\pmb{#1}}
+\newcommand{\boldfuzzysetsupstyle}[1]{\pmb{#1}}
+
+\newcommand{\fancyfuzzysetstyle}[1]{\mathcal{#1}}
+\newcommand{\fancyfuzzysetsubstyle}[1]{#1}
+\newcommand{\fancyfuzzysetsupstyle}[1]{#1}
+
+\newcommand{\plainfuzzysetstyle}[1]{\mathsf{#1}}
+\newcommand{\plainfuzzysetsubstyle}[1]{\mathsf{#1}}
+\newcommand{\plainfuzzysetsupstyle}[1]{\mathsf{#1}}
+
+\newcommand{\fuzzysetstyle}[1]{\plainfuzzysetstyle{#1}}
+\newcommand{\fuzzysetsubstyle}[1]{\plainfuzzysetsubstyle{#1}}
+\newcommand{\fuzzysetsupstyle}[1]{\plainfuzzysetsupstyle{#1}}
+
+\DeclareOption{blackboard}
+{
+    \renewcommand{\fuzzysetstyle}[1]{\blackboardfuzzysetstyle{#1}}
+    \renewcommand{\fuzzysetsubstyle}[1]{\blackboardfuzzysetsubstyle{#1}}
+    \renewcommand{\fuzzysetsupstyle}[1]{\blackboardfuzzysetsupstyle{#1}}
+}
+\DeclareOption{bold}
+{
+    \renewcommand{\fuzzysetstyle}[1]{\boldfuzzysetstyle{#1}}
+    \renewcommand{\fuzzysetsubstyle}[1]{\boldfuzzysetsubstyle{#1}}
+    \renewcommand{\fuzzysetsupstyle}[1]{\boldfuzzysetsupstyle{#1}}
+}
+\DeclareOption{fancy}
+{
+    \renewcommand{\fuzzysetstyle}[1]{\fancyfuzzysetstyle{#1}}
+    \renewcommand{\fuzzysetsubstyle}[1]{\fancyfuzzysetsubstyle{#1}}
+    \renewcommand{\fuzzysetsupstyle}[1]{\fancyfuzzysetsupstyle{#1}}
+}
+\DeclareOption{plain}
+{
+    \renewcommand{\fuzzysetstyle}[1]{\plainfuzzysetstyle{#1}}
+    \renewcommand{\fuzzysetsubstyle}[1]{\plainfuzzysetsubstyle{#1}}
+    \renewcommand{\fuzzysetsupstyle}[1]{\plainfuzzysetsupstyle{#1}}
+}
+
+\ExecuteOptions{plain}
+\ProcessOptions\relax
+
+\NewDocumentCommand{\FuzzySet}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {\fuzzysetstyle{#1}}
+            {\fuzzysetstyle{#1}_{\fuzzysetsubstyle{#2}}}
+    }
+    {\fuzzysetstyle{#1}_{\fuzzysetsubstyle{#2}}^{\fuzzysetsupstyle{#3}}}
+}
+
+\NewDocumentCommand{\FancyFuzzySet}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {\fancyfuzzysetstyle{#1}}
+            {\fancyfuzzysetstyle{#1}_{\fancyfuzzysetsubstyle{#2}}}
+    }
+    {\fancyfuzzysetstyle{#1}_{\fancyfuzzysetsubstyle{#2}}^{\fancyfuzzysetsupstyle{#3}}}
+}
+
+\NewDocumentCommand{\BlackboardFuzzySet}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {\blackboardfuzzysetstyle{#1}}
+            {\blackboardfuzzysetstyle{#1}_{\blackboardfuzzysetsubstyle{#2}}}
+    }
+    {\blackboardfuzzysetstyle{#1}_{\blackboardfuzzysetsubstyle{#2}}^{\blackboardfuzzysetsupstyle{#3}}}
+}
+
+\NewDocumentCommand{\PlainFuzzySet}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {\plainfuzzysetstyle{#1}}
+            {\plainfuzzysetstyle{#1}_{\plainfuzzysetsubstyle{#2}}}
+    }
+    {\plainfuzzysetstyle{#1}_{\plainfuzzysetsubstyle{#2}}^{\plainfuzzysetsupstyle{#3}}}
+}
+
+\NewDocumentCommand{\BoldFuzzySet}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {\boldfuzzysetstyle{#1}}
+            {\boldfuzzysetstyle{#1}_{\boldfuzzysetsubstyle{#2}}}
+    }
+    {\boldfuzzysetstyle{#1}_{\boldfuzzysetsubstyle{#2}}^{\boldfuzzysetsupstyle{#3}}}
+}
+
+\newcommand{\FuzzyDeg}[1]{\operatorname{\mu_{#1}}}

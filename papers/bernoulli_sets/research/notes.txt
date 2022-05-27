@@ -1,0 +1,129 @@
+
+
+
+probability space
+sample space 2^U
+probability measure P : 2^U -> [0,1]
+P[empty set] = 0
+P[2^U] = 1, i.e., one of those events will occur, it is the sure event.
+
+Let U = {1,2,3}
+elementary events are empty set, {},{1},{2},{3},{1,2},{1,3},{2,3},{1,2,3}
+
+
+
+The sample space is the set of possible outcomes. Since the outcomes of interest are subsets of U given some objective set A subset U.
+
+
+
+
+
+multisets as a relation (x1, f1), (x2, f2), ..., (xn,fn)
+this is an approximate relation. so, (x1, 1), (x1, 2), ... may also be in the approximation. how to deal with as a function? some ordering property, e.g.,
+try (x1, 1) first, then (x1, 2), and so on until a hit. each can be a false positive, and the one true one can be a false negative. thus, this approach
+has some issues, but is still reasonable when freq are only a few possibilities, e.g., {one,couple,few,many}. In this case four independent trials, and try
+them in order from smallest to largest.
+
+
+entropy of approx set
+
+H(S+) = log(m + (u-m)fpr)
+this stuff wrong?
+
+
+fpr = 2^(H(S+)) / (u(1-lambda) - lambda / (1 - lambda), lambda = m / u
+
+
+﻿
+Prob[x in S+ | x in S] = 1
+Prob[x in S+ | x not in S] = fpr
+
+H(S+|S) = - sum log(p(xi)) p(xi)
+        = - (u-m) log(fpr) fpr
+
+h = 2^{- (u-m) log(fpr) fpr} 
+solve for fpr
+
+this stuff is reaonable for oblivious set stuff.
+
+
+H(S+,S) = H(S+|S) + H(S)
+
+
+
+----
+
+what happens when univers is an approximate set? approximate abstract data types?
+
+
+
+---
+
+Rethink degeneracy. Instead, don’t talk about that, but given (P(U),and,or,not,0,U) make the data type of an algebra of approximate sets with a value constructor f be over (sigma(f) or 0 or U,and,or,not,0,U) just to force 0 and U to be in the universe (and thus make it closed). This means that for some deterministic f it may be the case that multiple labels for 0 or U exist, e.g., if f(A) maps to 0 then A* and 0 are both labels for 0. More systemically, this may be the case for many of them, unless f is a bijection.
+---
+
+Approximate sets have two principle roles:
+1. Uncertainty. There may be some objective set of interest for which complete information about the members is not available.
+2. Space-efficiency. Especially for large sets (or just large universal sets), space-efficient data structures that implement sets exist but with false positives (or false negatives, but usually not both).
+
+In item 1 above, there are many ways in which information about a set can be incomplete.
+=====================
+Case 1:
+Any subset of the universal set U may be described by some predicate in U → {0,1}, e.g., A = { x in U | P(x) }. Suppose we are uncertain about the definition of some objective predicate P. We may choose to approximate it with some predicate P’ which generate another set A* = { x in U | P’(x) }.
+
+Suppose that for some x in U, P’(x) != P(x), i.e., P’(x) is an error with respect to P. Two common error classifications , false positives and false negatives, are given respectively by P’(x) | !P(x) and !P’(x) | P(x).
+
+Case 2:
+The universe U may be uncertain. This is just another application of error approximation, where predicate P applies to the elements in some superset V >= U, i.e., P : V→{0,1}, and we replace it with P* to generate U*.
+
+Case 3:
+???
+#####
+In item 2 above, the Bloom filter and the Perfect hash filter are two implementations of space-efficient positive approximate sets.
+####
+
+Regardless, whether the approximation exists as a consequence of item 1 or 2, once we have approximate sets, operations on those approximate sets may generate approximate sets.
+
+
+
+
+
+@@@@@@@@@@@@
+Suppose that you have a huge objective set of m elements and have restricted the universe to N elements, which means there are m positives and N - m negatives. Suppose you represent the set with a Bloom filter. You can insert each of those member elements into the Bloom filter, yielding a bit length of O(-1.44 m log v) where v is the false positive rate. Alternatively, if N - m << m, you may choose to insert the N - m negative elements into the Bloom filter and, then, an element is a true member if it is not in the Bloom filter. This yields a space complexity O(-1.44(N-m)log v) with a false negative rate v, i.e., positives may be marked as negatives but negatives are never marked as positives. This may or may not be reasonable.
+@@@@@@@@@@
+
+
+Suppose we have a data type constructor ASet<A>.  and we have value constructors.
+
+
+
+template <typename T>
+using ASetAlgebra = std::variant<EmptySet, UniversalSet<T>, ASet<T>>
+
+template <typename T1, typename T2>
+using ASetAlgebra = std::variant<ASetAlgebra<T1, ASet<T2>>
+
+template <typename T1, typename T2, typename T3>
+using ASetAlgebra = std::variant<ASetAlgebra<T1,T2>, ASet<T3>>
+
+
+
+
+---
+
+
+
+
+
+refactor generation of secure indexes into a pipeline following unix philosophy.
+
+
+let the boolean secure index generator simply accept a set of elements. how the elements are to be interpretted depends on the nature of the secure index type.
+is it a relation? is it a set of relations? is it just a set?
+
+
+
+remove_html document.html | tokenize regexp | build_secure_index
+
+or something like that...
+

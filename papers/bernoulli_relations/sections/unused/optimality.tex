@@ -1,0 +1,267 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+
+\SetKwFunction{GetAttributes}{attributes}
+\SetKwFunction{HasKey}{has\_key}
+\SetKwFunction{Keys}{keys}
+\SetKwFunction{FalsePositiveRate}{fpr}
+\SetKwFunction{FalseNegativeRate}{fnr}
+\SetKwFunction{GetAttributeNames}{get\_names}
+
+\SetKwData{NullValue}{null}
+\SetKwData{True}{true}
+\SetKwData{False}{false}
+
+\section{Implementation of approximate relations}
+The space complexity and time complexity of the implementation depends on what sort of operations are required to be efficient.
+
+If the only operation required is a query as to whether a particular relation exists, then $\log_2 \frac{1}{\fprate}$ bits per element is required as an expected lower-bound.
+
+A single map may, of course, represent a relation by having keys (unique identifiers) map to tuples. For example, \cref{tbl:relation} may be given by
+\begin{equation}
+    \Fun{f} = \left\{
+        \left(k_j, \left(a_{j 1}, \cdots, a_{j n}\right)\right) \colon j = 1,\ldots,p
+    \right\}\,.
+\end{equation}
+
+\begin{table}[h]
+\centering
+\caption{A table representing a relation of $p$ tuples each with $n$ elements}
+\label{tbl:relation_tuple_value}
+\begin{tabular}{|c c|} 
+\hline
+key & values\\
+\hline
+    $k_1$ & $a_{1 1},\cdots,a_{1 n}$\\
+    $k_2$ & $a_{2 1},\cdots,a_{2 n}$\\
+    $\vdots$ & $\vdots$\\
+    $k_p$ & $a_{p 1},\cdots,a_{p n}$\\
+\hline
+\end{tabular}
+\end{table}
+
+If we code each tuple element independently, and compute the entropy of the $j$-th attribute to be $\mu_j$, then the information-theoretic lower-bound is given by
+\begin{equation}
+    -\log_2 \fprate + \sum_{j=1}^{n} \mu_j \; \si{bits \per tuple}\,.
+\end{equation}
+
+An alternative way to construct a relation is given by
+\begin{equation}
+    \ExactMap{k} =
+    \left\{
+        \left(k_j, a_{j k}\right) \colon j = 1,\ldots,p
+    \right\}
+\end{equation}
+for $k=1,\ldots,n$. That is, for each of the $n$ attributes, generate a map. The tuple in the relation with a unique id $x$ is then given by $\ExactMap{1}(x),\ldots,\ExactMap{n}(x)$.
+
+\begin{table}[h]
+\centering
+\caption{A table representing a relation of $p$ tuples each with $n$ elements}
+\label{tbl:relation2}
+\begin{tabular}{|c c|} 
+\hline
+key & attribute$_1$\\
+\hline
+    $k_1$ & $a_{1 1}$\\
+    $k_2$ & $a_{2 1}$\\
+    $\vdots$ & $\vdots$\\
+    $k_p$ & $a_{p 1}$\\
+\hline
+\end{tabular}
+$\cdots$
+\begin{tabular}{|c c|} 
+\hline
+key & attribute$_n$\\
+\hline
+    $k_1$ & $a_{1 n}$\\
+    $k_2$ & $a_{2 n}$\\
+    $\vdots$ & $\vdots$\\
+    $k_p$ & $a_{p n}$\\
+\hline
+\end{tabular}
+\end{table}
+
+Using a map for each attribute in a relation is generally more flexible, e.g., one may add or remove attributes about a relation by adding or removing maps. Multiple relations may also be joined or combined in various ways. However, since we assume the maps are not enumerable (e.g., countably infinite), then the full relational model is not possible since we may only retrieve a tuple by its (unique) key.
+
+The information-theoretic lower-bound of this approach is given by
+\begin{equation}
+\label{eq:lb_join}
+    -\log_2 \fprate_2 \cdots \fprate_n + \sum_{j=1}^{n} \mu_j \; \si{bits \per tuple}\,,
+\end{equation}
+which has a false positive rate $\fprate_2 \cdots \fprate_n$ and thus obtains an absolute efficiency of $1$. \Cref{eq:lb_join} may be rewritten as
+\begin{equation}
+    \sum_{j=1}^{n} \left[\log_2 \frac{1}{\fprate_j} + \mu_j\right] \; \si{bits \per tuple}\,.
+\end{equation}
+As $\fprate_j \to 1$ for $j=1,\ldots,n$, the result converges to
+\begin{equation}
+    \sum_{j=1}^{n} \mu_j \; \si{bits \per tuple}\,.
+\end{equation}
+We could use an \emph{approximate set}\cite{aset} of the keys with a false positive rate $\fprate$, and use $n$ approximate maps. As $\fprate_j \to 1$ for $j=1,\ldots,n$, the false positive rate of the relation converges to $\fprate$ and the bit length converges to
+\begin{equation}
+    -\log_2 \fprate + \sum_{j=1}^{n} \mu_j \; \si{bits \per tuple}\,.
+\end{equation}
+
+If we relax the assumption that each exact map in the relation share the same set of keys, then the information-theoretic lower-bound is no longer obtainable by this approach. However, it allows for relations with \emph{null} values that do not require any bits to code and generally allows for more flexibility, i.e., adding or removing columns, tuples, or even individual tuple elements by adding or removing maps from the relation.
+
+There are advantages and disadvantages to each approach. The first approach, where the keys map to actual tuples, is computationally the most efficient since only one lookup must be performed. Additionally, in practice, greater efficiency is obtained since each map has a bit length with some constant overhead cost (that only asymptotically vanishes as the number of keys in the map goes to infinity).
+
+%\begin{equation}
+%    -\beta (n \log_2 \fprate) + \sum_{j=1}^{n} \mu_j \; \si{bits \per tuple}\,,
+%\end{equation}
+
+
+
+
+
+
+TODO: prefix free code for (n-1)-ary part of each tuple where nth is ... y'know. now we just see that the space complexity is independent off the arity of the partial function. However, the arity does determine HOW MANY false positives are expected to occur.
+
+Show how the approximate partial function may be used to \emph{optimally} implement the approximate relation. Actually, the approximate relation, like the approximate map, do not necessarily have a strong selling point unless the value is small compared to the key, in which case the key takes up most of the space and we still achieve something by allowing false positives on the key and then mapping to a value.
+
+
+\subsection{Abstract data type}
+The abstract data type of the approximate relation is given by the following definition.
+\begin{definition}
+\label{def:approx_rel}
+Given a relation $\Relation{R}$, we denote any approximate relation of $\Relation{R}$ by $\ARelation{R}$. The abstract data type of the \emph{approximate relation} $\ARelation{R}$ where the set of keys is given by $\Set{X}$, the set of attribute \emph{names} is given by $\Set{Y}$, and the set of attributes is given by $\mathbb{A} = \Set{Y}[1] \times \cdots \times \Set{Y}[n]$ has the following operations defined:
+\begin{align*}
+    &\GetAttributeNames \colon \left[\ARelation{R}\right] \mapsto \left[\Set{Y}\right]\,,\\
+    &\HasKey \colon \left[\ARelation{R}\right] \times \Set{X} \mapsto \{ \True, \False \}\,,\\
+    &\GetAttributes \colon \left[\ARelation{R}\right] \times \Set{X} \mapsto \Set{A} \cup \{ \NullValue \}\,\,\\
+    &\FalsePositiveRate \colon \left[\ARelation{R}\right] \mapsto [0,1]\,,\\
+    &\FalseNegativeRate \colon \left[\ARelation{R}\right] \mapsto [0,1]\,.
+\end{align*}
+
+The \HasKey function tests whether a particular \emph{key} is in the relation, i.e., \HasKey{$\ARelation{R}$,$x$}, $x \in \Set{X}$, returns \True if $x \in \Keys(\ARelation{R})$ and otherwise returns \False.
+
+The \GetAttributes function retrieves the \emph{attributes}, a set of iterable key-value pairs, where the key is the \emph{name} of the attribute, about a particular \emph{key}. If a key has no associated attributes, \NullValue is returned.
+
+The relation $\ARelation{R}$ is an approximate relation of $\Relation{R}$ with a false positive rate $\fprate$ and false negative rate $\fnrate$ if the following conditions hold:
+\begin{enumerate}[(i)]
+    \item Let a key that is selected uniformly at random from the universe $\Set{X}$ be denoted by $\RV{X}$. If $\RV{X}$ is a member of $\Keys(\Relation{R})$, it is not a member of $\Keys(\ARelation{R})$ with a probability $\fnrate$,
+    \begin{equation}
+        \Prob{\neg \HasKey\!\left(\ARelation{R},\RV{X}\right) \Given \HasKey\!\left(\Relation{R},\RV{X}\right)} = \fnrate\,.
+    \end{equation}
+    
+    \item Let an element that is selected uniformly at random from the universe $\Set{X}$ be denoted by $\RV{X}$. If $\RV{X}$ is \emph{not} a member of $\Keys(\Relation{R})$, it is a member of $\Keys(\ARelation{R})$ with a probability $\fprate$,
+    \begin{equation}
+        \Prob{\HasKey\!\left(\ARelation{R},\RV{X}\right) \Given \neg \HasKey\!\left(\Relation{R},\RV{X}\right)} = \fprate\,.
+    \end{equation}
+\end{enumerate}
+\end{definition}
+
+
+
+
+The abstract data type of the approximate relation may be \emph{optimally} (space efficiency) implemented by \emph{approximate maps} and \emph{approximate sets}.
+
+
+A single map may, of course, represent a relation by having keys (unique identifiers) map to tuples. For example, \cref{tbl:relation} may be given by
+\begin{equation}
+    \Fun = \left\{
+        \left(k_j, \left(a_{j 1}, \cdots, a_{j n}\right)\right) \colon j = 1,\ldots,p
+    \right\}\,.
+\end{equation}
+
+\begin{table}[h]
+\centering
+\caption{A table representing a relation of $p$ tuples each with $n$ elements}
+\label{tbl:relation_tuple_value}
+\begin{tabular}{|c c|} 
+\hline
+key & values\\
+\hline
+    $k_1$ & $a_{1 1},\cdots,a_{1 n}$\\
+    $k_2$ & $a_{2 1},\cdots,a_{2 n}$\\
+    $\vdots$ & $\vdots$\\
+    $k_p$ & $a_{p 1},\cdots,a_{p n}$\\
+\hline
+\end{tabular}
+\end{table}
+
+If we code each tuple element independently, and compute the entropy of the $j$-th attribute to be $\mu_j$, then the information-theoretic lower-bound is given by
+\begin{equation}
+    -\log_2 \fprate + \sum_{j=1}^{n} \mu_j \; \si{bits \per tuple}\,.
+\end{equation}
+
+An alternative way to construct a relation is given by
+\begin{equation}
+    \ExactMap{k} =
+    \left\{
+        \left(k_j, a_{j k}\right) \colon j = 1,\ldots,p
+    \right\}
+\end{equation}
+for $k=1,\ldots,n$. That is, for each of the $n$ attributes, generate a map. The tuple in the relation with a unique id $x$ is then given by $\ExactMap{1}(x),\ldots,\ExactMap{n}(x)$.
+
+\begin{table}[h]
+\centering
+\caption{A table representing a relation of $p$ tuples each with $n$ elements}
+\label{tbl:relation2}
+\begin{tabular}{|c c|} 
+\hline
+key & attribute$_1$\\
+\hline
+    $k_1$ & $a_{1 1}$\\
+    $k_2$ & $a_{2 1}$\\
+    $\vdots$ & $\vdots$\\
+    $k_p$ & $a_{p 1}$\\
+\hline
+\end{tabular}
+$\cdots$
+\begin{tabular}{|c c|} 
+\hline
+key & attribute$_n$\\
+\hline
+    $k_1$ & $a_{1 n}$\\
+    $k_2$ & $a_{2 n}$\\
+    $\vdots$ & $\vdots$\\
+    $k_p$ & $a_{p n}$\\
+\hline
+\end{tabular}
+\end{table}
+
+Using a map for each attribute in a relation is generally more flexible, e.g., one may add or remove attributes about a relation by adding or removing maps. Multiple relations may also be joined or combined in various ways. However, since we assume the maps are not enumerable (e.g., countably infinite), then the full relational model is not possible since we may only retrieve a tuple by its (unique) key.
+
+The information-theoretic lower-bound of this approach is given by
+\begin{equation}
+\label{eq:lb_join}
+    -\log_2 \fprate_2 \cdots \fprate_n + \sum_{j=1}^{n} \mu_j \; \si{bits \per tuple}\,,
+\end{equation}
+which has a false positive rate $\fprate_2 \cdots \fprate_n$ and thus obtains an absolute efficiency of $1$. \Cref{eq:lb_join} may be rewritten as
+\begin{equation}
+    \sum_{j=1}^{n} \left[\log_2 \frac{1}{\fprate_j} + \mu_j\right] \; \si{bits \per tuple}\,.
+\end{equation}
+As $\fprate_j \to 1$ for $j=1,\ldots,n$, the result converges to
+\begin{equation}
+    \sum_{j=1}^{n} \mu_j \; \si{bits \per tuple}\,.
+\end{equation}
+We could use an \emph{approximate set}\cite{aset} of the keys with a false positive rate $\fprate$, and use $n$ approximate maps. As $\fprate_j \to 1$ for $j=1,\ldots,n$, the false positive rate of the relation converges to $\fprate$ and the bit length converges to
+\begin{equation}
+    -\log_2 \fprate + \sum_{j=1}^{n} \mu_j \; \si{bits \per tuple}\,.
+\end{equation}
+
+If we relax the assumption that each exact map in the relation share the same set of keys, then the information-theoretic lower-bound is no longer obtainable by this approach. However, it allows for relations with \emph{null} values that do not require any bits to code and generally allows for more flexibility, i.e., adding or removing columns, tuples, or even individual tuple elements by adding or removing maps from the relation.
+
+There are advantages and disadvantages to each approach. The first approach, where the keys map to actual tuples, is computationally the most efficient since only one lookup must be performed. Additionally, in practice, greater efficiency is obtained since each map has a bit length with some constant overhead cost (that only asymptotically vanishes as the number of keys in the map goes to infinity).
+
+%\begin{equation}
+%    -\beta (n \log_2 \fprate) + \sum_{j=1}^{n} \mu_j \; \si{bits \per tuple}\,,
+%\end{equation}
+
+
+
+The latter approach that uses multiple maps all indexed by the same key can more fully implement the relational logic. Moreover, if each approximate map has some false positive rate less than $1$, say a false positive rate that is independently useful, then there are fewer restrictions on how the approximate maps may be combined to generate new table views, joins, or compositions.
+
+However, note that since we have the restriction that we may only index based off of a single key, we cannot do certain types of joins.
+
+
+
+
+
+
+
+
+
+
+\end{document}

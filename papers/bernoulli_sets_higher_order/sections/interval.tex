@@ -1,0 +1,375 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+\section{Uncertain rate distortions}
+\label{sec:intervals}
+We may not be certain about the \emph{expected} false positive and true positive rates, i.e., we may only have the joint distribution of $\ASet{A}$, $\FPR$, and $\FNR$.
+
+\subsection{First-order model}
+The easiest case to analyze is the \emph{first-order} random approximate set model.
+Suppose we are interested in the distribution of $\ASet{A}$ given $\RV{R}$ has $p$ positives and $n$ negatives.
+Since we are primarily interested in the distribution of false positives and true positives (or their corresponding rates), we consider the related random tuple $\Tuple{\FP_n, \TP_p, \TPR, \FPR}$ which, assuming $\FPR$ and $\TPR$ are independent, has a joint probability density function given by
+\begin{equation}
+	\PDF{t,f,\tprate,\fprate}[\TP_p, \FP_n,\TPR,\FPR] = \PDF{t, \tprate}[\TP_p,\TPR] \PDF{f,\fprate}[\FP_n,\FPR]
+\end{equation}
+where
+\begin{align}
+	\PDF{t,\tprate}[\TP_p,\TPR] &= \PDF{t \Given \tprate}[\TP_p \Given \TPR] \PDF{\tprate}[\TPR]\,,\\
+	\PDF{f,\fprate}[\FP_n,\FPR] &= \PDF{f \Given \fprate}[\FP_p \Given \FPR] \PDF{\fprate}[\FPR]\,.
+\end{align}
+
+When we \emph{marginalize} over the true positives, we get the result
+\begin{equation}
+\begin{split}
+	\PDF{t}[\TP_p] &= \int_{0}^{1} \PDF{t \Given \tprate}[\TP_p \Given \TPR] \PDF{\tprate}[\TPR] \dif \tprate\\
+	                 &= \int_{0}^{1} \binom{p}{t} \tprate^{t}(1-\tprate)^{p-t} \PDF{\tprate}[\TPR] \dif \tprate\,.
+\end{split}
+\end{equation}
+
+If all the probability mass for $\TPR$ is assigned to a particular point $\tprate$, the probability mass function simplifies to
+\begin{equation}
+\PDF{t}[\TP_p] = \binom{p}{t} \tprate^{t_p}(1-\tprate)^{p-t}\,,
+\end{equation}
+which is probability mass function of a binomial distribution.
+
+\begin{figure}
+	\def\svgwidth{\columnwidth}
+	%\def\svgscale{0.75}
+	\centering
+	\captionsetup{justification=centering}
+	\caption
+	{
+		Relative frequency of positive predicitive values for several different parameterizations of the false positive and true positive rates given $\n = 900$ negatives and $\p=100$ positives.
+	}    
+	\input{img/norms.pdf_tex}
+	\label{fig:mixnorm}
+\end{figure}
+
+The simplest kind of uncertainty is given by a disjoint set of intervals, in which the true expected rate is uniformly distributed across the support.
+\begin{definition}
+An interval is a convex set of real numbers. We denote by $\Interval{x} = \Interval{\underbar{x},\bar{x}}$ an interval with a lower-bound $\underbar{x}$ and an upper-bound $\bar{x}$.
+\end{definition}
+
+A further simplification comes from mapping the disjoint set of intervals to the smallest interval that \emph{spans} all of them.
+\begin{definition}
+Given a disjoint interval set $\Set{X}$, $\IntervalSpan(\Set{X})$ maps to an interval with lower and upper bounds that are the lower and upper bounds of $\Set{X}$.
+\end{definition}
+
+
+
+
+A confidence interval, for instance, may be specified in this notation.
+Here, however, we consider an algebra for interval arithmetic and put it to use quantifying our ignorance about the distribution of parameters after, for instance, a union operation.
+
+The performance measures summarized by \cref{tbl:perf_sum} depend upon the false positive rate $\fprate$, false negative rate $\fnrate$, and proportion of positives $\lambda$ being \emph{known}.
+Any parameters that are not known with certainty may be replaced in the above table by intervals that (are assumed to) contain the expected value.
+As a consequence, the performance measure will also be an interval.
+
+\emph{Maximum} uncertainty is when the parameter value is in the interval $[0,1]$, e.g., $[\lambda] = [0,1]$, and \emph{minimum} uncertainty is when the parameter is some value in the degenerate interval $[x,x]$, e.g., $[\fprate] = [.2,.2]$. The more certain--the smaller the width of the intervals--the more certain the performance measure.
+
+When using interval arithmetic, the \emph{dependency problem} can lead to overly pessimistic bounds.
+In our case, the formulae are simple enough to ensure dependencies are satisfied. We show the results of an uncertain proportion of positives $[\lambda]$ for the \emph{accuracy} measure in the following example.
+
+\begin{example}
+	Suppose we wish to determine the expected accuracy given that the proportion of positives is known to be some value in the interval 
+	$[\lambda]$. Then, the expected accuracy is some value in the interval
+	\begin{equation}
+		\begin{split}
+		\acc([\fprate],[\fnrate] ; [\lambda]) =
+		\biggl[
+		\operatorname{f}(\overline{\fprate},\overline{\fnrate})(1-\overline{\fnrate}) + 
+		\left(1-\operatorname{f}(\overline{\fprate},\overline{\fnrate})\right)(1-\overline{\fprate}),\\
+		\operatorname{f}(\underline{\fnrate},\underline{\fprate})(1-\underline{\fnrate}) + 
+		\left(1-\operatorname{f}(\underline{\fnrate},\underline{\fprate})\right)(1-\underline{\fprate})
+		\biggr]\,,
+		\end{split}
+		\end{equation}
+		where $\operatorname{f}(x,y) = \overline{\lambda}[x < y] + 
+		\underline{\lambda}[y \leq x]$. If we have complete ignorance about 
+		$\lambda$ then $[\lambda] = [0,1]$. As a special case, if we have 
+		complete 
+		ignorance about lambda and $\fnrate = 0$ (positive approximate set), 
+		then 
+		$\acc([\fprate],0 ; [0,1]) = [1-\overline{\fprate}, 1]$.
+\end{example}
+
+However, the expected rates may not be known, e.g., the values of $\alpha_1$ and $\alpha_2$ in \cref{eq:union_fn_rate} may not be known.
+Alternatively, we may not be interested in the \emph{expected} value, but the smallest set of values such that with probability $1-\alpha$ the true rate 
+realizes some value in the set, which is typically an \emph{interval}, i.e., a confidence interval.
+
+Intervals represent an uncertainty and they manifest themselves in two independent ways.
+The common notion of the \emph{confidence interval} is a product of the probabilistic model, i.e., the realized true positive rate $\tprateob$, which is normally centered around the expected true positive rate $\tprate$ as discussed in \cref{sec:asymtotic}.
+We may use \emph{interval arithmetic} and replace point values interval values, point values being a degenerate case.
+Basic interval arithmetic is presented in \cite{basicinterval}.
+
+A set sampled from $\ASet{A}(\fprate,\tprate)$ is an approximate set such that 
+the $(1-\alpha)\%$ asymptotic confidence interval for the false negative and 
+false positive rates given respectively by
+\begin{equation}
+\label{eq:fnrate_union_set}
+\Interval{\fnrate} = ?
+\end{equation}
+and
+\begin{equation}
+\label{eq:fprate_union_set}
+\Interval{\fprate} = ?\,.
+\end{equation}
+
+
+By \cref{dummyref}, $\SetUnion[\ASet{A}][\ASet{B}]$, the observation 
+$\ASet{A}(\fprate,\tprate) = \Set{A}$ is an approximate set with a false 
+negative rate
+\begin{equation}
+\label{eq:fnrate_union_set}
+\fnrateob \in \Interval{\fnrate_1}(1 - \Interval{\fprate_2}) \cup  
+\Interval{\fnrate_2} 
+(1 - \Interval{\fprate_1}) \cup [\fnrate_1][\fnrate_2]
+\end{equation}
+and a false positive rate
+\begin{equation}
+\label{eq:fprate_union_set}
+\fprateob \in 1 - (1 - \Interval{\fprate_1})(1 - \Interval{\fnrate_2})\,.
+\end{equation}
+
+\Cref{eq:fnrate_union_set} represents a disjoint set of intervals.
+However, we  are only interested in the best and worst case of the false negative rate.
+Thus, we map the disjoint set to a \emph{minimum width} interval that contains every point in the disjoint set.
+\begin{definition}
+	Given a set $\Set{X}$, $\IntervalSpan(\Set{X})$ maps to an interval with 
+	lower and upper bounds that are the lower and upper bounds of $\Set{X}$.
+\end{definition}
+
+\begin{theorem}
+	\label{thm:uncertain_rates_union_set}
+	The \emph{union} of two approximate sets with uncertain false negative 
+	rates 
+	$\Interval{\fnrate_1}$ and $\Interval{\fnrate_2}$ and uncertain false 
+	positive rates $\Interval{\fprate_1}$ and $\Interval{\fprate_2}$ is an 
+	approximate set with an uncertain false negative rate
+	\begin{equation}
+	\label{eq:fnrate_union_set}
+	\begin{split}
+	\Interval{\fnrate}
+	&= \IntervalSpan([\fnrate_1](1 - \Interval{\fprate_2}) \cup  
+	[\fnrate_2] (1 - \Interval{\fprate_1}) \cup 
+	\Interval{\fnrate_1}[\fnrate_2])\\
+	&= \biggl[
+	\min\!\left\{
+	\underline{\fnrate}_1(1 - \overline{\fprate}_2),
+	\underline{\fnrate}_2(1 - \overline{\fprate}_1),
+	\underline{\fnrate}_1 \underline{\fnrate}_2
+	\right\},\\
+	& \qquad \qquad \max\!\left\{
+	\overline{\fnrate}_1(1 - \underline{\fprate}_2),
+	\overline{\fnrate}_2(1 - \underline{\fprate}_1),
+	\overline{\fnrate}_1 \overline{\fnrate}_2\right\}
+	\biggr]
+	\end{split}
+	\end{equation}
+	and an uncertain true negative rate
+	\begin{equation}
+	\label{eq:fprate_union_set}
+	\begin{split}
+	\Interval{\tnrate}
+	&= \Interval{\tnrate_1}\Interval{\tnrate_2}\\
+	&= \Interval{
+		\underline{\tnrate}_1 \underline{\tnrate}_2,
+		\overline{\tnrate}_1 \overline{\tnrate}_2}\\
+	&= 1-(1-\Interval{\fprate_1})(1-\Interval{\fprate_2})\\
+	&= \Interval{
+		\underline{\fprate}_1 + \underline{\fprate}_2 - 
+		\underline{\fprate}_1 \underline{\fprate}_2\,, \overline{\fprate}_1 
+		+ \overline{\fprate}_2 - \overline{\fprate}_1 \overline{\fprate}_2}\,.
+	\end{split}
+	\end{equation}
+\end{theorem}
+\begin{proof}
+	By \cref{dummyref}, the false positive rate of $\ASet{A} \cup \ASet{B}$ is
+	\begin{equation}
+	\left[\fprate\right] = \left[\fprate_1\right] + \left[\fprate_2\right] - 
+	\left[\fprate_1\right] \left[\fprate_2\right]\,.
+	\end{equation}
+	and the false negative rate is
+	\begin{equation*}
+	\begin{split}
+	\left[\fnrateob\right] &=
+	\alpha_1 \left[\fnrateob_1\right](1 - \left[\fprate_2\right]) + 
+	\alpha_2 \left[\fnrateob_2\right] (1 - \left[\fprate_1\right])\\
+	&\qquad+ (1 - \alpha_1 - \alpha_2) \left(1 - \left[\fprate_1\right] + 
+	\left[\fnrateob_2\right] \left[\fprate_1\right]\right)\,,
+	\end{split}
+	\tag{\ref{eq:union_fn_rate} revisited}
+	\end{equation*}
+	where $\alpha_1,\alpha_2 \geq 0$ and $\alpha_1 + \alpha_2 \leq 1$. Thus, to 
+	maximize (minimize) this equation, we simply need to put all of the 
+	\emph{weight} into the largest (smallest) term.
+\end{proof}
+
+
+\begin{theorem}
+	\label{thm:uncertain_rates_comp_set}
+	The \emph{complement} of an approximate set with a false negative rate $\Interval{\fnrate}$ and false positive rate $\Interval{\fprate}$ is an approximate set 
+	with a false negative rate $\Interval{\fprate}$ and false positive rate $\Interval{\fnrate}$.
+\end{theorem}
+
+Since any set-theoretic composition is reducible to a combination of unions and 
+complements, we may use 
+\cref{thm:uncertain_rates_union_set,thm:uncertain_rates_comp_set} to compute 
+the bounds for any set-theoretic composition of approximate sets. See 
+\cref{tab:set_theory_intervals} for a summary of a several well-known 
+operations.
+
+\begin{table}[h]
+	\centering
+	\caption{The smallest intervals that contain the false positive and false 
+		negative rates of the approximate sets that result from the 
+		corresponding 
+		set-theoretic operations on approximate sets 
+		$\ASet{A}\left(\Interval{\fnrate_1},\Interval{\fprate_1}\right)$ and 
+		$\ASet{B}\left(\Interval{\fnrate_2},\Interval{\fprate_2}\right)$.}
+	\label{tab:bin_op_interval}    
+	\begin{tabular}{@{} l l l @{}}
+		\toprule
+		\textbf{op} & \textbf{param} & \textbf{interval}\\
+		\midrule
+		$\SetUnion[\ASet{A}][\ASet{B}]$ & $\left[\fprate\right]$ &
+		$1 - (1 - \Interval{\fprate_1})(1 - \Interval{\fprate_2}$\\ 
+		\addlinespace
+		&$\Interval{\fnrate}$ &
+		$\IntervalSpan(\Interval{\fnrate_1}(1 - \Interval{\fprate_2}) \cup  
+		\Interval{\fnrate_2} (1 - 
+		\Interval{\fprate_1}) \cup \Interval{\fnrate_1}[\fnrate_2])$\\ 
+		\cmidrule{1-3}
+		$\SetIntersection[\ASet{A}][\ASet{B}]$ & $\left[\fprate\right]$ & 
+		$\IntervalSpan(\Interval{\fnrate_1}(1 - \Interval{\fnrate_2}) \cup  
+		\Interval{\fprate_2} (1 - 
+		\Interval{\fnrate_1}) \cup \Interval{\fnrate_1}\Interval{\fprate_2})$\\
+		\addlinespace
+		&$\Interval{\fnrate}$ &
+		$1 - (1 - \Interval{\fnrate_1})(1 - \Interval{\fnrate_2}$\\ 
+		\cmidrule{1-3}
+		$\SetDiff[\ASet{A}][\ASet{B}]$ &
+		$\Interval{\fprate}$ &
+		$\IntervalSpan(\Interval{\fnrate_1}(1 - \Interval{\fprate_2}) \cup  
+		\Interval{\fnrate_2}(1 - 
+		\Interval{\fnrate_1}) \cup \Interval{\fnrate_1}\Interval{\fnrate_2})$\\
+		\addlinespace
+		&$\Interval{\fnrate}$ &
+		$\Interval{
+			\underline{\fnrate}_1 + \underline{\fprate}_2(1 - 
+			\overline{\fnrate}_1),
+			\overline{\fnrate}_1 + \overline{\fprate}_2(1 - 
+			\underline{\fnrate}_1)            
+		}$\\
+		\cmidrule{1-3}
+		$\SetComplement[\ASet{A}]$ & $\left[\fprate\right]$ & 
+		$\Interval{\fnrate_1}$\\
+		&$\Interval{\fnrate}$ &  $\Interval{\fprate_1}$\\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\begin{table*}
+	\caption{The tightest intervals that contain the false positive and false 
+	negative rates of the positive or negative approximate sets that result 
+	from the corresponding set-theoretic operations.}
+	\label{tab:neg_pos}    
+	\begin{subfigure}[b]{\columnwidth/2}
+		\centering
+		\caption{$\PASet{A}(\Interval{\fprate_1})$ and 
+		$\PASet{A}(\Interval{\fprate_2})$.}
+		\begin{tabular}{@{} l l l @{}}
+			\toprule
+			\textbf{op} & \textbf{param} & \textbf{interval}\\
+			\midrule
+			$\SetUnion[\PASet{A}][\PASet{B}]$ & $\Interval{\fprate}$ &
+			$1 - \left(1 - \Interval{\fprate_1}\right)\left(1 - 
+			\Interval{\fprate_2}]\right)$\\ 
+			\cmidrule{1-3}
+			$\SetIntersection[\PASet{A}][\PASet{B}]$ & $\Interval{\fprate}$ 
+			&
+			$\left[
+			\underline{\fprate}_1 \underline{\fprate}_2, 
+			\max\!\left(\overline{\fprate}_1,\overline{\fprate}_2\right)
+			\right]$\\
+			\cmidrule{1-3}
+			$\SetDiff[\PASet{A}][\PASet{B}]$ & $\Interval{\fprate}$ &
+			$\left[0,\overline{\fprate}_1(1-\overline{\fprate}_2\right]$\\ 
+			\addlinespace
+			&$\Interval{\fnrate}$ & $\Interval{\fprate_2}$\\
+			\cmidrule{1-3}
+			$\SetComplement[\PASet{A}]$ & $\Interval{\fnrate}$ &  
+			$\Interval{\fprate_1}$\\
+			\bottomrule
+		\end{tabular}
+	\end{subfigure}
+	\begin{subfigure}[b]{\columnwidth/2}
+		\centering
+		\caption{$\NASet{A}(\Interval{\fnrate_1})$ and 
+		$\NASet{B}(\Interval{\fnrate_2})$.}
+		\begin{tabular}{@{} l l l @{}}
+			\toprule
+			\textbf{op} & \textbf{param} & \textbf{interval}\\
+			\midrule
+			$\SetUnion[\NASet{A}][\NASet{B}]$ & $\Interval{\fnrate}$ &
+			$\left[\underline{\fnrate}_1 \underline{\fnrate}_2,
+			\max\!\left(\overline{\fnrate}_1,
+			\overline{\fnrate}_2\right)
+			\right]$\\ 
+			\cmidrule{1-3}
+			$\SetIntersection[\NASet{A}][\NASet{B}]$ & $\Interval{\fnrate}$ &
+			$1 - (1 - \Interval{\fnrate_1})(1 - \Interval{\fnrate_2})$\\ 
+			\cmidrule{1-3}
+			$\SetDiff[\NASet{A}][\NASet{B}]$ & $\Interval{\fprate}$ &
+			$\left[
+			0,
+			\overline{\fnrate}_2(1 - \underline{\fnrate}_1)\right]$\\ 
+			\addlinespace
+			&$\Interval{\fnrate}$ &
+			$\Interval{\fnrate_1}$\\
+			\cmidrule{1-3}
+			$\SetComplement[\NASet{A}]$ & $\Interval{\fprate}$ & 
+			$\Interval{\fnrate_1}$\\
+			\bottomrule
+		\end{tabular}
+	\end{subfigure}
+\end{table*}
+
+% TODO: is the interval a max, as claimed, or a min, i.e, max(e1,e2) or 
+%min(e1,e2)? in the asymptotic limit
+% we claim that infinite intersections of A(ei) converges almost surely to A. 
+%but if max, then by the formula
+% it converges to A(e = [0, max(e1,e2,...,en)]... maybe its min?
+
+
+\begin{example}
+Suppose we have three sets $\Set{A}$, $\Set{B}$, and $\Set{C}$ and consider the random approximate set
+\begin{equation}
+	\ASet{D}[\fprate][\tprate] = 
+	\SetDiff[
+	\left(
+	\SetIntersection[\PASet{A}[\fprate]][\PASet{B}[\fprate]]
+	\right)
+	]
+	[\PASet{C}[\fprate]]\,.
+\end{equation}
+The intersection of $\PASet{A}$ and $\PASet{B}$ is an approximate set 
+\begin{equation}
+	\SetIntersection[\PASet{A}][\PASet{B}][\Interval{\fprate}] =
+	\SetComplement[\SetUnion[\SetComplement[\ASet{A}]][\SetComplement[\ASet{B}]]]\,.
+\end{equation}
+\end{example}
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}

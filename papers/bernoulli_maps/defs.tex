@@ -1,0 +1,176 @@
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{naturalnames}{hyperref}
+\pgfplotsset{compat=1.14} 
+
+\hypersetup{
+    pdftitle={The approximate map abstract data type},
+    pdfauthor={Alexander Towell},               % author
+    pdfsubject={computer science},              % subject of the document
+    pdfkeywords={
+        associative array,
+        dictionary,
+        probabilistic data structure,
+        function,
+        tabular function,
+        discrete function,
+        approximate set,
+        approximate map,
+        perfect hash filter,
+        perfect map filter},                    % keywords
+    colorlinks=false,                           % false: boxed links;
+    citecolor=green,                            % color of links to 
+    filecolor=magenta,                          % color of file links
+    urlcolor=green                              % color of external
+}
+
+
+\newcommand{\catop}{{+\!\!+}}
+\newcommand{\cisb}{\mathbb{B}}
+\newcommand{\rv}[1]{\mathrm{#1}}
+\newcommand{\pmf}{p}
+\newcommand{\cdf}{F}
+\newcommand{\prob}{\Pr} %\mathrm{Pr}
+\newcommand{\setc}[1]{\overline{#1}}
+
+\newcommand{\card}[1]{\left\vert{#1}\right\vert}
+\newcommand{\given}{{\,|\,}}
+\newcommand{\indicator}[1]{\operatorname{\mathbbm{1}_{#1}}}
+\renewcommand{\vec}[1]{\boldsymbol{\mathbf{#1}}}
+\newcommand{\matrx}[1]{\boldsymbol{#1}}
+\newcommand*{\euler}{\mathrm{e}}
+\newcommand{\St}{\mathbb{S}}
+\newcommand{\Sd}{\St^*}
+\newcommand{\Sp}{\St^+}
+\newcommand{\Sn}{\St^-}
+
+\newcommand{\X}{\mathbb{X}}
+\newcommand{\Y}{\mathbb{Y}}
+\newcommand{\Xp}{\X^+}
+\newcommand{\Yp}{\Y^+}
+
+
+\newcommand{\Fun}{\operatorname{f}}
+\newcommand{\Afun}{\operatorname{f^*}}
+
+\newcommand{\ExactMap}[1]{\operatorname{f_{#1}}}
+\newcommand{\ApproxMap}[1]{\operatorname{f_{#1}^*}}
+
+
+\newcommand{\ResultSet}[1]{\operatorname{R_#1}}
+\newcommand{\AResultSet}[1]{\operatorname{R_#1^+}}
+
+
+\DeclareMathOperator{\expectation}{\mathbb{E}}
+
+\SetKwFunction{OrderedList}{ordered\_list}
+\SetKwFunction{AddDerivedAttribue}{add\_derived\_attribute}
+\SetKwFunction{Merge}{merge\_relations}
+\SetKwFunction{GetSubRelation}{retrieve\_subrelation}
+\SetKwFunction{SetAttributeName}{set\_attribute\_name}
+\SetKwFunction{JoinRelations}{join\_relations}
+\SetKwFunction{AddAttribute}{add\_attribute}
+\SetKwFunction{RemoveAttribute}{remove\_attribute}
+\SetKwFunction{GetAttributeNames}{retrieve\_attribute\_names}
+\SetKwFunction{GetAttributes}{retrieve\_attributes}
+\SetKwFunction{FalseNegativeRate}{false\_negative\_rate}
+\SetKwFunction{Find}{find}
+\SetKwFunction{Powerset}{powerset}
+\SetKwFunction{Loss}{loss}
+\SetKwFunction{FalsePositiveRate}{false\_positive\_rate}
+\SetKwFunction{Union}{union}
+\SetKwFunction{Complement}{complement}
+\SetKwFunction{Intersection}{intersection}
+\SetKwFunction{ApproxBooleanSearch}{approximate\_boolean\_search}
+\SetKwFunction{BooleanSearch}{boolean\_search}
+\SetKwFunction{Contains}{contains}
+\SetKwFunction{Image}{image}
+\SetKwFunction{Preimage}{preimage}
+\SetKwFunction{Dom}{domain}
+\SetKwFunction{DomCard}{domain\_cardinality}
+\SetKwFunction{ImageCard}{image\_cardinality}
+\SetKwFunction{Codom}{codomain}
+\SetKwFunction{HasKey}{has\_key}
+\SetKwFunction{Map}{map}
+\SetKwFunction{Decode}{decode}
+\SetKwFunction{Encode}{encode}
+\SetKwFunction{BL}{BL}
+\SetKwFunction{RE}{RE}
+\SetKwFunction{Count}{count}
+\SetKwFunction{Cardinality}{cardinality}
+\SetKwFunction{Keys}{keys}
+\SetKwFunction{Values}{values}
+\SetKwFunction{OkapiBM}{okapi\_bm\_25}
+\SetKwFunction{RankOrderedSearch}{rank\_ordered\_search}
+\SetKwFunction{Length}{doc\_length}
+\SetKwFunction{Ref}{ref}
+\SetKwFunction{IDF}{idf}
+\SetKwFunction{Rank}{rank}
+
+\SetKw{nullvalue}{null}
+\SetKw{True}{true}
+\SetKw{False}{false}
+\SetKw{Bool}{Boolean}
+\SetKw{Break}{break}
+
+\SetKwFunction{Somewhat}{somewhat}
+\SetKwData{found}{found}
+
+\SetKwInOut{KwIn}{in}
+\SetKwInOut{KwOut}{out}
+\SetKwInOut{parameters}{params}
+
+\RestyleAlgo{ruled}
+\LinesNumbered
+
+\setglossarystyle{list}
+\glsdisablehyper
+\makeglossaries
+
+\newcounter{equationstore}
+\AtBeginEnvironment{proof}{\setcounter{equationstore}{\value{equation}}
+\setcounter{equation}{0}\renewcommand{\theequation}{\alph{equation}}}
+\AtEndEnvironment{proof}{\setcounter{equation}{\value{equationstore}}}
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+\newtheorem{definition}{Definition}
+\newtheorem{postulate}{Postulate}
+\newtheorem{assumption}{Assumption}
+\newtheorem{conjecture}{Conjecture}
+
+\newcounter{examplecounter}
+\newenvironment{example}
+{
+    \begin{quote}%
+    \refstepcounter{examplecounter}%
+    \textbf{Example \arabic{examplecounter}}%
+    \quad
+}
+{%
+    \end{quote}%
+}
+
+\newcounter{equationex}
+\AtBeginEnvironment{example}{\setcounter{equationex}{\value{equation}}
+\setcounter{equation}{0}\renewcommand{\theequation}{\alph{equation}}}
+\AtEndEnvironment{example}{\setcounter{equation}{\value{equationex}}}
+
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+\newtheorem*{notation}{Notation}
+
+\setglossarystyle{list}
+\glsdisablehyper
+\makeglossaries
+
+\bibliographystyle{plainnat}
+
+\usetikzlibrary{arrows,shapes,positioning}
+\usetikzlibrary{calc,decorations.markings}
+
+\graphicspath{{img/}} 
+
+\definecolor{ltgray}{rgb}{0.65,0.65,0.65}
+\newcommand\mycommfont[1]{\footnotesize\ttfamily\textcolor{ltgray}{#1}}
+\SetCommentSty{mycommfont}

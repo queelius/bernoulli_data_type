@@ -1,0 +1,180 @@
+TODO: separately, what about an OBLIVIOUS TYPE? In an approximate set, the elements are instances of an OBLIVIOUS TYPE because:
+(1) You don't know the element x is in the set until you specifically ask if x is in the set. That is, you can't iterate over the set, that is, just by looking at the collection of bits that make up the set, you can't infer what the elements are. You actually have to ask for x specifically, and only then is it revealed to be a member or not. The less you can tell about the elements of the set by looking at the collection of bits that make up the set, the better. In a Perfect Hash Filter, we can know some things... like we can know that there are N or fewer elements if the perfect hash function is 1,...,N. The load factor may not be known, though (although a low load factor makes the distribution of bit lengths assign greater probability to smaller values), so we can only say with certainty that there are N or fewer. Another thing we know is that each actual element of the set
+====================
+
+
+
+
+
+
+
+Show that approx map f* may implement approx set ...
+
+
+
+f(x) = true <=> x in S
+f(x) = false <=> x not in S
+dom(x) = U
+codom(x) = {true, false}
+image(x) = ?   compute for f* given an image for f
+
+then, if f* is approx map of f,
+P[f*(x) = f(x) | x not in dom(f)] = varepsilon
+
+this is sufficient for f* to implement an approx set of S.
+
+what would unions look like?
+
+a binary function
+    union : (U -> {true, false} * U -> {true, false}) -> {true, false}
+
+defined by
+    union(f1*, f2*) = f1(x) or f2(x)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{alex}[2018/02/2 Customizations for my papers]
+
+\RequirePackage[bold]{setstyles}
+
+
+\renewcommand{\vec}[1]{\boldsymbol{#1}}
+\newcommand{\matrx}[1]{\boldsymbol{#1}}
+\newcommand{\catop}{{+\!\!+}}
+\newcommand{\rv}[1]{\mathrm{#1}}
+\newcommand{\pmf}{p}
+\newcommand{\cdf}{F}
+\newcommand{\prob}{\Pr} %\mathrm{Pr}
+\newcommand{\dudist}{\operatorname{\rm{DU}}}
+\newcommand{\berdist}{\operatorname{\rm{BER}}}
+\newcommand{\expdist}{\operatorname{\rm{EXP}}}
+\newcommand{\geodist}{\operatorname{\rm{GEO}}}
+\newcommand{\card}[1]{\left\vert{#1}\right\vert}
+\newcommand{\given}{{\,|\,}}
+\newcommand*{\euler}{\mathrm{e}}
+
+\newcommand{\St}{\setx{S}}
+\newcommand{\Sd}{\St^*}
+\newcommand{\Sp}{\St^+}
+\newcommand{\Sn}{\St^-}
+
+\newcommand{\X}[1]{\setx{X}}
+\newcommand{\X}{\setx{X}}
+\newcommand{\Y}{\setx{Y}}
+\newcommand{\Z}{\setx{Z}}
+\newcommand{\Xp}{\X^+}
+\newcommand{\Yp}{\Y^+}
+
+\newcommand{\fprate}{\varepsilon}
+\newcommand{\fnrate}{\omega}
+
+\newcommand{\Fun}{\operatorname{f}}
+\newcommand{\Afun}{\operatorname{f^*}}
+
+\newcommand{\rel}{\setx{\mathcal{R}}}
+\newcommand{\rela}{\rel^*}
+\newcommand{\reli}[1]{\setx{\mathcal{R}_{#1}}}
+\newcommand{\relai}[1]{\rela_{#1}^*}
+
+\newcommand{\Powerset}{\mathcal{P}}
+
+\DeclareMathOperator{\expectation}{E}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\SetKwFunction{Join}{join}
+\SetKwFunction{Proj}{proj}
+\SetKwFunction{Nec}{nec}
+\SetKwFunction{Pos}{pos}
+\SetKwFunction{OrderedList}{ordered\_list}
+\SetKwFunction{AddDerivedAttribue}{add\_derived\_attribute}
+\SetKwFunction{Merge}{merge\_relations}
+\SetKwFunction{GetSubRelation}{retrieve\_subrelation}
+\SetKwFunction{SetAttributeName}{set\_attribute\_name}
+\SetKwFunction{JoinRelations}{join\_relations}
+\SetKwFunction{AddAttribute}{add\_attribute}
+\SetKwFunction{RemoveAttribute}{remove\_attribute}
+\SetKwFunction{GetAttributeNames}{retrieve\_attribute\_names}
+\SetKwFunction{GetAttributes}{retrieve\_attributes}
+\SetKwFunction{FalseNegativeRate}{false\_negative\_rate}
+\SetKwFunction{Find}{find}
+\SetKwFunction{Loss}{loss}
+\SetKwFunction{FalsePositiveRate}{false\_positive\_rate}
+\SetKwFunction{Union}{union}
+\SetKwFunction{Complement}{complement}
+\SetKwFunction{Intersection}{intersection}
+\SetKwFunction{ApproxBooleanSearch}{approximate\_boolean\_search}
+\SetKwFunction{BooleanSearch}{boolean\_search}
+\SetKwFunction{Contains}{contains}
+\SetKwFunction{Image}{image}
+\SetKwFunction{Preimage}{preimage}
+\SetKwFunction{Dom}{domain}
+\SetKwFunction{DomCard}{domain\_cardinality}
+\SetKwFunction{ImageCard}{image\_cardinality}
+\SetKwFunction{Codom}{codomain}
+\SetKwFunction{HasKey}{has\_key}
+\SetKwFunction{Map}{map}
+\SetKwFunction{Decode}{decode}
+\SetKwFunction{Encode}{encode}
+\SetKwFunction{BL}{BL}
+\SetKwFunction{RE}{RE}
+\SetKwFunction{Count}{count}
+\SetKwFunction{Cardinality}{cardinality}
+\SetKwFunction{Keys}{keys}
+\SetKwFunction{Values}{values}
+\SetKwFunction{OkapiBM}{okapi\_bm\_25}
+\SetKwFunction{RankOrderedSearch}{rank\_ordered\_search}
+\SetKwFunction{Length}{doc\_length}
+\SetKwFunction{Ref}{ref}
+\SetKwFunction{IDF}{idf}
+\SetKwFunction{Rank}{rank}
+
+\SetKw{nullvalue}{null}
+\SetKw{True}{true}
+\SetKw{False}{false}
+\SetKw{Bool}{Boolean}
+\SetKw{Break}{break}
+
+\SetKwFunction{Somewhat}{somewhat}
+\SetKwData{found}{found}
+
+\SetKwInOut{KwIn}{in}
+\SetKwInOut{KwOut}{out}
+\SetKwInOut{parameters}{params}
+
+\RestyleAlgo{ruled}
+\LinesNumbered
+
+\setglossarystyle{list}
+\glsdisablehyper
+\makeglossaries
+
+\setglossarystyle{list}
+\glsdisablehyper
+\makeglossaries
+
+\bibliographystyle{plainnat}
+
+\usetikzlibrary{arrows,shapes,positioning}
+\usetikzlibrary{calc,decorations.markings}
+
+\graphicspath{{img/}} 
+
+\definecolor{ltgray}{rgb}{0.65,0.65,0.65}
+\newcommand\mycommfont[1]{\footnotesize\ttfamily\textcolor{ltgray}{#1}}
+\SetCommentSty{mycommfont}

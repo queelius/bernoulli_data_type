@@ -1,0 +1,101 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+\section{Introduction}
+A \emph{map}, also known as a \emph{function}, associates elements in a domain to elements in a codomain.
+This association may only be partial over the domain, in which case it is a \emph{partial function} and otherwise is a \emph{total function}.
+A total function is commonly called just a \emph{function}.
+A partial function $\Fun{f} \colon \Set{X} \pfun \Set{Y}$ may be thought of as a total function $\Fun{f} \colon \Set{X} \mapsto \Maybe \Set{Y}$.
+
+Let $\Fun{f} \colon \Set{X} \mapsto \Set{Y}$ be a function.
+The concept of a Bernoulli map of $\Fun{f}$, denoted by $\AFun{f} \colon \Set{X} \mapsto \Set{Y}$, models $\Fun{f}$ with \emph{error}, either do to rate distortion, noise, or ignorance, such that
+\begin{equation}
+    \Prob{\AFun{f}(x) \neq \Fun{f}(x) \Given x \in \Set{A}} = \epsilon_{\Set{A}}\,.
+\end{equation}
+
+
+
+
+with two general categories of error:
+\begin{enumerate}
+	\item Elements in the domain of definition may be undefined.
+	\item Undefined elements may be defined.
+\end{enumerate}
+
+There are also random approximate value types.
+
+The \Void and \Unit types have respectively $0$ and $1$ elements, therefore there are no approximations of these types.
+The most primitive type which has an approximation is the approximate Boolean type, in which which under the \emph{random approximate type model}, the element $\True_\fprate^\tprate$ is Bernoulli distributed that realizes $\True$ with probability $\tprate$ and $\False$ with probability $\fprate$ and similarly for $\False_\fprate^\tprate$.
+
+Given \Void, \Unit, and $\Bool^{\sigma}$, we may algebraically compose them to generate other types.
+For instance, the product type $\Bool^{\sigma} \times \Bool^{\sigma}$ is a random approximate product of Booleans.
+By the product rule in probability,
+\begin{equation}
+	\Prob{\Pair{\True_{\fprate_1}^{\tprate_1}}{\True_{\fprate_2}^{\tprate_2}} = \Pair{\True}{\True}} = \tprate_1 \tprate_2\,.
+\end{equation}
+
+Under the random approximate Boolean model, the logical functions $\AndFn \colon \Bool \times \Bool \mapsto \Bool$ and $\NotFn \colon \Bool \mapsto \Bool$ are also random.
+In particular, $\NotFn(\True_b^a)$ and $\NotFn(\False_b^a)$ are respectively distributed as  $\False_a^b$ and  $\True_a^b$.
+
+These results generate the random approximate Boolean algebra
+\begin{equation}
+\label{eq:boolalg}
+\left(
+	\Bool_{\fprate_1}^{\tprate_1} \times \Bool_{\fprate_2}^{\tprate_2},
+	\AndFn, \OrFn, \NotFn,
+	\Pair{\True_{\fprate_1}^{\tprate_1}}{\True_{\fprate_2}^{\tprate_2}},
+	\Pair{\False_{\fprate_1}^{\tprate_1}}{\False_{\fprate_2}^{\tprate_2}}
+\right)\,,
+\end{equation}
+which only \emph{approximately} obeys the axioms.
+
+Any set $\Set{U}$ with operations set-intersection and set-complement may be used to form the Boolean algebra
+\begin{equation}
+\left(
+	\PS{\Set{U}},
+	\SetIntersection, \SetUnion, \SetComplement,
+	\Set{U},
+	\EmptySet
+\right)\,.
+\end{equation}
+If $\Card{\PS{\Set{U}}} = 4$, then it is \emph{isomorphic} to the Boolean algebra given by \cref{eq:boolalg}.
+The \emph{approximate algebra of sets} over a universe $\Set{U}$ is thus given by
+\begin{equation}
+\left(
+	\left(\Bool_{\fprate}^{\tprate}\right)^n,
+	\AndFn, \OrFn, \NotFn,
+	\left(\True_{0}^{1}\right)^n,
+	\left(\False_{0}^{1}\right)^n
+\right)\,.
+\end{equation}
+
+
+Functions of the type $\Set{X} \mapsto \Set{Y}$ where $\Set{X}$ and $\Set{Y}$ may be any algebraic type, e.g., $\Set{X} = \Set{X}[1] \times \Set{X}[2]$ for a \emph{binary function}, has an algebraic notation $\Set{Y}^{\Set{X}}$.
+
+A \emph{random approximate exponential type} is a partial or total function, $\APFun{f} \colon \Set{X} \pfun \Set{Y}$, with a domain of definition $\Dod(\APFun{f}[\tprate][\fprate]) = \ASet{\left(\Dod(\Fun{f})\right)}[\tprate][\fprate]$ but whose range depends on the function.
+For example, if $\PFun{f}$ is a bijection when restricted to its domain of definition, then $\Range\!\left(\APFun{f}[\tprate][\fprate]\right) = \ASet{\left(\Range(\Fun{f})\right)}[\tprate][\fprate]$.
+
+The approximate map is an example of a class of \emph{approximate relations} where the relation has a functional constraint.
+Other constraints include properties like \emph{symmetric} or \emph{reflexivity}.
+Some constraints, however, are difficult to implement under the random approximate type model.
+However, note that, more generally, the approximation error can be applied to \emph{any} predicate.
+%In other words, $\SetBuilder{ y }{ (x,y) \in \Set{X} \times \Set{Y} }$ is either the empty set or singleton set.
+
+
+
+
+
+The approximate map is closely related to the \emph{approximate set}\cite{aset} and \emph{approximate relation}\cite{arelation}.
+Approximate maps are one of the key components in an algebraic data type corresponding to the \emph{exponential type}.
+
+
+Bernoulli distributed, such that anything that composes them, e.g., a \emph{random approximate set} over a universe of $n$ elements may be modeled as the product of $n$ random approximate Booleans.
+
+
+
+In \cref{dummyref}, we precisely define the approximate map.
+In \cref{dummyref}, we explore properties of approximate maps, such as its \emph{mean average precision} with respect to particular scoring functions.
+In \cref{dummyref}, we consider compositions of approximate maps, which are themselves approximate maps.
+In \cref{dummyref}, we show how the approximate map may optimally implement the abstract data type of the \emph{approximate relation}.
+Finally, in \cref{dummyref}, we explore approximate rank-ordered search based on \emph{first-order} random approximate maps.
+\end{document}

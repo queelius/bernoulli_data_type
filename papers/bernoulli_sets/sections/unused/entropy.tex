@@ -1,0 +1,78 @@
+\documentclass[ ../main.tex]{subfiles}
+%\providecommand{\mainx}{..}
+\begin{document}
+\section{Entropy}
+\label{sec:entropy}
+\begin{theorem}
+The \emph{entropy} of the uncertain number of false positives and false negatives is given by
+\begin{equation}
+    c + \frac{1}{2} \log_2\!\left((u - m)m\fprate(1 - \fprate)\fnrate(1-\fnrate)\right) + \mathcal{O}\left(\frac{u}{m(u - m)}\right)\,,
+\end{equation}
+where $c = \log_2(2 \pi e)$.
+\end{theorem}
+\begin{proof}
+The entropy of the joint distribution of false positives and false negatives given that $m$ are positive is given by
+\begin{equation}
+    \Entropy{\FP_m, \FN_m}\,.
+\end{equation}
+By \cref{dummyref}, $\FP_m$ and $\FN_m$ are independent. Thus,
+\begin{equation}
+    \Entropy{\FP_m,\FN_m} = \Entropy{\FP_m} + \Entropy{\FN_m}\,.
+\end{equation}
+The entropy of $\FP_m$ is defined as
+\begin{equation}
+    \Entropy{\FP_m} = -\sum_{f_p = 0}^{u - m} \log_2 \PDF{f_p \Given u, \fprate}[\FP_m] \PDF{f_p \Given u, \fprate}[\FP_m]\,.
+\end{equation}
+\begin{equation}
+    \Entropy{\FP_m} = c + \log_2 \sqrt{u - m} + \log_2 \sqrt{\fprate} + \log_2 \sqrt{1 - \fprate} + \mathcal{O}\left(\frac{1}{u - m}\right)\,,
+\end{equation}
+\begin{equation}
+    \Entropy{\FN_m} = c + \log_2 \sqrt{m} + \log_2 \sqrt{\fnrate} + \log_2 \sqrt{1 - \fnrate} + \mathcal{O}\left(\frac{1}{m}\right)\,,
+\end{equation}
+and $c = \log_2 \sqrt{2 \pi e}$. Summing these and simplifying yields the result
+\begin{equation}
+    \Entropy{\FP_m, \FN_m} = c + \frac{1}{2} \log_2\!\left((u - m)m\fprate(1 - \fprate)\fnrate(1-\fnrate)\right) + \mathcal{O}\left(\frac{u}{m(u - m)}\right)\,,
+\end{equation}
+where $c = \log_2(2 \pi e)$.
+\end{proof}
+
+\subsection{Positives and negatives}
+The distribution of false positives and false negatives are Bernoulli distributed random variables conditioned on a particular number of positives. The distribution of positives (and negatives) is given by the following definition.
+\begin{definition}
+The number of \emph{positives} in a universe of $u$ elements is uncertain. We model the uncertainty as a discrete random variable, denoted by $\RV{P}$, with a probability mass function\footnote{The probability mass function of a random variable $\RV{X}$ is denoted by $\PDF{\,\cdot\,}[\RV{X}]$.}
+\begin{equation}
+    \PDF{p \Given u}[\RV{P}]
+\end{equation}
+and a support $\{0,\ldots,u\}$. Conversely, the distribution of negatives is a random variable $\RV{N} = u - \RV{P}$ with a probability mass function
+\begin{equation}
+    \PDF{n \Given u}[\RV{N}] = \PDF{u - n \Given u}[\RV{P}]\,.
+\end{equation}
+\end{definition}
+The form the probability mass function $\PDF{\,\cdot\,}[\RV{P}]$ takes cannot be a priori specified, although it may be estimated with an empirical probability.
+
+Modeling the distribution of positives provides a complete specification for the distribution of false positives and false negatives (and true positives and true negatives).
+\begin{example}
+The \emph{expected} number of false positives is give by the expectation
+\begin{align}
+    \Expect{\FP}
+        &= \sum_{p=0}^{u} \sum_{f_p=0}^{u - p} f_p \cdot \PDF{p \Given u}[\RV{P}] \PDF{f_p \Given p, u, \fprate}[\FP]\\
+        &= \sum_{p=0}^{u} \PDF{p \Given u}[\RV{P}] \Expect{\FP_p \Given u} = \sum_{p=0}^{u} \PDF{p \Given u}[\RV{P}] (u-p) \fprate\\
+        &= \fprate\left(u - \sum_{p=0}^{u} m \PDF{p \Given u}[\RV{P}]\right) = \fprate\left(u - \Expect{\RV{P}}\right)\,.
+\end{align}
+Note that $\Expect{\RV{N}} = u - \Expect{\RV{P}}$, thus
+\begin{equation}
+    \Expect{\FP} = \fprate \Expect{\RV{N}}\,.
+\end{equation}
+\end{example}
+
+The joint probability mass function of positives, false positives, and false negatives is given by
+\begin{equation}
+    \PDF{p, f_p, f_n \Given u, \fprate, \fnrate} = \PDF{p \Given u}[\RV{P}] \PDF{f_p \Given p, u, \fprate}[\FP] \PDF{f_n \Given p, u, \fnrate}[\FN]\,.
+\end{equation}
+Since $\FP$ and $\FN$ are independent, the joint entropy of $\RV{P}$, $\FP$, and $\FN$ is given by
+\begin{align}
+    \Entropy{\RV{P}, \FP, \FN}`
+        &= \Entropy{\RV{P}} + \Entropy{\FP \Given \RV{P}} + \Entropy{\FN \Given u - \RV{P}}\\
+        &= \Entropy{\RV{P}} + \sum_{p=0}^{u}\Entropy{\FP \Given p} + \sum_{n=0}^{u} \Entropy{\FN \Given n}\,.
+\end{align}
+\end{document}

@@ -1,0 +1,178 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+\section{Application: rank-ordered search}
+In \cite{}, we discussed a fuzzy approximate set where the degree-of-membership was directly coded by an approximate mpa. However, the degree-of-membership may be a function of other properties.
+
+Let the degree-of-membership be with respect to a function
+\begin{equation}
+    \operatorname{u} \colon \cisb \mapsto [0,1]\,,
+\end{equation}
+which maps the bits associated with a particular element $w \in \mathbb{W}$ to a degree-of-membership.
+
+An information retrieval process begins when a user submits a \emph{query} to an information system, where a query represents an \emph{information need}. In response, the information system returns a set of relevant objects that satisfy the information need.
+
+Boolean search is a well-known information retrieval model given by the following definition.
+\begin{definition}
+In Boolean search, an object is either \emph{relevant} or \emph{non-relevant} to a query, where a query is a \emph{bag-of-words} and an object is relevant to the query if every search key in the query is in the object.
+\end{definition}
+To support Boolean search operations, each object only needs to support membership tests on the search keys. Thus, each object may be efficiently modeled as a \emph{bag-of-words}, a \emph{set} where the positive members are the \emph{searchable} keys in corresponding object. We denote this bag-of-words as the \emph{search index}.
+
+In the bag-of-words query model, the universe of queries is the \emph{powerset} of the search keys. A subset of the objects in the collection is \emph{relevant} to each particular query (if no object is relevant, the subset is the \emph{empty set}). Thus, Boolean search is a function, defined by \Cref{alg:bool_search}, from the powerset of the search keys to the powerset of objects. The subset that a query $\mathbb{X}$ maps to is its \emph{positive result set}, denoted by $\mathbb{R}_{\mathbb{X}}$. Conversely, the \emph{negative result set} is the complement of $\mathbb{R}_{\mathbb{X}}$.
+
+\begin{algorithm}[h]
+    \caption{Implementation of \protect\BooleanSearch}
+    \label{alg:bool_search}
+    \SetKwProg{func}{function}{}{}
+    \Params
+    {
+        $\mathbb{U}$ is a universe of search indexes.
+    }
+    \KwIn
+    {
+        $\mathbb{X}$ is a bag-of-words query.
+    }
+    \KwOut
+    {
+        The result set $\mathbb{R}_{\mathbb{X}}$ that is relevant to query $\mathbb{X}$.
+    }
+    \func{\BooleanSearch{$\mathbb{U}$, $\mathbb{X}$}}
+    {
+        $\mathbb{R}_{\mathbb{X}} \gets \emptyset$\;
+        \tcp{Each object in the collection is represented by a set.}
+        \ForEach{$\St \in \mathbb{U}$}
+        {
+            \DataSty{match} $\gets \True$\;
+            \ForEach{$x \in \mathbb{X}$}
+            {
+                \tcp{Function \Contains is provided by the abstract data type of the set.}
+                \If{\Contains{$\St$, $x$}}
+                {
+                    \DataSty{match} $\gets$ \False\;
+                }
+            }
+            \If{\DataSty{match}}
+            {
+                $\mathbb{R}_{\mathbb{X}} \gets \mathbb{R}_{\mathbb{X}} \cup \left\{\St\right\}$\;
+            }
+        }
+        \Return $\mathbb{R}_{\mathbb{X}}$\;
+    }
+\end{algorithm}
+
+\subsection{Fuzzy approximate result sets}
+We consider an \emph{approximation} of the \emph{rank-ordered search} model where the result sets (and search indexes) are \emph{fuzzy approximate sets}.
+\begin{assumption}
+Each search index is a \emph{positive fuzzy approximate set} with a false positive rate $\varepsilon$.
+\end{assumption}
+The \emph{fuzzy approximate set} is an appropriate abstract data type in \emph{Encrypted Search}\cite{es} where typical search indexes reveal too much information about the collection. An implementation of this abstract data type may also, in which case see \emph{oblivious} fuzzy sets\cite{}.
+
+In \emph{approximate} rank-ordered search, the rank-ordered result set (where each result item has a rank normalized betwen $0$ and $1$ to represent degree-of-membership) that maps to a query is a fuzzy approximate set of the \emph{exact} fuzzy result set that contains only positives. We denote the fuzzy approximate result set of $\mathbb{R}_{\mathbb{X}}$ by $\mathbb{R}_{\mathbb{X}}^*$.
+
+By \Cref{}, a fuzzy set $\mathbb{R}_{\mathbb{X}}^*$ is an fuzzy approximate set of $\mathbb{R}_{\mathbb{X}} \subset \mathbb{U}$ if $\mathbb{R}_{\mathbb{X}}$ contains no false negatives and the true positives have the same degree-of-membership.
+
+The \emph{true positive} rate is given by the following definition.
+\begin{definition}
+The \emph{true positive rate} is the probability that a randomly chosen secure index $\Sp \in \mathbb{U}$ tests positive for a random query given that the corresponding \emph{exact} set $\St$ contains all of the search keys.
+\end{definition}
+
+\begin{theorem}
+The \emph{true positive rate} is $1$, i.e., \emph{false negatives} are not possible.
+\end{theorem}
+\begin{proof}
+Suppose we have randomly choose set $\Sp \subset \mathbb{U}$ which approximates a set $\St$ and a random hidden query of $m$ trapdoors
+\begin{equation}
+    \left\{\rv{Y_1},\ldots,\rv{Y_m}\right\}\,.
+\end{equation}
+The \emph{true positive rate} is the conditional probability given by
+\begin{equation}
+    \Pr\left[\bigcap_{j=1}^{m} \left(\rv{Y_j} \in \Sp\right) \Given \bigcap_{j=1}^{m} \left(\rv{Y_j} \in \St\right)\right]\,.
+\end{equation}
+By the axioms of probability, this conditional probability be rewritten as
+\begin{equation}
+\label{eq:proof_tp_rate}
+\frac
+    {
+        \Pr\left[\bigcap_{j=1}^{m} \left(\rv{Y_j} \in \Sp \cap \St\right)\right]
+    }
+    {
+        \Pr\left[\bigcap_{j=1}^{m} \left(\rv{Y_j} \in \St\right)\right]
+    }\,.
+\end{equation}
+By \Cref{}, $\Sp$ is a superset of $\St$ and therefore $\Sp \cap \St = \St$. Thus, \Cref{eq:proof_tp_rate} may be rewritten as
+\begin{equation}
+    \frac
+    {
+        \Pr\left[\bigcap_{j=1}^{m} \left(\rv{Y_j} \in \St\right)\right]}
+    {
+        \Pr\left[\bigcap_{j=1}^{m} \left(\rv{Y_j} \in \St\right)\right]
+    } = 1\,.
+\end{equation}
+\end{proof}
+
+\begin{definition}
+Given a query $\mathbb{X}$ consisting of $k$ search keys that exactly maps to a result set $\mathbb{R}_{\mathbb{X}}$, the \emph{false positive rate} $\varepsilon_k$ is the probability that a randomly chosen approximate set from $\mathbb{U} \setminus \mathbb{R}_{\mathbb{X}}$ tests positive.
+\end{definition}
+
+The false positive rate $\varepsilon_k$ is not unknown but may be estimated. However, if estimating it is impractical, $\varepsilon_k$ has upper and lower bounds given by the following theorem.
+\begin{theorem}
+The false positive rate given a random query consisting of $k$ search keys has a support given by
+\begin{equation}
+    \varepsilon_k \in [\varepsilon^k, \varepsilon]
+\end{equation}
+where $\varepsilon$ is the false positive rate of a random query consisting of one search key.
+\end{theorem}
+\begin{proof}
+Given a random query consisting of $m$ search keys that exactly maps to a result set $\mathbb{R}$, the \emph{worst-case} scenario is when the joint distribution of $\rv{Y_1}, \ldots, \rv{Y_m}$ is degenerate such that
+\begin{equation}
+    \Pr\left[\left(\rv{Y_1} \notin \St\right) \bigcap_{j=2}^{m} \left(\rv{Y_j} \in \St\right)\right] = 1\,.
+\end{equation}
+Since only one outcome may occur, we may rewrite 
+\begin{equation}
+    \varepsilon_m =
+        \Pr\left[\bigcap_{i=1}^{m} \rv{Y_1} \in \Sp \Given \left(\rv{Y_1} \notin \St\right) \bigcap_{j=2}^{m} \left(\rv{Y_j} \in \St\right)\right]\,.
+\end{equation}
+Since $\rv{Y_j}$ for $j=1,\ldots,m$ are independently distributed (degenerate), the above may be rewritten as
+\begin{align}
+    \varepsilon_m
+        &= \prod_{i=1}^{m} \Pr\left[\rv{Y_j} \in \Sp \Given \left(\rv{Y_1} \notin \St\right) \bigcap_{j=2}^{m} \left(\rv{Y_j} \in \St\right)\right]\\
+        &= \Pr\left[\rv{Y_1} \in \Sp \given \rv{Y_1} \notin \St\right] \prod_{i=2}^{m} \Pr\left[\rv{Y_i} \in \Sp \given \rv{Y_i} \in \St\right]\,.
+\end{align}
+By definition, $\varepsilon = \Pr[\rv{Y_1} \in \Sp \given \rv{Y_1} \notin \St]$ and, since $\St \subset \Sp$ (\emph{false negatives} are not possible), $\Pr[\rv{Y_j} \in \Sp \given \rv{Y_j} \in \St] = 1$. Performing these substitutions results in
+\begin{equation}
+\label{eq:proof_fprate_hq_lb}
+    \varepsilon_m = \varepsilon \prod_{i=2}^{m} 1 = \varepsilon\,.
+\end{equation}
+
+The \emph{best-case} scenario is when the joint distribution of $\rv{Y_1}, \ldots, \rv{Y_m}$ is degenerate such that
+\begin{equation}
+    \Pr\left[\bigcap_{j=1}^{m} \left(\rv{Y_j} \notin \St\right)\right] = 1\,.
+\end{equation}
+Thus, since that is the only event which may occur,
+\begin{equation}
+    \varepsilon_m =
+        \Pr\left[\bigcap_{i=1}^{m} \rv{Y_1} \in \Sp \Given \bigcap_{j=1}^{m} \left(\rv{Y_j} \notin \St\right)\right]\,.
+\end{equation}
+Since $\rv{Y_j}$ for $j=1,\ldots,m$ are independently distributed in this scenario (degenerate), the above may be rewritten as
+\begin{align}
+    \varepsilon_m
+        &= \prod_{i=1}^{m} \Pr\left[\rv{Y_j} \in \Sp \Given \bigcap_{j=1}^{m} \left(\rv{Y_j} \notin \St\right)\right]\\
+        &= \prod_{i=1}^{m} \Pr\left[\rv{Y_i} \in \Sp \given \rv{Y_i} \notin \St\right]\,.
+\end{align}
+By definition, $\varepsilon = \Pr[\rv{Y_j} \in \Sp \given \rv{Y_j} \notin \St]$. Performing this substitution results in
+\begin{equation}
+\label{eq:proof_fprate_hq_ub}
+    \varepsilon_m = \prod_{i=1}^{m} \varepsilon = \varepsilon^m\,.
+\end{equation}
+By \Cref{eq:proof_fprate_hq_lb} the \emph{best-case} scenario for a hidden query of $m$ trapdoors has a false positive rate $\varepsilon^m$ and by \Cref{eq:proof_fprate_hq_ub} the \emph{worst-case} scenario has a false positive rate $\varepsilon$, therefore the false positive rate $\varepsilon_m$ of hidden queries consisting of $m$ trapdoors has lower and upper-bounds given respectively by $\varepsilon^m$ and $\varepsilon$.
+\end{proof}
+\begin{corollary}
+As the number $k$ of search keys in a query increases, the false positive rate $\varepsilon_k$ decreases. Asymptotically, as $k \to \infty$, $\varepsilon_k \to 0^+$.
+\end{corollary}
+
+Queries map to \emph{uncertain} approximate result sets. Since we are seeking a way to quantify the information retrieval system by performance measures like \emph{precision}, the distribution of documents in result sets is not relevant; rather, the only relevant data points are the uncertain number of \emph{true positives} and \emph{false positives} in result sets. We have proven that the result sets are \emph{positive approximate sets} that are functions of the number of search keys and the false positive rate of the search indexes. Therefore, we may use the general results about approximate sets, e.g., by \Cref{}, the \emph{expected} precision is given by
+\begin{equation}
+    \gamma(m, u, \eta=0, \varepsilon_k)\,,
+\end{equation}
+where $m$ is the number of \emph{positives}, $k$ is the number of search keys in the query, and $u$ is the number of search indexes in the collection. As $u \to \infty$ the precision goes to $0$ and as $m \to \infty$ the precision goes to $1$.
+\end{document}

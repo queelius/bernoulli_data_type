@@ -1,0 +1,246 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+\section{Approximate relations with invariants}
+Sometimes, a set must satisfy certain invariants.
+We have already encountered two invariants in the form of \emph{positive} and \emph{negative} random approximate sets in which if $x \in \Set{A}$ then $x \in \PASet{A}$ and if $x \notin \Set{A}$, then $x \notin \NASet{A}$.
+These invariants rely upon the usual partition of the universal set into \emph{positives} and \emph{negatives}, but now we wish to complicate this somewhat.
+
+Sometimes, a relation must satisfy certain predicates, e.g., if a power set has a member $\{a,b\}$ then by definition it \emph{necessarily} has members $\{a\}$, $\{b\}$, and $\EmptySet$.
+In these cases, if we wish the predicates to hold in the random approximate relation model, we must \emph{relax} the model somewhat so that predicates hold.
+In what follows we consider many predicates with suggestive names.
+
+\subsection{Properties of binary relations}
+A binary relation $\Relation{R} \subset \Set{A} \times \Set{A}$ is \emph{reflexive} if and only if $\Pair{a}{a} \in \Relation{R}$ for every $a \in \Set{A}$.
+
+
+
+Transitivity. This is an example of a relation with an invariant that is difficult to satisfy in the random approximation. Show the probability.
+Some types of transitivity can be satisfied, however. For instance, if $a=b$ and $b=c$ then by transitivy $a=c$. This is an equivalence relation and, at the time of construction of a random approximation, we can hash each of these to the same value, i.e., $a$,$b$, and $c$ all hash to $a$.
+
+Subset relations are another invariant that cannot be easily satisfied.
+
+
+Irreflexive.
+
+Connex. Difficult to satisfy.
+
+
+\begin{theorem}
+	A random approximate relation $\ARelation{R}(\tprate,\fprate)$ of a symmetric relation $\Relation{R}$ induces a random approximate symmetric relation $\ARelation{R}[s]\!\left(\tprate,1-(1-\fprate)^2\right)$ if we say that $(x_1,x_2) \in \ARelation{R}[s]$ if $\Pair{x_1}{x_2} \in \ARelation{R}$ or $\Pair{x_2}{x_1} \in \ARelation{R}$.
+\end{theorem}
+\begin{proof}
+	\begin{equation}
+	\Prob{\Pair{x}{y} \in \ARelation{R} \SetUnion \Pair{y}{x} \in \ARelation{R} \Given \Pair{x}{y} \notin \Relation{R}}
+	\end{equation}
+\end{proof}
+
+We may \emph{compose} these binary relations with any of the properties we wish.
+
+
+
+
+
+
+A binary relation is just a set of pairs.
+
+
+A binary relation $\Relation{R} \subset \Set{A} \times \Set{A}$ is \emph{symmetric} if and only if whenever $\Pair{a}{b} \in \Relation{R}$, $\Pair{b}{a} \in \Relation{R}$ for any $a,b \in \Set{A}$.
+
+
+A binary relation $\Relation{R} \subset \Set{A} \times \Set{A}$ is \emph{reflexive} if and only if $\Pair{a}{a} \in \Relation{R}$ for every $a \in \Set{A}$.
+A random approximate symmetric binary relation must also have this property.
+
+
+% do the selection operation
+% 
+A binary relation $\Relation{R} \subset \Set{X} \times \Set{Y}$ is a \emph{functional} relation if $\Selection_{x} \Set{R}$ has a cardinality of $0$ or $1$. If there exists an $x \in \Set{X}$ such that its selection is zero, then the binary relation is a \emph{partial function}.
+
+
+
+\begin{remark}
+Some of these properties may be difficult to guarantee, especially for oblivious relations.
+However, \emph{tractability} is a separate issue from specification and definition.
+\end{remark}
+
+\subsection{Random approximate maps}
+\label{sec:map}
+The set $\Set{A} \mapsto \Set{B}$ is all functions from domain $\Set{A}$ to codomain $\Set{B}$, which may also be denoted by $\Set{B}^{\Set{A}}$ since there are $\Card{\Set{B}}^{\Card{\Set{A}}}$ functions that take input from $\Set{A}$ and \emph{map} it to output in $\Set{B}$.
+However, we consider the set of \emph{partial functions} $\Set{A} \pfun \Set{B}$, which has a cardinality of $(\Card{\Set{B}}+1)^{\Card{\Set{A}}}$.
+
+We restrict our attention to partial functions of \emph{countable domains}, which we refer to as \emph{maps}.
+Suppose we have some map $\PFun{f}$. Then, by definition, any $a \in \Set{A}$ can only map to at most one $b \in \Set{B}$ by $\PFun{f}$, and any random approximate map of $\PFun{f}$, denoted by $\APFun{f}$, must have the same property.
+
+\begin{notation}
+	When we wish to make the true positive and false positive rates explicit, we may denote a random approximate map of $\PFun{f}$ with a true positive rate $\tprate$ and false positive rate $\fprate$ by $\APFun{f}[\tprate][\fprate]$.
+\end{notation}
+Note that if the map $\PFun{f} \colon \Set{A} \mapsto \Set{B}$ is a total function, then $\APFun{f}[\tprate][] \colon \Set{A} \pfun \Set{B} $ is (probably) a map.
+
+Suppose function $\PFun{f}$ has a domain $\Set{A}$ and codomain $\Set{B}$.
+The \emph{domain} of $\PFun{f}$ may be denoted by $\Dom(\PFun{f})$.
+The \emph{codomain} of $\PFun{f}$ may be denoted by $\Codom(\PFun{f})$.
+The \emph{domain of definition} of $\operatorname{f}$ is the subset of the domain for which it is defined and may be denoted by $\Dod(\PFun{f})$.
+The \emph{range} of $\PFun{f}$ is defined as
+\begin{equation}
+\Range(\PFun{f}) \coloneqq
+\SetBuilder{y \in \Codom(\PFun{f})}{(x,y) \in \Dom(\PFun{f}) \times \Codom(\PFun{f}) \land x \in \Dod(\PFun{f})}\,.
+\end{equation}
+
+To address undefined elements in the domain, we implicitly assume the maps are \emph{augmented} in the following two ways:
+\begin{enumerate}
+	\item The \emph{augmented} codomain of $\PFun{f}$ is the sum type (or disjoint union) $\Codom(\PFun{f}) + \{\epsilon\}$, where $\epsilon$ denotes \emph{nothing}.
+	\item The \emph{augmented} function of $\PFun{f}$ maps any element $x \notin \Dod(\PFun{f})$ to $\epsilon$.
+\end{enumerate}
+For simplicity, we implicitly assume the augmented form and keep the notation the same as before.
+
+%In a similar way, the \emph{pre-image} of $\operatorname{f}$ is defined as
+%\begin{equation}
+%\Preimage(\operatorname{f}) =
+%\SetBuilder{x \in \Dom(\operatorname{f})}{(x,y) \in \Dom(\operatorname{f}) \times \Codom(\operatorname{f}) \land y \in \Image(\operatorname{f})}\,.
+%\end{equation}
+
+\begin{remark}
+	Approximation errors of the form $\APFun{f}(x) \neq \PFun{f}(x),x\in \Dod(\operatorname{f})$ and $x \in \Dod(\APFun{f})$, are outside the scope of the random approximate map model.
+	Certainly, these kind of approximation errors may also exist in a map, but the ``approximate'' in random approximate maps deals exclusively with false positives and false negatives on the \emph{domain of definition}, which induces false negatives and false positives on the \emph{range}.
+\end{remark}
+
+The false positive rate is defined as
+\begin{equation}
+\Prob{x \in \Dod(\APFun{f}) \Given x \notin \Dod(\PFun{f})} = \fprate
+\end{equation}
+and the true negative rate is defined as
+\begin{equation}
+\Prob{x \in \Dod(\APFun{f}) \Given x \in \Dod(\PFun{f})} = \tprate\,.
+\end{equation}
+
+With these definitions, we see that random approximate maps have similiar properties to random approximate sets on the domain.
+In particular, the \emph{domain of definition} is the random approximate set $\ASetStyle{\left[\Dod(\PFun{f})\right]}[\tprate][\fprate]$.
+In turn, this induces an approximation of the image of $\PFun{f}$, but the nature of the approximation depends on the way in which the function is defined.
+Two extremes are given by one-to-one and constant functions.
+If $\PFun{f}$ is one-to-one over the domain of definition,, then the image is the random approximate set $\ASetStyle{\left[\Image(\PFun{f})\right]}[\tprate][\fprate]$.
+If $\PFun{f}$ is a constant that maps to $c$, then $c \in \Image(\PFun{f})$ with probability $1 - (1 - \tprate)^d$ where $d$ is the cardinality of the domain.
+
+A primary operation on functions is \emph{composition}, which is a special case of composition of relations.
+The composition of $\PFun{f} \colon \Set{A} \mapsto \Set{B}$ and $\PFun{g} \colon \Set{B} \mapsto \Set{C}$ is the function $\PFun{f} \circ \PFun{g} \colon \Set{A} \mapsto \Set{C}$, defined by
+\begin{equation}
+\left(\PFun{f} \circ \PFun{g}\right)(a) = \SetBuilder{(a,c) \in \Set{A} \times \Set{C}}{(a,b) \in \PFun{f} \land (b,c) \in \PFun{g}}\,.
+\end{equation}
+Since these are partial functions, $a$ may not be defined if either $a \notin \Dom(\PFun{f})$ or $b \notin \Dom(\PFun{g})$.
+
+The composition of random approximate maps is a random approximate map given by the following theorem.
+\begin{theorem}
+	Consider two random approximate maps $\APFun{f}[\tprate_1][\fprate_1] \colon \Set{X} \mapsto \Set{Y}$ and $\APFun{g}[\tprate_2][\fprate_2] \colon \Set{Y} \mapsto \Set{Z}$.
+	The \emph{compositions} $\APFun{f}[\tprate_1][\fprate_1] \circ \APFun{g}[\tprate_2][\fprate_2] \colon \Set{X} \mapsto \Set{Z}$ and $\APFun{g}[\tprate_2][\fprate_2] \circ \APFun{f}[\tprate_1][\fprate_1] \colon \Set{X} \mapsto \Set{Z}$ are random approximate maps with a true positive rate $\tprate_1 \tprate_2$ and a false positive rate in the interval
+	\begin{equation}
+	\IntervalSpan\!\left(\fprate_1 \tprate_2 \SetUnion \tprate_1 \fprate_2 \SetUnion \fprate_1 \fprate_2\right)\,.
+	\end{equation}
+\end{theorem}
+\begin{proof}
+	The composition is defined as
+	\begin{equation}
+	\left(\PFun{f} \circ \PFun{g}\right)(a) = \SetBuilder{(a,c) \in \Set{A} \times \Set{C}}{(a,b) \in \PFun{f} \land (b,c) \in \PFun{g}}\,.
+	\end{equation}
+	Given that $a \in \Dom\!\left(\PFun{f} \circ \PFun{g}\right)$, the probability $a \notin \Dom(\APFun{f} \circ \APFun{g})$ is just the probability that  ...
+\end{proof}
+
+
+
+
+
+Point-wise operations on functions,
+\begin{equation}
+\PFun{f} + \PFun{g} \coloneq \lambda x \mapsto \PFun{f}(x) + \PFun{g}(x)
+\end{equation}
+
+
+
+
+
+
+
+
+We consider relations known as \emph{partial functions} as given by the following definition.
+\begin{definition}
+	A relation
+	\begin{equation}
+	\PFun{f} \subseteq \Set{X}[1] \times \cdots \times \Set{X}[n] \times \Set{Y}[1] \times \cdots \times \Set{Y}[m]\,,
+	\end{equation}
+	is a \emph{function} if $\Card{\Proj_{\Set{X}[1] \times \cdots \times \Set{X}[n]}(\PFun{f})} = \Card{\PFun{f}}$ and is a \emph{partial} function if, additionally, $\Card{\Proj_{\Set{X}[1] \times \cdots \times \Set{X}[n]}(\PFun{f})} < \Card{\Set{X}[1] \times \cdots \times \Set{X}[n]}$.
+	
+	We say that each tuple $\Tuple{x_1,\ldots,x_n}$ in the relation \emph{maps} to a tuple $\Tuple{y_1,\ldots,y_m} \in \Set{Y}[1] \times \cdots \times \Set{Y}[m]$. To make the mapping explicit, we denote the partial function by
+	\begin{equation}
+	\PFun{f} \colon \Set{X}[1] \times \cdots \times \Set{X}[n] \mapsto \Set{Y}[1] \times \cdots \times \Set{Y}[m]\,.
+	\end{equation}
+\end{definition}
+A partial function represents \emph{many}-to-\emph{one} relationships. Consequently, denoting a tuple
+\begin{equation}
+%\Tuple{x_1,\ldots,x_n} \in \Set{X}[1] \times \cdots \times \Set{X}[n]
+\end{equation}
+by its \emph{mapped} value $\Tuple{y_1,\ldots,y_m} = \PFun{f}(x_1,\ldots,x_n) \in \Set{Y}[1] \times \cdots \times \Set{Y}[m]$ is ambiguous unless the partial function is a bijection (one-to-one).
+
+In the finite case, the number of partial functions of the type $\PFun{f} \colon \Set{X}[1] \times \cdots \times \Set{X}[n] \mapsto \Set{Y}[1] \times \cdots \times \Set{Y}[m]$ is
+\begin{equation}
+\left(\Card{\Set{Y}} + 1\right)^{\Card{\Set{X}}}\,.
+\end{equation}
+
+The projection $\Proj_{\Set{X}[1] \times \cdots \times \Set{X}[n]}(\PFun{f})$ is also called the \emph{domain} of $\PFun{f}$, denoted by $\Dom(\PFun{f})$. The projection $\Proj_{\Set{Y}[1] \times \cdots \times \Set{Y}[m]}(\PFun{f})$ is also called the \emph{image} of $\PFun{f}$, denoted by $\Image(\PFun{f})$. The \emph{range} of $\PFun{f}$ is denoted by $\Range(\PFun{f}) = \Set{Y}[1] \times \cdots \times \Set{Y}[m]$.
+
+A \emph{table} is a convenient way to represent a partial function, where each tuple $\Tuple{x} \in \Dom(\PFun{f})$ is associated with $\PFun{f}(\Tuple{x}) \in \Image(\PFun{f})$. The column for the keys consists of \emph{unique} values from $\Set{X}$ and column for the values consists of (possibly repeated) values from $\Set{Y}$.
+\begin{example}
+	Suppose we have a partial function $\PFun{f} \colon \Set{Z}[1] \times \Set{Z}[2] \mapsto \Set{Q}$ defined by the table below.
+	\begin{table}[h]
+		\centering
+		\label{tbl:partialfunc}
+		\begin{tabular}{l l l} 
+			\toprule
+			$\Set{Z}[1]$ & $\Set{Z}[2]$ & $\Set{Q}$\\
+			\midrule
+			$1$ & $5$ & $\frac{1}{5}$\\
+			$2$ & $10$ & $\frac{1}{5}$\\
+			$10$ & $2$ & $5$\\
+			\bottomrule
+		\end{tabular}
+		\caption*{$\Set{Z}[1] \times \Set{Z}[2] \mapsto \Set{Q}$.}
+	\end{table}
+	We see that $\Dom(\PFun{f}) = \{\Pair{1}{5},\Pair{2}{10},\Pair{10}{2}\}$ and $\Image(\PFun{f}) = \left\{\frac{1}{5},5\right\}$. As a partial function, we may umambiguously denote any value in the \nth{3} position of the relation by the unique combination of tuple values in the \nth{1} and \nth{2} positions, i.e., $\PFun{f}(10,2)=5$.
+\end{example}
+
+\emph{Maps} and \emph{partial functions} are synonymous, but the term \emph{map} is more common in the context of a partial function of order $2$ where the elements of the domain are denoted \emph{keys} and the elements of the range may be denoted \emph{values}.
+
+
+
+
+
+
+
+
+\subsubsection{Abstract data type}
+A \emph{type} is a set and the elements of the set are called the \emph{values} of the type. An \emph{abstract data type} is a type and a set of operations on values of the type. For example, the \emph{integer} abstract data type is defined by the set of integers and standard operations like addition and subtraction. A \emph{data structure} is a particular way of organizing data and may implement one or more abstract data types. An \emph{immutable} data structure has static state; once constructed, its state does not change until it is destroyed.
+
+The abstract data type of the \emph{immutable} approximate set is given by the following definition.
+\begin{definition}
+	\label{def:approx_pfun}
+	A relation $\APFun{f} = \Set{X}[1] \times \cdots \times \Set{X}[n] \times \Set{Y}[1] \times \cdots \times \Set{Y}[m]$ is an \emph{approximate partial function} of $\PFun{f} \colon \Set{X}[1] \times \cdots \times \Set{X}[n] \mapsto \Set{Y}[1] \times \cdots \times \Set{Y}[m]$ if the following conditions hold:
+	
+	Let a random tuple that is selected uniformly at random from the universe $\Set{X}[1] \times \cdots \times \Set{X}[n]$ be denoted by $\Tuple{\RV{X}} = \Tuple{\RV{X_1},\cdots,\RV{X_n}}$. The partial function $\APFun{f}$ is an approximate partial function of $\PFun{f}$ with a false domain rate $\fprate$ and false complementary domain rate $\fnrate$ if the following conditions hold:
+	\begin{enumerate}[(i)]
+		\item If $\Tuple{\RV{X}}$ is in the domain of $\PFun{f}$, it is not in the domain of $\APFun{f}$ with a probability $\fnrate$,
+		\begin{equation}
+		\Prob{\Tuple{\RV{X}} \notin \Dom(\APFun{f}) \Given \Tuple{\RV{X}} \in \Dom(\PFun{f})} = \fnrate\,.
+		\end{equation}    
+		\item If $\Tuple{\RV{X}}$ is \emph{not} in the domain of $\PFun{f}$, it is in the domain of $\APFun{f}$ with a probability $\fprate$,
+		\begin{equation}
+		\Prob{\Tuple{\RV{X}} \in \Dom(\APFun{f}) \Given \Tuple{\RV{X}} \notin \Dom(\APFun{f})} = \fprate\,.
+		\end{equation}
+	\end{enumerate}
+\end{definition}
+
+\subsubsection{Composition}
+
+Composition...from relational stuff.
+
+\subsubsection{Currying}
+
+Currying... 
+
+\end{document}

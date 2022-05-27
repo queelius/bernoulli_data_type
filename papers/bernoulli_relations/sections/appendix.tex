@@ -1,0 +1,24 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+
+\newcommand{\Loss}{\Fun{\ell}}
+
+\begin{document}
+\appendix
+\section{Error measurements}
+\label{sec:error}
+Consider a partial funtion $\PFun{f} \colon \Set{X}[1] \times \cdots \times \Set{X}[n] \mapsto \Set{Y}[1] \times \cdots \times \Set{Y}[m]$ and an approximate partial function $\APFun{f}$ of the same type. Then, a measure of error is given by
+\begin{equation}
+    \beta + \sum_{\Tuple{x} \in \Set{A}} \Loss\!\left(\PFun{f}(x), \APFun{f}(x)\right)\\
+\end{equation}
+where
+\begin{align}
+    \Set{A} = \Dom(\PFun{f}) \cap \Dom(\APFun{f})\,,\\
+    \beta = \Card{\Dom(\PFun{f}) \triangle \! \Dom(\APFun{f})}\,,
+\end{align}
+and is the cardinality of the symmetric-difference between the domain of $\PFun{f}$ and the domain in $\APFun{f}$. If we suppose that $\PFun{f}$ and $\APFun{f}$ are binary classification functions, then the loss function is given by
+\begin{equation}
+    \Loss(y',y) = [y' \neq y]\,,
+\end{equation}
+which is $1$ if $y' \neq y$ and $0$ otherwise.
+\end{document}

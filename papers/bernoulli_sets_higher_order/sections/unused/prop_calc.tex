@@ -1,0 +1,190 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+
+\SetKwFunction{MakeIndex}{facts}
+\SetKwFunction{MakeApproxIndex}{facts$^\sigma$}
+\SetKwFunction{OrOp}{or}
+\SetKwFunction{NotOp}{not}
+\SetKwFunction{AndOp}{and}
+\SetKwFunction{EncryptedFind}{hidden\_find$^\sigma$}
+
+\begin{document}
+\chapter{Application: propositional calculus}
+\label{sec:bool_search}
+Any given proposition may be represented with a symbol and all propositions are either true or false.
+\begin{example}
+Let $P$ be the proposition that it is raining outside. $P$ is \True if it is raining outside otherwise $\neg P$ is \True.
+\end{example}
+
+The \emph{domain of discourse} is a set of symbols, statements that are either true or false.
+
+
+
+
+An information retrieval process begins when a user submits a \emph{query} to an information system, where a query represents an \emph{information need}.
+In response, the information system returns a set of relevant documents that satisfy the query.
+
+Boolean search is an information retrieval model given by the following definition.
+\begin{definition}
+A document in the collection is either \emph{relevant} or \emph{non-relevant} to a Boolean query.
+\end{definition}
+
+
+We consider queries over the Boolean algebra $Q = (\PS{\Set{K}}, \land, \lor, \neg, \epsilon, \Set{K})$, where $\Set{K}$ denotes a set of \emph{search keys}, e.g., units of information like English words.
+%\footnote{A set $\Set{K}$ consists of only \emph{irreducible} units of information if no element $a \in \Set{K}$ can be denoted by the Boolean algebra $(\PS{\Set{K} \setminus \{a\},\land,\lor,\neg,\epsilon,\Set{K} \setminus \{a\}}$, but there is usually no harm, and often many benefits, in allowing such redundancy.}
+
+%We consider Boolean queries defined by the language
+%\begin{align*}
+%\langle\text{query}\rangle & ::= \text{``} \langle \text{key} \rangle\text{''} \mid 
+%\NotOp \left(\langle\text{query}\rangle \right) \mid 
+%\OrOp \left(\langle\text{query}\rangle\,,\langle\text{query}\rangle\right)\,,\\
+%\langle\text{key}\rangle & ::= \text{a key in $\Set{K}$}\,,
+%\end{align*}
+%where $\Set{K}$ is the universal set of \emph{search keys}.
+
+%This Boolean language includes a \emph{maximally expressive} set of Boolean connectives, e.g., $a \land b \coloneqq %\NotOp{\OrOp{\NotOp{a}, \NotOp{b}}}$.
+%In particular, this is a Boolean algebra $(\PS{\Set{K}}, \land, \lor, \neg, \EmptySet, \Set{K})$.
+
+We denote the set of documents by $\Set{D}$. \emph{Search indexes} may be used to quickly compute which subset of $\Set{D}$ is relevant to a given query.
+Since the queries are a Boolean algebra over the powerset of $\Set{K}$, we have chosen a simple model given by the following:
+\begin{enumerate}
+\item Search indexes model \emph{sets} in $\PS{\Set{K}}$, i.e., search indexes are over the Boolean algebra $S = (\PS{\Set{K}}, \SetIntersection, \SetUnion, \SetComplement, \EmptySet, \Set{K})$. In particular, let $\MakeIndex \colon \Set{D} \mapsto \PS{\Set{K}}$ be a function that maps documents to search indexes with a definition given by
+\begin{equation}
+\MakeIndex(d) \coloneqq
+\SetBuilder
+{
+	k \in \Set{K}
+}
+{
+	\text{$k$ is relevant to $d$}
+}\,.
+\end{equation}
+\item There is a one-to-one correspondence between $\Set{D}$ and the set of search indexes $\SetBuilder{\MakeIndex(d) \in \PS{\Set{K}}}{d \in \Set{D}}$.
+\item A bijection $\operatorname{f} \colon Q \mapsto S$ is given by the mappings $\land \mapsto \SetIntersection$, $\lor \mapsto \SetUnion$, $\neg \mapsto \SetComplement$, and $\epsilon \mapsto \EmptySet$.
+\item A document $d \in \Set{D}$ is relevant to a Boolean query $q$ in $Q$ if the the query maps to a \emph{subset} of $\MakeIndex(d)$, e.g., document $d$ is relevant to $(a \land b) \lor c$ if $\{a,b\} \subseteq \MakeIndex(d)$ or $\{c\} \subseteq \MakeIndex(d)$.
+\item Let $\Find \colon Q \mapsto \PS{\Set{D}}$ be a function that maps a query $q$ in $Q$ to the \emph{subset} of $\Set{D}$, denoted the \emph{result set}, that is relevant to $q$. In particular,
+\begin{equation}
+	\Find(q) \coloneqq \SetBuilder{d \in \Set{D}}{\operatorname{f}(q) \subseteq \MakeIndex(d)}\,,
+\end{equation}
+NOTE: the above is WRONG.
+which forms the Boolean algebra $R = (\PS{\Set{D}}, \SetIntersection, \SetUnion, \SetComplement, \EmptySet, \Set{D})$, i.e.,
+\end{enumerate}
+
+
+An implementation of Boolean search is given by \cref{alg:bool_search}, which implements a function $\Find \colon [\text{query}] \mapsto \PS{\Set{D}}$ where $\PS{\Set{D}}$ is the result set.
+
+
+
+\begin{algorithm}[h]
+	\caption{Pseudo-code for \protect\Find}
+    \label{alg:bool_search}
+    \SetKwProg{func}{function}{}{}
+    \Params{$\Set{D}$, the collection of documents.}
+    \KwIn{$q$, a Boolean query.}    
+    \KwOut{$\Set{R}_{q}$, the subset of documents in $\Set{D}$ relevant to query $q$.}
+    \func{\Find{$q$}}
+    {
+    	\tcp{\Head gets the outer most \emph{operation} or terminal \emph{key}.}
+        $h \gets \Head(q)$\;
+        \If{$h = \NotOp$}
+        {
+        	$t \gets \Tail(q)$\;
+        	$\Set{R}[t] \gets \Find(t)$\;
+            \Return $\SetComplement[\Set{R}[t]]$\;
+        }
+        \ElseIf{$h = \OrOp$}
+        {
+        	$t \gets \Tail(q)$\;
+            $\Set{R}[l] \gets \Find(\Left(t))$\;
+            $\Set{R}[r] \gets \Find(\Right(t))$\;
+            \Return $\SetUnion[\Set{R}[l]][\Set{R}[r]]$\;   
+        }
+        \Else
+        {
+        	\tcp{$h$ must be a key.}
+        	$\Set{R}[h] \gets \EmptySet$\;
+        	\For{$d \in \Set{D}$}
+        	{
+        		\If{$h \in \MakeIndex(d)$}
+        		{
+	        		$\Set{R}[h] \gets \Set{R}[h] \cup \{ d \}$\;
+    	    	}
+        	}
+            \Return $\Set{R}[h]$\;
+        }
+    }
+\end{algorithm}
+
+
+
+
+%TODO: x xor y = (x or y) and not (x and y)
+% blindly apply the transformation rules for AND, OR, and NOT, we get:
+%     (x + y - xy)(1 - xy) = x + y - xy - x^2y - xy^2 +x^2y^2
+% replace v^2 by v
+%     x + y - xy - xy - xy + xy = x + y - 2xy
+% other rules: x^2 = x, (x + x) = x .. so, hmm? seems like it should be x + y - xy?
+%
+% better approach: Karnaugh maps. use this algorithm and other properties (empty set + A = A)
+% to simplfy any boolean expression as much as possible,
+% then use some ordering relation to order the connectives and terminal sets so that any two equivalent
+% set-theoretic expressions on the same sets reduce to the same form.
+
+
+
+%
+% what is the iterated function f applied repeated to approximate set A',B'? it converges
+% to something... particular examples: f is union, then U. intersection: empty set.
+% if pos approximate set and f union, f(f(...f(A',B'))) = U, intersection -> AB.
+%
+
+\section{Secure indexes based on the random approximate set model}
+We consider an \emph{approximation} of the set-theoretic \emph{Boolean search} model where the Boolean search indexes are \emph{secure indexes} based on \emph{random approximate sets}, which is an appropriate abstract data type in \emph{Encrypted Search}\cite{es} where typical search indexes reveal too much information to untrusted third-parties.
+We denote the resulting find function that searches over the random approximate sets by $\Find^\sigma$ as opposed to the objective function $\Find$.
+
+This replacement \emph{induces} random approximate \emph{result sets}, i.e., $\Find^\sigma(q)$ maps to a random approximate set of the set that $\Find(q)$ maps to.
+Note that $\Find^\sigma$ is a deterministic algorithm that always generates the same output (result set) for the same input (query), i.e., $\Find^\sigma$ is still a function rather than a distribution, but it is compatible with the random approximate set model described in \cref{dummyref}. 
+
+\begin{remark}
+The function $\Find^\sigma$ as described is not by itself an implementation of Encrypted Search.
+A weak implementation may be based off of a simple substitution cipher from keys to \emph{trapdoors} using a one-way cryptographic hash function $\operatorname{h} \colon \BitSet^* \mapsto \BitSet^k$.
+Suppose we have a function $\operatorname{H} \colon [q] \mapsto \left[q'\right]$ that maps set-theoretic queries on keys to equivalent set-theoretic queries on trapdoors using $\operatorname{h}$.
+
+Then, Encrypted Search's find function is the composition given by
+\begin{equation}
+\EncryptedFind = \Find^\sigma \circ \operatorname{H} \colon \left[q\right] \mapsto \PS{\Set{D}}\,.
+\end{equation}
+Generally, $\operatorname{H}$ is computed on a \emph{trusted machine} and the output, the set-theoretic query of trapoors, is sent to an untrusted machine that executes $\Find^\sigma$.
+
+The simple substitution cipher is not a sophisticated approach since the set-theoretic queries on trapdoors have the same entropy as the set-theoretic queries on keys.
+Thus, using entropy as a measure of confidentiality, this solution does not increase the confidentiality, especially against an adversary with a sufficiently large sample of queries.\footnote{For instance, it may be highly suspectible to known-plaintext attacks.}
+%See \cite{dummycite} for more.
+\end{remark}
+
+\begin{theorem}
+The result set $\ASet{R}[x]$ that is relevant to key $x$ is a \emph{random approximate set} of the \emph{objective} result $\Set{R}[x]$.\footnote{Disregarding the notion that the approximate result sets 
+may also have obfuscated references that are homomorphic to the objective 
+result sets.}
+\end{theorem}
+\begin{proof}
+A search index $\ASet{S}$ with a false positive rate $\fprate$ and false negative rate $\fnrate$ is relevant to a key $x$ if the key $x$ tests positive in $\ASet{S}$. A false positive occurs if the key $x$ is not in $\Set{S}$ but is in $\ASet{S}$, which occurs with some probability $\fprate \geq 0$. A false negative occurs if a key $x$ is in $\Set{S}$ but is not in $\ASet{S}$, which occurs with some probability $\fnrate \geq 0$.
+\end{proof}
+
+We have established that the result sets of a single atomic key are approximate result sets. We may now apply the set-theoretic results in \cref{dummyref} to implement the full set-theoretic model for approximate sets.
+\begin{example}
+Suppose the search indexes are positive approximate sets each with a false positive rate $\fprate$. A common type of Boolean query is the \emph{intersection} (conjunction) of atomic keys. Consider a conjunctive query of $k$ keys, $x_1,\ldots,x_k$. The result set $\PASet{R}\left(\{x_1\} \cap \cdots \cap \{x_k\}\right) = \Find\!\left(\SetComplement[\SetComplement[x_1] \cup \cdots \cup \SetComplement[x_k]]\right)$ is a positive approximate set with an uncertain false positive rate $[\fprate_k] = [\fprate^k, \fprate]$.
+\begin{proof}
+Let the approximate result set for key $x_j$ be denoted by $\PASet{R}[x_j]$. The result set is given by
+\begin{equation}
+    \PASet{R}[\Set{X}] = \bigcap_{j=1}^{k} \PASet{R}[j]\,.
+\end{equation}
+By \cref{cor:fprate_atomic_search}, $\PASet{R}[j]$ has a false positive rate $\fprate$ for $j \in [1,\ldots,k]$. By \cref{dummyref}, $\SetIntersection[\PASet{R}[1]][\PASet{R}[2]]$ has a false positive rate $[\fprate^2,\fprate]$. Similarly,
+\begin{equation}
+\SetIntersection[\left(\SetIntersection[\PASet{R}[1]][\PASet{R}[2]]\right)][\PASet{R}[3]] = \PASet{R}[1] \cap \PASet{R}[2] \cap \PASet{R}[3]    
+\end{equation}
+has a false positive rate $[\fprate^3,\fprate]$. Continuing in this fashion, we see that $\PASet{R}[\Set{X}] = \PASet{R}[1] \cap \cdots \cap \PASet{R}[k]$ has a false positive rate $[\fprate^k,\fprate]$.
+\end{proof}
+\end{example}
+
+To quantify the performance measure of the information retrieval system, we may use the binary classification results in \cref{sec:perf}.
+\end{document}

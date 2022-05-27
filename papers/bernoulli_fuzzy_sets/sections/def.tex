@@ -1,0 +1,53 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+\section{\emph{Fuzzy} approximate sets}
+A set is given by the following definition.
+\begin{definition}
+A set is an unordered collection of distinct elements from a universe of elements.
+\end{definition}
+Fuzzy sets are a super-set of classical (crisp) sets. In a \emph{fuzzy set}, denoted by $S$, each element $x$ in the universe, denoted by $\Set{U}$, has a degree-of-membership
+\begin{equation}
+    \FuzzyDeg{S} \colon \Set{U} \mapsto [0,1]\,.
+\end{equation}
+Classical sets are a special case of fuzzy sets where all elements either have $0$ or $1$ degree-of-membership.
+
+The cardinality of classical set is a measure of the number of elements in the set. The cardinality of a fuzzy set $S$ is the sum of the degree-of-membership values
+\begin{equation}
+    |S| = \sum_{x \in \Set{U}} \FuzzyDeg{S}(x)\,.
+\end{equation}
+If all degree-of-membership values are $0$ or $1$, then this definition agrees with the classical definition of the cardinality of a set.
+
+We are interested in the countable fuzzy sets. A countable fuzzy set is \emph{finite} or \emph{countably infinite}. A \emph{finite fuzzy set} has a finite cardinality.
+\begin{example}
+Suppose we have a universe of elements
+\begin{equation}
+    \Set{U} = \{ x_1, x_2, x_3, x_4, x_5 \}
+\end{equation}
+and a fuzzy set $S$ defined by
+\begin{equation}
+    \FuzzyDeg{S}(x_j) = \frac{1}{j}\,.
+\end{equation}
+The cardinality is
+\begin{equation}
+    \Card{S} = \sum_{j=1}^{5} \frac{1}{j} = 2.8\overline{3}\,.
+\end{equation}
+\end{example}
+A \emph{countably infinite} set can be put into a one-to-one correspondence with the natural numbers. A a \emph{countably infinite} fuzzy set has a countably infinite number of elements with positive membership degree.
+
+\subsection{Approximate fuzzy sets}
+Any fuzzy set $\hat S$ that we use as an \emph{approximation} of a fuzzy $S$ may have a different degree-of-membership for one or more elements. There are many ways to quantify the approximation error. In this paper, we consider the approximation error that results from the application of a \emph{truth function}, denoted by $\Truth$, that maps a degree-of-membership to a crisp true or false value, known as defuzzification. We can then generate crisp sets from fuzzy sets by applying the truth function, i.e.,
+\begin{equation}
+    \Set{S}_{S} = \SetBuilder{x \in \Set{U} \colon \Truth(\FuzzyDeg[S][x]}\,.
+\end{equation}
+Under this framework, an approximate fuzzy set $\hat S$ defuzzifies to an approximate crisp set $\ASet{S}_{\hat S}$ of $\Set{S}_{S}$. Thus, all the results of approximate sets\cite{} apply. 
+
+The \emph{approximate fuzzy set} is given by the following formal definition.
+\begin{definition}
+Given a fuzzy set $S$ and a truth function $\mu$, a fuzzy set $\hat S$ with the same truth function $\mu$ is denoted an \emph{approximate fuzzy set} of $S$ with a \emph{false positive rate} $\varepsilon$ and \emph{false negative rate} $\eta$ if the following conditions hold:
+\begin{enumerate}
+    \item $\Pr[X \in \ASet{S}_{\hat S} \given X \notin \Set{S}_{S}] = \fprate$.
+    \item $\Pr[X \notin \ASet{S}(\mu_{\FSa}) \given X \in \Set{S}(\mu_{S})] = \fnrate$.    
+\end{enumerate}
+\end{definition}
+\end{document}

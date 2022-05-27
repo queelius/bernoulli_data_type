@@ -1,0 +1,24 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+\section{More notes on rate distortion (from overleaf)}
+The rate distortion approximate (cipher) map.
+
+Rate distortion may be the result of a few constraints.
+
+Suppose there are m keys to map. If we only allow N bits in total, or N/m bits per key on average, then some of the keys will not be mapped correctly within N bits. If it takes up nearly all N bits, that's not good either, so you need a loss function to determine which generated map is best for the N bits.
+Since each bit in the optimal map generates a new map with a specific number of errors, where here error is defined by the number of values that don't match the objective values, we can try all $2^(N+1)-1$ solutions and pick the best one. What is the expected rate distortion using the previous loss function?
+
+Depends on the values being mapped to, etc.
+
+Let's consider prefix free with average bit length k.
+
+Then, as a prelim though, we first think that the most likely values to be correctly mapped to are those values with the shortest code. We're saying these values are more important by giving them a shorter code. Maybe they're more important because they're used more often, so this reduces the expected rate distortion on them. What's the expected rate distortion, thought? What's the probability that some particular value (associated with a key) will be distorted?
+
+What about negative keys? Two approaches, first we may do as before and use hashing (with poss. of collision). But this is not so good for cipher values. So, second, we can do the same thing we described in perf hash solution below. This, of course, requires more coordination over the value type encodings...
+
+\subsection{Perfect hash solution}
+
+For the perfect hash function based map, a simple heuristic is just to provide N/m bits per value and if a solution can't be found for a particular key-value pair, then the value is disorted. In this case, we should use the value with the smallest loss with respect to some loss function. This is a more nuanced error. What if the key is a negative? Some ideas: first, we can provide a large space for "not a value" values, say K in total, with Q good ones, and then the negative key will map to a "not a value" with probability $K/(K+Q)$. Alternatively, we could check that the key is no good by storing the hash of the good key that maps there and checking, as before, but this is no good for the cipher approach since it reveals that, whatver the cipher value reps, it's not a positive key. We may want to conceal that. 
+
+\end{document}

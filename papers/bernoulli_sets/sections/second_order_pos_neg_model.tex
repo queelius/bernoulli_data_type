@@ -1,0 +1,32 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+In the second-order model, the universal set may be partitioned into two subsets $\Set{A}$ and $\Set{B}$ with non-identical error rates $\epsilon_A$ and $\epsilon_B$.
+If the subset of interest is a subset of $\Set{A}$, then the error rate over that subset is Bernoulli distributed with error rate $\epsilon_A$ and similarly if it is a subset of $\Set{B}$.
+For example, in the positive-negative random (PNR) approximate set model, the error rate over the positives is $\fnrate$, denoted the \emph{false negative rate}, and the error rate over the negatives is $\fprate$, denoted the \emph{false positive rate}.
+Thus, if either the positives or negatives (or their respective subsets) are of interest, the error rates are completely characterized by either $\fnrate$ or $\fprate$.
+
+
+
+
+The second-order model has $2^k$ partitioning schemes, where $k$ is the cardinality of the universal set.
+
+One could imagine, say, a \emph{guarded approximate model} which, say, ensures that some special subset of elements have a reduced error rate $\epsilon_1$ and the rest have some error rate $\epsilon_2 > \epsilon_1$.
+
+A natural set to guard is the positive set with respect to some objective input set.
+We denote this second-order model the \emph{positive-negative} approximate set model.
+
+It is isomorphic to the binary symmetric channel model.
+Suppose we have a communications channel over which we transmit $1$s and $0$s and due to \emph{noise} or \emph{rate-distortion} flips $0$s and $1$s respectively with probabilities $\fnrate$ and $\fprate$.
+
+If we serialize a set as a bit string where the $j$-th bit is $1$ if the $j$-th element is a member of the set and otherwise $0$, then the channel induces a \emph{positive-negative} approximation of any such set transmitted over the channel.
+
+Typically, the communications channel is a storage medium and $\fnrate$ and $\fprate$ are rate distortions caused by \emph{lossy} compression \emph{algorithms} that construct approximations of input sets.
+Data structures like the Bloom filter are a practical example which models the concept of a \emph{positive} approximate set, where $\fprate > 0$ and $\fprate = 0$.
+If we take the \emph{complement} of a positive approximate set with a false positive rate $\fprate$, the result is a \emph{negative} approximate set with a false negative rate $\fnrate = \fprate$.
+
+Positive-negative approximate sets may be conditioned on $\Expect{\FPR} = \fprate$ or $\Expect{\FNR} = \fnrate$, which results in an approximations that are expected to obtain the indicated false positive and false negative rates.
+
+
+
+\end{document}

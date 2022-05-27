@@ -1,0 +1,54 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+\section{Fuzzy set-theoretic model}
+In the fuzzy set-theoretic model, any fuzzy set may be defined as a composition of other fuzzy sets. Any composition, in turn, may be reduced to fuzzy interesections and complements (or fuzzy unions and complements).
+
+The fuzzy set-theoretic operators operate on degree-of-membership values. Fuzzy operator equivalents to Boolean $\notfn$, $\orfn$, and $\andfn$ are given by
+\begin{align}
+    \notfn(x) &= 1 - x\,,\\
+    \orfn(x, y) &= \max(x, y)\,,\\
+    \andfn(x, y) &= \min(x, y)\,,
+\end{align}
+where $x$ and $y$ are degree-of-membership values.
+
+
+For instance, fuzzy set-difference, $\Sa_1 \setminus \Sa_2$, the approximate fuzzy set consisting of elements in $\Sa_1$ but not in $\Sa_2$, is given by
+\begin{equation}
+    
+\end{equation}
+
+
+A hedge function transforms degree-of-membership values as demonstrated by the following example.
+\begin{example}
+It may be true that an element is a member of a set $\St$ but it may not be \emph{very} true. If we are interested in sets in which it is \emph{very} true that an element is a member, then the hedge function given by
+\begin{equation}
+    \very(x) = x^2
+\end{equation}
+makes the appropriate transformation since $\True\left(\very(x)\right)$ is \emph{false} for larger values of $x$ than $\true(x)$.
+\end{example}
+
+A Boolean membership test is eventually needed, in which case defuzzification transforms degree-of-membership values into crisp $\true$ or $\false$ values. For instance,
+\begin{equation}
+    \true(x) = x \geq K\,,
+\end{equation}
+where $K \in [0,1]$, transforms degree-of-membership values larger than $K$ to $\true$ and otherwise $\false$. At this point, standard set-theoretic queries as given by BNF~\ref{bnf:set_theoretic} may be used.
+
+
+Fuzzy set-theoretic queries operate on degree-of-membership values given by $\operatorname{u}$. Fuzzy operator equivalents to Boolean $\notfn$, $\orfn$, and $\andfn$ are given by
+\begin{align}
+    \notfn(x) &= 1 - x\,,\\
+    \orfn(x, y) &= \max(x, y)\,,\\
+    \andfn(x, y) &= \min(x, y)\,,
+\end{align}
+where $x$ and $y$ are degree-of-membership values.
+
+A Boolean membership test is eventually needed, in which case defuzzification transforms degree-of-membership values into crisp $\true$ or $\false$ values. For instance,
+\begin{equation}
+    \TrueFn(x) = x \geq K\,,
+\end{equation}
+where $K \in [0,1]$, transforms degree-of-membership values larger than $K$ to $\True$ and otherwise $\False$. At this point, standard set-theoretic queries as given by BNF~\ref{bnf:set_theoretic} may be used.
+
+
+
+\end{document}

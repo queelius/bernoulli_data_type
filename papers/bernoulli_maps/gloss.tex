@@ -1,0 +1,91 @@
+\newglossaryentry{gls-preimageres}
+{
+    name={pre-image resistant},
+    description={Given a hash function and a hash, it is difficult to find an input for the given hash function that outputs the given hash.}
+}
+
+\newglossaryentry{gls-fprate}
+{
+    name={false positive rate},
+    description={Given a set $\St$ and a an element $x$ that is not a member of a $\St$, an approximate set of $\St$ contains $x$ with a probability denoted the \emph{false positive rate}}.
+}
+
+\newglossaryentry{gls-preimageattack}
+{
+    name={pre-image attack},
+    description={Given a hash function and a hash, searching for an input for the given hash function that outputs the given hash.}
+}
+
+\newglossaryentry{gls-randomoracle}
+{
+    name={random oracle},
+    description={A theoretical function that maps every unique input from its domain to a uniform and random output in its range.}
+}
+
+\newglossaryentry{gls-approxset}
+{
+    name={approximate set},
+    description={A set $\Sp$ is an approximate set of $\St$ if $\Sp \supset \St$ and an element not in $\St$ is in $\Sp$ with a probability denoted the \gls*{gls-fprate}.}
+}
+
+\newglossaryentry{gls-shs}
+{
+    name={Singular Hash Set},
+    description={A theoretically optimal data structure for implementing the \emph{approximate set} abstract data type.}
+}
+
+\newglossaryentry{gls-shmap}
+{
+    name={Singular Hash Map},
+    description={A theoretically optimal data structure for implementing the \emph{approximate map} abstract data type.}
+}
+
+\newglossaryentry{gls-pf}
+{
+    name={perfect hash function},
+    description={A hash function that guarantees no collisions among members of a specified set.}
+}
+
+\newglossaryentry{gls-phf}
+{
+    name={Perfect Hash Filter},
+    description={A data structure for implementing the \emph{approximate set} abstract data type that is a function of a \gls*{gls-pf}.}
+}
+
+\newglossaryentry{gls-blf}
+{
+    name={Bloom filter},
+    description={A poular data structure for implementing the \emph{approximate set} abstract data type.}
+}
+
+\newglossaryentry{gls-nb}
+{
+    name={negative binomial distribution},
+    description={A distribution where we are interested in observing the number of Bernoulli trials needed to observe a specific number of ``successes.''}
+}
+
+\newglossaryentry{gls-geo}
+{
+    name={geometric distribution},
+    description={A distribution where we are interested in observing the number of Bernoulli trials needed to observe a a ``successes.''}
+}
+
+\newglossaryentry{gls-set}
+{
+    name={set},
+    description={An ordered collection of distinct elements.}
+}
+
+\newglossaryentry{gls-es}
+{
+    name={Encrypted Search},
+    description={description here.}
+}
+
+
+\newacronym{acr-nb}{NB}{\gls*{gls-nb}}
+\newacronym{acr-geo}{GEO}{\gls*{gls-geo}}
+\newacronym{acr-shs}{SHS}{\gls*{gls-shs}}
+\newacronym{acr-abf}{BF}{\gls*{gls-blf}}
+\newacronym{acr-aphf}{PHF}{\gls*{gls-phf}}
+\newacronym{acr-aph}{PH}{\Gls*{gls-pf}}
