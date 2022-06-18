@@ -8,7 +8,7 @@ namespace bernoulli
     /**
      * @brief Models the concept of a bernoulli set.
      *
-     * bernoulli_set<H> models a bernoulli set of type
+     * hash_set<H> models a bernoulli set of type
      *     contains : Hashable(H) -> bool
      * where H is a hash function of type
      *     Hashable(H) -> size_t.
@@ -16,14 +16,14 @@ namespace bernoulli
      * @tparam H hash function type
      */
     template <typename H>
-    struct bernoulli_set
+    struct hash_set
     {
         using hash_fn_type = H;
         using hash_type = typename H::hash_type;
 
-        bernoulli_set(bernoulli_set const &) = default;
-        bernoulli_set(bernoulli_set &&) = default;
-        bernoulli_set(size_t N, H h, size_t l, double fnr) :
+        hash_set(bernoulli_set const &) = default;
+        hash_set(bernoulli_set &&) = default;
+        hash_set(size_t N, H h, size_t l, double fnr) :
             N(N), h(h), l(l), fnr(fnr) {}
 
         /**
@@ -35,7 +35,7 @@ namespace bernoulli
         template <typename X>
         auto contains(X const & x) const
         {
-          return (h(x) ^ l) <= N;
+          return h.mix(l,h(x)) <= N;
         }
 
         /**

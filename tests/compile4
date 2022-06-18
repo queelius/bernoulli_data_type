@@ -1,2 +1,2 @@
 #!/bin/sh
-g++ -std=c++20 -O3 test_bernoulli_set.cpp -I ~/sources/perfect_hash_functions/include
+g++ -std=c++20 -O3 test_bernoulli_set.cpp -I ~/sources/algebraic_hash_functions/include

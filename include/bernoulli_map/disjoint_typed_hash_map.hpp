@@ -110,15 +110,12 @@ namespace alex::hash
             s ^= h + 0x9e3779b9 + (s << 6) + (s >> 2);
         }
 
-        outpu_type operator()(input_type const & x)
+        template <typename X>
+        auto operator()(X const & x)
         {
-            auto s = s0_;
-            hash_combine(s, h_(x));
+            auto hash = h.mix(h(x),s0_);
             hash_combine(s, hs_[s % nbins()]);
-            //s ^= h_(x) + 0x9e3779b9 + (s << 6) + (s >> 2);
-            //s ^= hs_[s % nbins()] + 0x9e3779b9 + (s << 6) + (s >> 2);
             return d_(s);
-            //return bernoulli<output_type>{d_(s),guarded_error_rate(),unguarded_error_rate()};
         }
 
         /**
@@ -204,27 +201,14 @@ namespace alex::hash
     using disjoint_hash_set = disjoint_hash_map<H, bool_decoder>;
 
     template <typename H>
-    auto fpr(disjoint_hash_set<H> const & dhs)
+    auto unguarded_error(disjoint_hash_set<H> const & dhs)
     {
-        return dhs.unguarded_error_rate(false);
+        return dhs.error_rate();
     }
 
     template <typename H>
-    auto fnr(disjoint_hash_set<H> const & dhs)
+    auto guarded_error(disjoint_hash_set<H> const & dhs)
     {
         return dhs.guarded_error_rate();
     }
-
-    template <typename H>
-    auto tpr(disjoint_hash_set<H> const & dhs)
-    {
-        return decltype(fnr(dhs))(1) - fnr();
-    }
-
-    template <typename H>
-    auto tnr(disjoint_hash_set<H> const & dhs)
-    {
-        return decltype(fpr(dhs))(1) - dhs.fpr();;
-    }
-
 }

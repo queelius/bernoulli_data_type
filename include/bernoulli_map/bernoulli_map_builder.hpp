@@ -1,7 +1,6 @@
 #pragma once
 
-#include <bernoulli/bernoulli_set.hpp>
-#include <hashing/fnv_hash.hpp>
+#include <bernoulli/bernoulli_map.hpp>
 #include <algorithm>
 #include <limits>
 #include <chrono>
@@ -10,8 +9,24 @@
 
 namespace bernoulli
 {
-  template <typename H>
-  struct bernoulli_set_builder
+  /**
+   * @brief The bernoulli map builder
+   *        for a function of type Hashable(H) -> D::value_type.
+   *
+   * The builder does not need encoders,
+   * only the decoder. It essentially does
+   * the encoding of values in the codomain
+   * by finding a hashing index
+   * the generates an appropriate encoding
+   * where appropriate is defined as when
+   * we apply the decoder to it, we get back
+   * the expected value in the codomain.
+   *
+   * @tparm H hash function object type
+   * @tpaam D prefix-free decoder function object type
+   */
+  template <typename H, typename D>
+  struct bernoulli_map_builder
   {
     static auto max_index()
     {
@@ -23,58 +38,40 @@ namespace bernoulli
       return (size_t)0;
     }
 
-    static auto min_false_positive_rate()
-    {
-      return 1.0 / std::numeric_limits<size_t>::max();
-    }
-
-    static auto max_false_positive_rate()
-    {
-      return 1.0;
-    }
-
     static auto max_timeout()
     {
       return std::chrono::milliseconds::max().count();
     }
 
-    static auto default_false_positive_rate()
-    {
-      return 1.0/1024; // approx 1e-3 = 0.001
-    }
-
     H h;
+    D d;
     size_t lower_index;
     size_t upper_index;
     double fpr;
     std::chrono::milliseconds duration;
 
-    bernoulli_set_builder() :
+    bernoulli_map_builder() :
       lower_index(min_index()),
       upper_index(max_index()),
-      duration(max_timeout()),
-      fpr(default_false_positive_rate()) {}
-
-    /**
-     * @brief Set the target false positive rate, a value in the interval (0,1].
-     * @param r the target false positive rate of the bernojlli set.
-     *          if such a bernoulli set cannot be constructed, then the
-     *          false positive rate has r as a lower-bound.
-     */
-    auto & false_positive_rate(double r)
-    {
-      fpr = std::min(max_false_positive_rate(),
-                     std::max(r, min_false_positive_rate()));
-      return *this;
-    }
+      duration(max_timeout()) {}
 
     /**
      * @brief Set the hash function object.
-     * @param h hash function
+     * @param h hash function object
      */
     auto & hash_fn(H h)
     {
       this->h = h;
+      return *this;
+    }
+
+    /**
+     * @brief Set the decoder function object.
+     * @param d decoder function object
+     */
+    auto & decoder_fn(H h)
+    {
+      this->d = d;
       return *this;
     }
 
@@ -109,6 +106,14 @@ namespace bernoulli
      * @brief Constructs a random perfect hash function for the range of
      *        elements in [begin,end).
      *
+     * Each element in [begin,end) models the concept of a pair, where
+     * car(*begin) maps to a value in the domain of the function f
+     * and cdr(*begin) maps to a value in the codomain of the function f
+     * such that f(car(*begin)) = cdr(*begin).
+     *
+     * Precondition: [begin,end) does not include any pairs such that
+     * its car is not unique.
+     *
      * @tparam I models a forward iterator
      * @param begin start of range
      * @param end end of range
@@ -116,9 +121,6 @@ namespace bernoulli
     template <typename I>
     auto operator()(I begin, I end)
     {
-      auto N = (size_t)std::round(fpr * std::numeric_limits<size_t>::max());
-      std::sort(begin,end);
-      end = std::unique(begin,end);
       auto m = std::distance(begin,end);
 
       size_t l_star;
@@ -132,14 +134,11 @@ namespace bernoulli
           cur_time - start_time);
         if (succ_star == m || elapsed > duration)
           break;
-          
+
         size_t succ = 0;
         for (auto x = begin; x != end; ++x)
         {
-          auto hash = h(*x);
-          hash ^= h(l);
-          hash *= hashing::details::fnv_params::prime;
-          if (hash <= N)
+          if (d(h.mix(h(*x),l)) == *x)
             ++succ;
         }
 
@@ -152,7 +151,7 @@ namespace bernoulli
         }
       }
 
-      return bernoulli_set<H>(N,h,l_star,(double)(m-succ_star)/m);
+      return bernoulli_map<H,D>(h,d,l_star,(double)(m-succ_star)/m);
     }
 
     template <typename X>

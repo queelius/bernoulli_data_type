@@ -1,8 +1,10 @@
+#pragma once
+
 /**
  * @file bernoulli_set.hpp Type-erased set open over types and closed over
  * some specified set of operators.
  * 
- * bernoulli_set<X,N> models the concept of a N-th order Bernoulli set with
+ * bernoulli_set<X,N> models the concept of a Nth order Bernoulli set with
  * elements of type X by wrapping some type that models the concept and then
  * subsequently erases the specific type. This is known as type-erasure, and
  * allows, for instance, one to store Bernoulli sets that vary over types into
@@ -18,12 +20,7 @@
  * algorithms than the general case.
  */
 
-#pragma once
-
 #include <memory>
-
-using std::shared_ptr;
-using std::make_shared;
 
 /**
  * Models `bernoulli<set<X>,N>`.
@@ -78,47 +75,47 @@ using std::make_shared;
  * Of course, we can generate higher-order Bernoulli types by replacing `X`
  * with `bernoulli<X,K>
  */
-template <typename X, int N>
-class bernoulli_set: public algebra::bernoulli_set_expr<bernoulli_set<X,N>>
+
+template <typename X, size_t N, typename I>
+class bernoulli_set: public algebra::bernoulli_set_expr<bernoulli_set<X,N,I>>
 public:
     
     using value_type = X;
 
-    constexpr auto order() const { return N; }
+    auto order() const { return N; }
 
-    template <typename BernoulliSet>
-    bernoulli_set(BernoulliSet s)
-        : s_(make_shared<model<BernoulliSet> const>(s)) {};
+    template <typename B>
+    bernoulli_set(B const & s)
+        : s_(std::make_shared<model<B> const>(s)) {};
 
     bernoulli_set(bernoulli_set const & s) : s_(s._s) {};
 
     auto contains(X const & x) const { return s_->contains(x); }
-    auto operator()(X const & x) const { return s_->contains(x); }
-    auto size() const { return s_->size(); }
+    auto operator()(X const & x) const { return contains(x); }
     auto fpr() const { return s_->fpr(); }
     auto fnr() const { return s_->fnr(); }
 
 private:
-    struct concept
+    struct concept_
     {
-        virtual bernoulli<bool,N> contains(X const &) const = 0;
-        virtual interval<double> fpr() const = 0;
-        virtual interval<double> fnr() const = 0;
+        virtual bernoulli_bool contains(X const &) const = 0;
+        virtual I fpr() const = 0;
+        virtual I fnr() const = 0;
     };
 
-    template <typename BernoulliSet>
-    struct model final : concept
+    template <typename B>
+    struct model_ final : concept_
     {
-        model(BernoulliSet s) : s_(s) {}
+        model(B s) : s_(s) {}
 
-        bernoulli<bool,N> contains(T const & x) const { return s_->contains(x); }
-        interval<double> fpr() const { return s_->fpr(); }
-        interval<double> fnr() const { return s_->fnr(); }
+        bernoulli_bool contains(T const & x) const { return s_->contains(x); }
+        I fpr() const { return s_->fpr(); }
+        I fnr() const { return s_->fnr(); }
 
-        BernoulliSet s_;
+        B s_;
     };
 
-    shared_ptr<concept const> s_;
+    std::shared_ptr<concept_ const> s_;
 };
 
 
