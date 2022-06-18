@@ -13,7 +13,8 @@
             ],
             "includePath": [
                 "${workspaceFolder}/include",
-                "C:/MinGW/include"
+                "~/sources/algebraic_hash_functions/include",
+                "~/sources/bernoulli_data_type/include",
             ],
             "browse": {
                 "path": [

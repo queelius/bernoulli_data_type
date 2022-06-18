@@ -1,64 +1,56 @@
 #pragma once
+#include <memory>
 
-#include <cmath>
-#include <limits>
-
-namespace bernoulli
+/**
+ * @brief Type-erasure for bernoulli maps.
+ * 
+ * bernoulli_map<X,Y> models the concept of a Bernoulli map (partial function)
+ * of type
+ *     X \-> Y
+ * by wrapping some type that models the concept and then
+ * subsequently erases the specific type. This is known as type-erasure, and
+ * allows, for instance, one to store Bernoulli maps that vary over types into
+ * a container of bernoulli_map<X,Y> elements.
+ * 
+ * As a model of a map, it is a functor that provides the member function
+ *     Y operator()(X const &) const
+ * to perform the mapping from X to Y.
+ */
+template <typename X, typename Y>
+class bernoulli_map
 {
-    /**
-     * @brief Models the concept of a bernoulli map.
-     *
-     * bernoulli_map<H,D> models a bernoulli map of type
-     *     Hashable(H) -> ValueType(D)
-     * where H is a hash function of type
-     *     Hashable(H) -> size_t
-     * and D models the concept of a prefix-free decoder.
-     *
-     * @tparam H hash function type
-     * @tparam D decoder type
-     */
-    template <typename H, typename D>
-    struct bernoulli_map
+public:    
+    using domain_type = X;
+    using codomain_type = Y;
+
+    template <typename F>
+    bernoulli_map(F const & f)
+        : f(std::make_shared<model<F> const>(f)) {};
+
+    bernoulli_map(bernoulli_map const & f) : f(f.f) {};
+
+    auto operator()(X const & x) const { return f(x); }
+    auto error() const { return f->error(); }
+
+private:
+    struct concept_
     {
-        using hash_fn_type = H;
-        using hash_type = typename H::hash_type;
-        using codomain = typename D::value_type;
-
-        bernoulli_map(bernoulli_map const &) = default;
-        bernoulli_map(bernoulli_map &&) = default;
-        bernoulli_map(H h, D d, size_t l, double err) :
-            h(h), d(d), l(l), err(err) {}
-
-        /**
-         * @brief retrieves the minimum hash value
-         * @tparam X the element type, must be hashable by H.
-         * @param x the input
-         * @returns the output associated with the input x
-         */
-        template <typename X>
-        auto operator()(X const & x) const
-        {
-          return d(h.mix(h(x),l));
-        }
-
-        /**
-         * @brief retrieves the hash function
-         */
-        auto hash_fn() const { return h; }
-
-        /**
-         * @brief retrieves the decoder function
-         */
-        auto decoder_fn() const { return d; }
-
-        /**
-         * @brief retrieves the error rate.
-         */
-        auto error_rate() const { return err; }
-
-        D const d;
-        H const h;
-        size_t const l;
-        double const err;
+        virtual Y apply(X const &) const = 0;
+        virtual double error() const = 0;
     };
-}
+
+    template <typename F>
+    struct model_ final : concept_
+    {
+        model(F f) : f(f) {}
+
+        Y apply(T const & x) const { return f(x); }
+        double error() const { return f->error(); }
+
+        F f;
+    };
+
+    std::shared_ptr<concept_ const> f;
+};
+
+

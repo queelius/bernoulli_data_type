@@ -1,8 +1,9 @@
 #include <hashing/fnv_hash.hpp>
-#include <bernoulli_map/bernuolli_map.hpp>
+#include <hash_map/hash_map.hpp>
+#include <hash_map/hash_map_builder.hpp>
+#include <coders/bool_coder.hpp>
 #include <vector>
 #include <iostream>
-#include <unordered_set>
 #include <chrono>
 #include "utils.hpp"
 
@@ -24,22 +25,20 @@ void test_phf()
 
     auto start = std::chrono::system_clock::now();
 
-    auto f = bernoulli_map::bernoulli_map_builder<hashing::fnv_hash,fixed_width_int_decoder>().
-        timeout(std::chrono::seconds(10)).
-        index(0,20000000)(xs);
+    auto f = bernoulli::hash_map_builder<hashing::fnv_hash,coders::bool_decoder>().
+        timeout(std::chrono::seconds(10)).debugging().
+        index(0,20000000)(xy);
 
     auto end = std::chrono::system_clock::now();
     auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end-start);
 
     std::cout << (double)elapsed.count() / 1000 << '\n';
-    std::cout << "error rate = " << ph.error_rate() * 100 << "%\n";
+    std::cout << "error rate = " << f.error_rate() * 100 << "%\n";
 
-    std::unordered_set<size_t> hashes;
-    for (auto x : xs)
+    for (auto [x,y] : xy)
     {
-        auto h = ph(x);
-        if (hashes.count(h) != 0)
-            std::cout << "collision: ph(" << x << ") = " << h << "\n";
-        hashes.insert(h);
+        auto res = f(x);
+        if (res != y)
+            std::cout << "error on f(" << x << ") = " << y << "; got f(" << x << ") = " << f(x) << "\n";
     }
 }

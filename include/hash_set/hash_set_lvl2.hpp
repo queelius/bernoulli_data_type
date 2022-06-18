@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <limits>
+#include <vector>
 
 namespace bernoulli
 {
@@ -16,15 +17,20 @@ namespace bernoulli
      * @tparam H hash function type
      */
     template <typename H>
-    struct hash_set
+    struct hash_set_lvl2
     {
         using hash_fn_type = H;
         using hash_type = typename H::hash_type;
 
-        hash_set(hash_set const &) = default;
-        hash_set(hash_set &&) = default;
-        hash_set(size_t N, H h, size_t s0, double fnr) :
-            N(N), h(h), l0(h(s0)), fnr(fnr) {}
+        hash_set_lvl2(hash_set_lvl2 const &) = default;
+        hash_set_lvl2(hash_set_lvl2 &&) = default;
+        hash_set_lvl2(
+          size_t N,
+          H h,
+          size_t l,
+          std::vector<size_t> sigma,
+          double fnr) :
+            N(N), h(h), l(l), fnr(fnr), sigma(sigma) {}
 
         /**
          * @brief retrieves the minimum hash value
@@ -35,7 +41,7 @@ namespace bernoulli
         template <typename X>
         auto contains(X const & x) const
         {
-          return h.mix(l0,x) <= N;
+          return h.mix(h(sigma[h.mix(h(l),x)]),x) <= N;
         }
 
         /**
@@ -63,34 +69,10 @@ namespace bernoulli
          */
         auto hash_fn() const { return h; }
 
-
-        auto index() const { return l0; }
-
         size_t const N;
         H const h;
-        size_t const l0;
+        size_t const l;
         double const fnr;
+        std::vector<size_t> sigma;
     };
-
-
-     /**
-     * hash_set<H> models a set indicator function of type
-     *     Hashable(H) -> bool
-     * where H is a hash function of type
-     *     Hashable(H) -> size_t
-     * template <typename H>
-     * using rd_hash_set = rd_hash_map<H, bool_decoder>;
-     *
-     * template <typename H>
-     * auto false_positive_rate(rd_hash_set<H> const & hs)
-     * {
-     *     return hs.unguarded_error_rate(false);
-     * }
-     * 
-     * template <typename H>
-     * auto false_negative_rate(rd_hash_set<H> const & hs)
-     * {
-     *     return hs.guarded_error_rate();
-     * }
-     */
 }

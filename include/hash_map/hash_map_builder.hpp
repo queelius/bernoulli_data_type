@@ -1,10 +1,9 @@
 #pragma once
 
-#include <bernoulli/bernoulli_map.hpp>
+#include <hash_map/hash_map.hpp>
 #include <algorithm>
 #include <limits>
 #include <chrono>
-
 #include <iostream>
 
 namespace bernoulli
@@ -26,7 +25,7 @@ namespace bernoulli
    * @tpaam D prefix-free decoder function object type
    */
   template <typename H, typename D>
-  struct bernoulli_map_builder
+  struct hash_map_builder
   {
     static auto max_index()
     {
@@ -43,17 +42,40 @@ namespace bernoulli
       return std::chrono::milliseconds::max().count();
     }
 
+    std::ostream & debug_out;
+    bool debug;
     H h;
     D d;
     size_t lower_index;
     size_t upper_index;
-    double fpr;
     std::chrono::milliseconds duration;
 
-    bernoulli_map_builder() :
+    hash_map_builder() :
+      debug_out(std::cout),
+      debug(false),
       lower_index(min_index()),
       upper_index(max_index()),
       duration(max_timeout()) {}
+
+    /**
+     * @brief Set debug mode to true or false.
+     * @param mode if mode is true, then show debugging information.
+     */
+    auto & debugging(bool mode = true)
+    {
+      debug = mode;
+      return *this;
+    }    
+    
+    /**
+     * @brief Set debug output.
+     * @param out the debugging output stream.
+     */
+    auto & debug_output(std::ostream & out)
+    {
+      debug_out = out;
+      return *this;
+    }
 
     /**
      * @brief Set the hash function object.
@@ -129,9 +151,8 @@ namespace bernoulli
 
       for (auto l = lower_index; l != upper_index; ++l)
       {
-        auto const cur_time = std::chrono::system_clock::now();
         auto const elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
-          cur_time - start_time);
+          std::chrono::system_clock::now() - start_time);
         if (succ_star == m || elapsed > duration)
           break;
 
@@ -144,14 +165,17 @@ namespace bernoulli
 
         if (succ > succ_star)
         {
-          std::cout << "best succ = " << succ << "\n";
-          std::cout << "best l = " << l << "\n";
+          if (debugging)
+          {
+            std::cout << "best succ = " << succ << "\n";
+            std::cout << "best l = " << l << "\n";
+          }
           l_star = l;
           succ_star = succ;
         }
       }
 
-      return bernoulli_map<H,D>(h,d,l_star,(double)(m-succ_star)/m);
+      return hash_map<H,D>(h,d,l_star,(double)(m-succ_star)/m);
     }
 
     template <typename X>

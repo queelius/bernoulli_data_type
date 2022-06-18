@@ -4,13 +4,13 @@
 #include <algorithm>
 #include <limits>
 #include <chrono>
-
+#include <vector>
 #include <iostream>
 
 namespace bernoulli
 {
   template <typename H>
-  struct hash_set_builder
+  struct hash_set_lvl2_builder
   {
     static auto max_index()
     {
@@ -44,40 +44,22 @@ namespace bernoulli
 
     std::ostream & debug_out;
     bool debug;
+    size_t M;
     H h;
     size_t lower_index;
     size_t upper_index;
     double fpr;
     std::chrono::milliseconds duration;
 
-    hash_set_builder() :
+    hash_set_lvl2_builder() :
       debug_out(std::cout),
       debug(false),
+      M(0),
       lower_index(min_index()),
       upper_index(max_index()),
       duration(max_timeout()),
       fpr(default_false_positive_rate()) {}
-
-    /**
-     * @brief Set debug mode to true or false.
-     * @param mode if mode is true, then show debugging information.
-     */
-    auto & debugging(bool mode = true)
-    {
-      debug = mode;
-      return *this;
-    }    
-    
-    /**
-     * @brief Set debug output.
-     * @param out the debugging output stream.
-     */
-    auto & debug_output(std::ostream & out)
-    {
-      debug_out = out;
-      return *this;
-    }
-
+      
     /**
      * @brief Set debug mode to true or false.
      * @param mode if mode is true, then show debugging information.
@@ -164,35 +146,55 @@ namespace bernoulli
       end = std::unique(begin,end);
       auto m = std::distance(begin,end);
 
-      size_t s0;
-      size_t succ0 = 0;
+      if (M == 0)
+        M = (size_t)std::ceil(std::sqrt(m));
+
+      std::vector<size_t> sigma(M);
+
+      // find l_star that most evenly divides the elements into the M sigma bins
+      size_t l_star;
+      double W = 0;
       auto const start_time = std::chrono::system_clock::now();
-
-      for (auto s = lower_index; s != upper_index; ++s)
+      
+      for (auto l = lower_index; l != upper_index; ++l)
       {
-        auto const elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+        auto const elapsed =
+          std::chrono::duration_cast<std::chrono::milliseconds>(
           std::chrono::system_clock::now() - start_time);
-        if (succ0 == m || elapsed > duration)
+        if (elapsed > duration)
           break;
-          
-        size_t succ = 0;
+        
+        std::vector<size_t> counts(M,0);
         for (auto x = begin; x != end; ++x)
-          if (h.mix(h(s),*x) <= N) ++succ;
+          ++counts[h.mix(h(l),*x) % M];
 
-        if (succ > succ0)
+        double S = 0;
+        for (auto n : counts)
         {
-          s0 = s;
-          succ0 = succ;
-          
+          if (n == 0)
+            continue;
+          S -= std::log(n/m)*(double)n/m;
+        }
+
+        if (S > W)
+        {
+          l_star = l;
+          W = S;
           if (debug)
-          {
-              debug_out << "succ0 = " << succ0 << "\n";
-              debug_out << "s0 = " << s0 << "\n";
-          }
+            debug_out << "l* = " << l_star << "\n";
+
+          if (abs(S - std::log(m)) < 1)
+            break;
+        }
+
+        std::vector<std::vector<size_t>> hashes(M);
+        for (auto x : xs)
+        {
+          hashes[h.mix(h(l_star),*x) % M];
         }
       }
 
-      return hash_set<H>(N,h,s0,(double)(m-succ0)/m);
+      return hash_set_lvl2<H>(N,h,l_star,sigma,(double)(m-succ_star)/m);
     }
 
     template <typename X>
