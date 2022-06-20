@@ -23,8 +23,8 @@ namespace bernoulli
 
         hash_set(hash_set const &) = default;
         hash_set(hash_set &&) = default;
-        hash_set(size_t N, H h, size_t s0, double fnr) :
-            N(N), h(h), l0(h(s0)), fnr(fnr) {}
+        hash_set(size_t N, H h, size_t l0, double fnr) :
+            N(N), h(h), l0(l0), fnr(fnr) {}
 
         /**
          * @brief retrieves the minimum hash value
@@ -45,10 +45,7 @@ namespace bernoulli
          * element in the complement of the set tests as being a member of the
          * set.
          */
-        auto false_positive_rate() const
-        {
-            return (double)N / std::numeric_limits<size_t>().max();
-        }
+        auto false_positive_rate() const { return (double)N / h.max(); }
 
         /**
          * @brief retrieves the false negative rate.
@@ -63,7 +60,13 @@ namespace bernoulli
          */
         auto hash_fn() const { return h; }
 
-
+        /**
+         * @brief retrieves the hash family index
+         * 
+         * We consider the hash function of type H to denote a family
+         * of hash functions. We choose a particular hash function in this
+         * family by its index, which in this case corresponds to l0.
+         */
         auto index() const { return l0; }
 
         size_t const N;

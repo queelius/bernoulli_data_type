@@ -7,19 +7,26 @@
 #include <chrono>
 #include "utils.hpp"
 
-void test_hash_set(size_t n, double fpr=0.1, size_t timeout = 120);
+void test_hash_set(size_t n,
+                   double fpr=0.01,
+                   size_t lower_index = std::numeric_limits<size_t>::min(),
+                   size_t upper_index = std::numeric_limits<size_t>::max(),
+                   size_t timeout = 120);
 
 int main()
 {
-  test_hash_set(50,.1);
+  test_hash_set(50,.25);
 }
 
-void test_hash_set(size_t n, double fpr, size_t timeout)
+void test_hash_set(size_t n, double fpr, size_t lower_index,
+                   size_t upper_index, size_t timeout)
 {
   auto xs = random_strings(n);
   auto start = std::chrono::system_clock::now();
   auto bs = bernoulli::hash_set_builder<hashing::fnv_hash>().
     false_positive_rate(fpr).debugging().
+    threads(7).
+    index(lower_index,upper_index).
     timeout(std::chrono::seconds(timeout))(xs);
 
   auto end = std::chrono::system_clock::now();

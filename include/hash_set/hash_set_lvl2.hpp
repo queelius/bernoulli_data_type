@@ -27,10 +27,10 @@ namespace bernoulli
         hash_set_lvl2(
           size_t N,
           H h,
-          size_t l,
+          size_t s0,
           std::vector<size_t> sigma,
           double fnr) :
-            N(N), h(h), l(l), fnr(fnr), sigma(sigma) {}
+            N(N), h(h), s0(s0), fnr(fnr), sigma(sigma) {}
 
         /**
          * @brief retrieves the minimum hash value
@@ -41,7 +41,7 @@ namespace bernoulli
         template <typename X>
         auto contains(X const & x) const
         {
-          return h.mix(h(sigma[h.mix(h(l),x)]),x) <= N;
+          return h.mix(h(sigma[h.mix(h(s0),x)]),x) <= N;
         }
 
         /**
@@ -71,7 +71,7 @@ namespace bernoulli
 
         size_t const N;
         H const h;
-        size_t const l;
+        size_t const s0;
         double const fnr;
         std::vector<size_t> sigma;
     };

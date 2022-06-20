@@ -4,7 +4,10 @@
 #include <algorithm>
 #include <limits>
 #include <chrono>
-
+#include <vector>
+#include <thread>
+#include <mutex>
+#include <pthread.h>
 #include <iostream>
 
 namespace bernoulli
@@ -24,7 +27,7 @@ namespace bernoulli
 
     static auto min_false_positive_rate()
     {
-      return 1.0 / std::numeric_limits<size_t>::max();
+      return 1.0 / max_index();
     }
 
     static auto max_false_positive_rate()
@@ -39,7 +42,12 @@ namespace bernoulli
 
     static auto default_false_positive_rate()
     {
-      return 1.0/1024; // approx 1e-3 = 0.001
+      return 1.0/1024.0; // approximately .0011
+    }
+
+    static auto default_threads()
+    {
+      return std::thread::hardware_concurrency();
     }
 
     std::ostream & debug_out;
@@ -48,6 +56,7 @@ namespace bernoulli
     size_t lower_index;
     size_t upper_index;
     double fpr;
+    size_t num_threads;
     std::chrono::milliseconds duration;
 
     hash_set_builder() :
@@ -55,8 +64,9 @@ namespace bernoulli
       debug(false),
       lower_index(min_index()),
       upper_index(max_index()),
-      duration(max_timeout()),
-      fpr(default_false_positive_rate()) {}
+      fpr(default_false_positive_rate()),
+      num_threads(default_threads()),
+      duration(max_timeout()) {}
 
     /**
      * @brief Set debug mode to true or false.
@@ -66,8 +76,8 @@ namespace bernoulli
     {
       debug = mode;
       return *this;
-    }    
-    
+    }
+
     /**
      * @brief Set debug output.
      * @param out the debugging output stream.
@@ -79,25 +89,17 @@ namespace bernoulli
     }
 
     /**
-     * @brief Set debug mode to true or false.
-     * @param mode if mode is true, then show debugging information.
+     * @brief Sets the number of threads.
+     * 
+     * @param n number of threads, defaults to 0, in which case system
+     *          automatically chooses a number.
      */
-    auto & debugging(bool mode = true)
+    auto & threads(size_t n = 0)
     {
-      debug = mode;
-      return *this;
-    }    
-    
-    /**
-     * @brief Set debug output.
-     * @param out the debugging output stream.
-     */
-    auto & debug_output(std::ostream & out)
-    {
-      debug_out = out;
+      num_threads = (n == 0 ? std::thread::hardware_concurrency() : n);
       return *this;
     }
-      
+
     /**
      * @brief Set the target false positive rate, a value in the interval (0,1].
      * @param r the target false positive rate of the bernojlli set.
@@ -164,35 +166,66 @@ namespace bernoulli
       end = std::unique(begin,end);
       auto m = std::distance(begin,end);
 
-      size_t s0;
+      size_t l0;
       size_t succ0 = 0;
-      auto const start_time = std::chrono::system_clock::now();
+      auto const stime = std::chrono::system_clock::now();
+      std::mutex lck;
 
-      for (auto s = lower_index; s != upper_index; ++s)
+      auto task = [&](size_t start, size_t stop)
       {
-        auto const elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
-          std::chrono::system_clock::now() - start_time);
-        if (succ0 == m || elapsed > duration)
-          break;
-          
-        size_t succ = 0;
-        for (auto x = begin; x != end; ++x)
-          if (h.mix(h(s),*x) <= N) ++succ;
-
-        if (succ > succ0)
+        for (auto s = start; s != stop; ++s)
         {
-          s0 = s;
-          succ0 = succ;
-          
-          if (debug)
+          auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+          std::chrono::system_clock::now() - stime);
+          if (succ0 == m || elapsed > duration)
+            break;
+
+          size_t l = h(s);
+          size_t succ = 0;
+          for (auto x = begin; x != end; ++x)
           {
-              debug_out << "succ0 = " << succ0 << "\n";
-              debug_out << "s0 = " << s0 << "\n";
+              //if ((l ^ h(*x)) <= N) ++succ;
+              if (h.mix(l,*x) <= N) ++succ;
+          }            
+
+          if (succ > succ0)
+          {
+            lck.lock();
+            if (succ > succ0)
+            {
+                l0 = l;
+                succ0 = succ;
+
+                if (debug)
+                {
+                    debug_out << "succ0: " << succ0 << "\n";
+                    debug_out << "l0: " << l0 << "\n";
+                }
+            }
+            lck.unlock();
           }
         }
+      };
+
+      size_t block_size = (upper_index - lower_index) / num_threads;
+
+      if (debug)
+      {
+        std::cout << "num_threads: " << num_threads << "\n";          
+        std::cout << "lower_index: " << lower_index << "\n";
+        std::cout << "upper_index: " << upper_index << "\n";
+        std::cout << "block_size: " << block_size << "\n";
+        std::cout << "N: " << N << "\n";
       }
 
-      return hash_set<H>(N,h,s0,(double)(m-succ0)/m);
+      std::vector<std::thread> threads;
+      for (int i = 0; i < num_threads; ++i)
+        threads.push_back(std::thread(task,lower_index+i*block_size,
+                                      lower_index+(i+1)*block_size));
+      for (auto & t : threads)
+        t.join();      
+
+      return hash_set<H>(N,h,l0,(double)(m-succ0)/m);
     }
 
     template <typename X>
