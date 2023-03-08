@@ -124,30 +124,6 @@ struct random_bernoulli<first_order,T,F>
 };
 
 
-template <int N>
-auto operator||(bernoulli<N,bool> a, bernoulli<N,bool> b)
-{
-    // a + b = (a' b')'
-    return ~((~a) & (~b))
-}
-
-template <int N>
-auto nor(bernoulli<N,bool> a, bernoulli<N,bool> b)
-{
-    return ~(a | b);
-}
-
-template <int N>
-auto nand(bernoulli<N,bool> a, bernoulli<N,bool> b)
-{
-    return ~(a & b);
-}
-
-template <int N>
-auto operator^(bernoulli<N,bool> a, bernoulli<N,bool> b)
-{
-    return (~a & b) | (a & ~b);
-}
 
 
 template <>
@@ -293,65 +269,6 @@ auto pdf(random_bernoulli<N,T> x)
 {
     return random_bernoulli_pdf<random_bernoulli<N,T>>{x};
 }
-
-
-
-/**
- * As a function of a random variable, f : bool -> bool is a random
- * variable. Since we apply f to a first-order random approximate Boolean,
- * the output is a first-order random approximate Boolean in which the
- * given value is f(x()).
- * 
- * It is nocomputation in the context of a first-order approximation error
- * on boolean values.
- */
-auto fmap(function<bool(bool)> f, random_approximate<1,bool> x)
-{
-    return random_approximate<1,bool>(f(x()),x.epsilon);
-}
-
-auto fmap(function<random_approximate<1,bool>(bool) f, random_approximate<1,bool> x)
-{
-    auto y = f(x());
-    // incorrect, fix
-    return random_approximate<1,bool>(y,x.epsilon*y.epsilon);
-}
-
-
-
-auto fmap(function<bool(bool)> f, random_approximate<1,bool> x)
-{
-    return random_approximate<1,bool>(f(x()),x.epsilon);
-}
-
-
-
-auto fmap(function<bool(bool)> f, random_approximate<2,bool> x)
-{
-    // return random_approximate<2,bool>(f(x.given),x.fpr,x.fnr);
-    return;
-}    
-
-template <typename N>
-auto fmap(function<void(void)> f, random_approximate<N,void> x)
-{
-    f();
-    return random_approximate<N,void>();
-}    
-
-
-auto fmap(function<bool(bool)> f, approximate<1,bool> x)
-{
-    
-    return approximate<1,bool>{x()};
-}
-
-auto fmap(function<bool(bool)> f, approximate<0,bool> x)
-{
-    
-    return approximate<0,bool>{x()};
-}
-
 
 
 

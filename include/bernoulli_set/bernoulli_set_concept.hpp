@@ -59,8 +59,7 @@ namespace bernoulli
   template <typename T, typename N>
   concept bernoulli_set = requires(T x)
   {
-    { x.fpr() };
-    { x.fnr() };
+    { x.error_rate(x) };
     { x.contains() };
   };
 }

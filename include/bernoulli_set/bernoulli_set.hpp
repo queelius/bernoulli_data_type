@@ -76,13 +76,11 @@
  * with `bernoulli<X,K>
  */
 
-template <typename X, size_t N, typename I>
-class bernoulli_set: public algebra::bernoulli_set_expr<bernoulli_set<X,N,I>>
+template <typename X>
+class bernoulli_set: public algebra::bernoulli_set_expr<bernoulli_set<X>>
 public:
     
     using value_type = X;
-
-    auto order() const { return N; }
 
     template <typename B>
     bernoulli_set(B const & s)
@@ -92,15 +90,15 @@ public:
 
     auto contains(X const & x) const { return s_->contains(x); }
     auto operator()(X const & x) const { return contains(x); }
-    auto fpr() const { return s_->fpr(); }
-    auto fnr() const { return s_->fnr(); }
+    auto false_positive_rate() const { return s_->fpr(); }
+    auto false_negative_rate() const { return s_->fnr(); }
 
 private:
     struct concept_
     {
         virtual bernoulli_bool contains(X const &) const = 0;
-        virtual I fpr() const = 0;
-        virtual I fnr() const = 0;
+        virtual interval<double> fpr() const = 0;
+        virtual interval<double> fnr() const = 0;
     };
 
     template <typename B>
@@ -109,8 +107,8 @@ private:
         model(B s) : s_(s) {}
 
         bernoulli_bool contains(T const & x) const { return s_->contains(x); }
-        I fpr() const { return s_->fpr(); }
-        I fnr() const { return s_->fnr(); }
+        interval<double> fpr() const { return s_->false_positive_rate(); }
+        interval<double> fnr() const { return s_->false_negative_rate(); }
 
         B s_;
     };
