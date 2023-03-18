@@ -1,5 +1,12 @@
 # The concept of the Bernoulli data type
 
+> NOTE
+> Most of the documentation/papers are outdated. Some of the code in the include
+> directory is more recent, but I threw a bunch of stuff in other projects
+> into this repo to try to organize it. It's also related to other repos,
+> like github.com/queelius/rd_ph_filter, but it's still being sorted out.
+> I'll try to whip it into shape when i have time.
+
 ## Random approximate set concept
 
 We provide two data types that model the concept of the random positive
