@@ -1,6 +1,4 @@
-# The concept of the random approximate data type (or value type)
-
-
+# The concept of the Bernoulli data type
 
 ## Random approximate set concept
 
@@ -40,7 +38,7 @@ uncertain.
 General purpose, space and time efficient generative models exist for
 representing any partial function over a finite domain of definition.
 
-Since a function, the expoential data type, can model many other data types,
+Since a function, the exponential data type, can model many other data types,
 like lists, matrices, and so on, the random approximate map provides a
 facility for representing any random approximate data type.
 
