@@ -1,6 +1,11 @@
-# The concept of the random approximate data type (or value type)
+# The concept of the Bernoulli data type
 
-
+> NOTE
+> Most of the documentation/papers are outdated. Some of the code in the include
+> directory is more recent, but I threw a bunch of stuff in other projects
+> into this repo to try to organize it. It's also related to other repos,
+> like github.com/queelius/rd_ph_filter, but it's still being sorted out.
+> I'll try to whip it into shape when i have time.
 
 ## Random approximate set concept
 
@@ -40,7 +45,7 @@ uncertain.
 General purpose, space and time efficient generative models exist for
 representing any partial function over a finite domain of definition.
 
-Since a function, the expoential data type, can model many other data types,
+Since a function, the exponential data type, can model many other data types,
 like lists, matrices, and so on, the random approximate map provides a
 facility for representing any random approximate data type.
 
@@ -55,3 +60,4 @@ Another example is an array of elements of type `T` which may be
 modeled as a function `f : (N -> maybe T)`, where `f(i)` represents the
 may be `i`-th element. If `i` is greater than or equal to the list's size,
 `Nothing` is returned.
+>>>>>>> bd5463270af092bedad5477d83944f4e2be8c7c7
