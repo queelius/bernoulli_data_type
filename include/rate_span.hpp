@@ -1,119 +1,51 @@
 #pragma once
 
 #include <algorithm>
-using std::min;
-using std::max;
 
 /**
  * Models an uncertain rate. It is an interval type.
  */
-class rate_span
+struct rate_span
 {
-public:
-    using value_type = double;
+    rate_span() : min(0.0f), max(1.0f) {}
+    rate_span(float r) : min(std::max(r,0.0f)), max(std::min(r,1.0f)) {}
+    rate_span(float r1, float r2)
+        : min(std::max(0.0f,std::min(r1,r2))), 
+          max(std::min(1.0f,std::max(r1,r2))) {}
 
-    rate_span() : lb(1),ub(-1) {}
-
-    rate_span(rate_span const & copy) = default;
-
-    rate_span(value_type r) :
-        lb(max(r,value_type(0))),
-        ub(min(r,value_type(1))) {}
-
-    rate_span(value_type r1, value_type r2) :
-        lb(max(value_type(0),min(r1,r2))),
-        ub(min(value_type(1),max(r1,r2))) {}
-
-    rate_span(value_type r1, value_type r2, value_type r3) :
-        lb(max(value_type(0),min(r1,r2))),
-        ub(min(value_type(1),max(r1,r2))) {}
-
-    auto min() const { return lb; }
-    auto max() const { return ub; }
-
-    auto contains(value_type r) const { return r >= min() && r <= max(); }
-    auto empty() const { return max() < min(); }
-
-private:
-    value_type const lb, ub;
+    const float min, max;
 };
 
-auto empty(rate_span const & x)
+auto min(rate_span x) {  return x.min; }
+auto max(rate_span x) {  return x.max; }
+
+auto operator+(rate_span l, rate_span r)
 {
-    return x.empty();
+    return rate_span(l.min+r.min, l.max+r.max);
 }
 
-auto contains(rate_span const & x, value_type r)
+auto operator-(rate_span l, rate_span r)
 {
-    return x.contains(r);
+    return rate_span(l.min-r.max, l.max-r.min);
 }
 
-auto degenerate(rate_span const & x)
+auto operator*(rate_span l, rate_span r)
 {
-    return min(x) == max(x);
+    auto x1 = l.min * r.min;
+    auto x2 = l.min * r.max;
+    auto x3 = l.max * r.min;
+    auto x4 = l.max * r.max;
+
+    return rate_span(std::min({x1,x2,x3,x4}),
+                     std::max({x1,x2,x3,x4}));
 }
 
-auto min(rate_span const & x)
+auto operator&(rate_span l, rate_span r)
 {
-    return x.min();
+    return rate_span(std::max(l.min,r.min), std::min(l.max,r.max));
 }
 
-auto max(rate_span const & x)
+auto operator|(rate_span l, rate_span r)
 {
-    return x.max();
+    return rate_span(std::min(l.min,r.min), std::max(l.max,r.max));
 }
-
-bool subset(
-    rate_span const & l,
-    rate_span const & r)
-{
-    return min(l) >= min(r) &&
-           max(l) <= max(r);
-}
-
-auto operator+(
-    rate_span const & l,
-    rate_span const & r)
-{
-    return rate_span(min(l)+min(r),max(l)+max(r));
-}
-
-auto operator-(
-    rate_span const & l,
-    rate_span const & r)
-{
-    return rate_span(min(l)-max(r),max(l)-min(r));
-}
-
-auto operator*(
-    rate_span const & l,
-    rate_span const & r)
-{
-    auto const x1 = min(l)*min(r);
-    auto const x2 = min(l)*max(r);
-    auto const x3 = max(l)*min(r);
-    auto const x4 = max(l)*max(r);
-
-    return rate_span(
-        min(x1,min(x2,min(x3,x4))),
-        max(x1,max(x2,max(x3,x4))));
-}
-
-auto operator&(
-    rate_span const & l,
-    rate_span const & r)
-{
-    return rate_span(
-        max(min(l),min(r)),
-        min(max(l),max(r)));
-}
-
-auto operator|(
-    rate_span const & l,
-    rate_span const & r)
-{
-    return rate_span(
-        min(min(l),min(r)),
-        max(max(l),max(r)));
-}
-
