@@ -21,7 +21,7 @@ Suppose we have a set $C$ and a universal set $U = \{x_1,\ldots,x_n\}$. We may m
 
 If we transmit $b_1 \cdots b_n$ over a noisy binary symmetric channel with error rate $\epsilon$, then each bit may be flipped with probability $\epsilon$. Conceptually, this is a random process that maps $b_1 \cdots b_n$ to $b_1' \cdots b_n'$ where $\Pr\{b_j \neq b_j'\} = \epsilon$.
 
-If we define the characteristic function $1_C'(x_j) = b_j'$, then this models a first-order Bernoulli approximation of $1_C$. In general, the class of sets constructed in this way is the first-order Bernoulli model, which may be denoted by a pair of functions, the function being Bernoulli approximated, and the error rate function. In this case, $(\in, \epsilon)$ where $\epsilon$ is a constant function between $0$ and $1$.
+If we define the characteristic function $1_C'(x_j) = b_j'$, then this models a first-order Bernoulli approximation of $1_C$. In general, the class of sets constructed in this way is the first-order Bernoulli model, which may be denoted by a pair of functions, the function being Bernoulli approximated, and the error rate function. In this case, $(\in, \epsilon)$ where $\epsilon$ is a constant function between 0 and 1.
 
 ### Induced errors
 
@@ -66,3 +66,130 @@ where $\epsilon_{\in(x,A)} =
 
 
 If the computational basis is $\{f_1,\ldots,f_k\}$, where $f_j$ is some function of any type
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Inducing different kinds of Bernoulli types
+
+If we have a function `f : bool -> bool`, then the space of all possible functions
+is given by Table 1.
+
+Table 1: All possible functions `f : bool -> bool`
+
+| f     | f(true) | f(false) |
+|-------|---------|----------|
+| id    | true    | false    |
+| not   | false   | true     |
+| true  | true    | true     |
+| false | false   | false    |
+
+It may be interesting to consider what happens when we replace the Boolean inputs
+with Bernoulli boolean values and ask the question, "What is the probability that
+`f(bernoulli<bool,1>{x}) == f(x)`?" Notice that `bernoulli<bool,1>{x}` is `x`
+with some probability, but we don't actually know whether the origional `x` was
+`true` or `false`. We only *observe* `bernoulli<bool,1>{x}`, where `x` is
+a latent Boolean variable. If we know `p`, then we can compute the probability
+that `f(bernoulli<bool,1>{x}) == f(x)`, which will depend on `f` and `x`.
+Depending upon which function in this space we choose, we may either get the same function, or a different function.
+
+For the constant fuctions, `true` and `false`, we get the same
+function, i.e., `true(bernoulli<bool,1>{true}) == true` since `true : bool -> bool`
+always outputs `true`, and similiarly for `false : bool -> bool`.
+
+However, the `id` and `not` functions are different. For instance, suppose
+`Pr{bernoulli<bool,1>{x} == x} = p`. Then, when we input `bernoulli<bool,1>{true}`
+into `id`, we get the correct output `true` with probability `p` and the incorrect
+output `false` with probability `1-p`. Likewise, when we input `bernoulli<bool,1>{false}` into `id`, we get the correct output `false` with probability `p` and
+the incorrect output `true` with probability `1-p`.
+
+Since we can think of these outputs as either correct or incorrect with probability
+`p`, we can call them Bernoulli Boolean values too,
+```cpp
+    bernoulli<bool,1> : bool -> bernoulli<bool,1>
+```
+or even as a noisy `id` function,
+```cpp
+    bernoulli_id<1> : bool -> bernoulli<bool,1>
+```
+
+Notice that when we consider `bernoull_id`, we are not talking about whether the
+value (in this case, a function) is Bernoulli over equality, but in this case,
+it is Bernoulli over its output's equality. It is a subtle yet important
+distinction that will be more important for composite typpes, like `bernoulli_pair`
+or `bernoulli_set`, both of which are just special kinds of `bernoulli_map` types.
+
+Let's fix `p` and consider the total space of functions for `id : bool -> bool`.
+
+Table 2: `bernoulli_id<1> : bool -> bernoulli<bool,1>`
+
+| id    | `Pr{bernoulli_id(x)} = x` | `Pr{bernoulli_id(x)} != x` |
+|-------|---------------------------|----------------------------|
+| true  | p                         | 1-p                        |
+| false | p                         | 1-p                        | 
+
+Let's consider `bernoulli_id<2> : bool -> bernoulli<bool,2>`.
+
+Table 3: `bernoulli_id<2> : bool -> bernoulli<bool,2>`
+
+| id    | `Pr{bernoulli_id(x)} = x` | `Pr{bernoulli_id(x)} != x` |
+|-------|---------------------------|----------------------------|
+| true  | true positive rate        | false negative rate        |
+| false | true negative rate        | false positive rate        |
+
+
+
+## Binary functions
+For completeness, let's consider the set of binary functions
+`f : (bool, bool) -> bool`. 
+
+There are 2^2 = 4 possible functions `f : bool -> bool` since for each possible
+input, `true` or `false`, we have two possible outputs, `true` or `false`.
+More generally, if we have `f : X -> Y`, then we have `|Y|^|X|` possible functions,
+where `|.|` denotes the cardinality of a set. For instance, if `X = (bool, bool)`
+and `Y = bool`, then we have `2^4 = 16` possible functions, since `|X| = 4`
+and `|Y| = 2`.
+
+Each of these functions has a designated name, which we can use to refer to them,
+like `and`, `xor`, etc. However, we are just going to look at `and`.
+
+Table 4: `and : (bool, bool) -> bool`
+
+| `x1` | `x2` | `and(x1, x2)` |
+|------|------|---------------|
+| true | true | true          |
+| true | false| false         |
+| false| true | false         |
+| false| false| false         |
+
+Now, let's consider
+```
+and : (bernoulli<bool,1>, bernoulli<bool,1>) -> bernoulli_bool<?>`
+```
+
+We will go row by row, and examine the probability that the output is correct for
+each pair of inputs.
+
+Firt, if `x1 = bernoulli<bool,1>{true}` (the latent variable is `true`, an but apriori
+), and `x2 = bernoulli<bool,1>{true}`, then the output is
+
+Table 5: `and : (bernoulli<bool,1>, bernoulli<bool,1>) -> bernoulli_bool<?>`
+
+| `x1` | `x2` | `Pr{and(x1, x2)} == and(x1, x2)` |
+|------|------|----------------------------------|
+| true | true | p                                |
+| true | false| 1-p                              |
+| false| true | 1-p                              |
+| false| false| 1-p                              |
+
+
