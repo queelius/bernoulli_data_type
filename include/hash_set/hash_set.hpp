@@ -27,13 +27,13 @@ namespace bernoulli
             N(N), h(h), l0(l0), fnr(fnr) {}
 
         /**
-         * @brief retrieves the minimum hash value
+         * @brief Membership test
          * @tparam X the element type, must be hashable by H.
-         * @param x the element to retrieve the hash of.
+         * @param x the element to test membership for
          */
 
         template <typename X>
-        auto contains(X const & x) const
+        auto operator()(X const & x) const
         {
           return h.mix(l0,x) <= N;
         }
@@ -74,26 +74,4 @@ namespace bernoulli
         size_t const l0;
         double const fnr;
     };
-
-
-     /**
-     * hash_set<H> models a set indicator function of type
-     *     Hashable(H) -> bool
-     * where H is a hash function of type
-     *     Hashable(H) -> size_t
-     * template <typename H>
-     * using rd_hash_set = rd_hash_map<H, bool_decoder>;
-     *
-     * template <typename H>
-     * auto false_positive_rate(rd_hash_set<H> const & hs)
-     * {
-     *     return hs.unguarded_error_rate(false);
-     * }
-     * 
-     * template <typename H>
-     * auto false_negative_rate(rd_hash_set<H> const & hs)
-     * {
-     *     return hs.guarded_error_rate();
-     * }
-     */
 }

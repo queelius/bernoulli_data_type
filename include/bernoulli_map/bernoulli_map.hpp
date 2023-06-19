@@ -30,13 +30,26 @@ public:
     bernoulli_map(bernoulli_map const & f) : f(f.f) {};
 
     auto operator()(X const & x) const { return f(x); }
-    auto error() const { return f->error(); }
+
+    /**
+     * Average error rate over entire domain, assuming that
+     * elements in X are randomly chosen for f to be applied to.
+     */
+    auto error_rate() const { return f->error_rate(); }
+
+    /**
+     * Retrieve the expected or observed error rate on element x.
+     * Sometimes, this may not be knowable or may only be an estimate,
+     * like an expectation.
+     */
+    auto error_rate(X const & x) const { return f->error_rate(x); }
 
 private:
     struct concept_
     {
         virtual Y apply(X const &) const = 0;
-        virtual double error() const = 0;
+        virtual double error_rate(X const & x) const = 0;
+        virtual double error_rate() const = 0;
     };
 
     template <typename F>
@@ -44,8 +57,9 @@ private:
     {
         model(F f) : f(f) {}
 
-        Y apply(T const & x) const { return f(x); }
-        double error() const { return f->error(); }
+        Y apply(X const & x) const { return f(x); }
+        double error_rate(X const & x) const { return f->error_rate(x); }
+        double error_rate() const { return f->error_rate(); }
 
         F f;
     };
