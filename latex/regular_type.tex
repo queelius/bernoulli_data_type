@@ -1,0 +1,26 @@
+\label{regular_type_md_REGULAR_TYPE_CONCEPT}%
+\Hypertarget{regular_type_md_REGULAR_TYPE_CONCEPT}%
+
+
+A {\ttfamily Regular\+Type} is a concept that requires the following. Consider an object type {\ttfamily X}. If {\ttfamily X} is a {\ttfamily Regular\+Type}, then at minimum it implements assignment, default constructor, copy constructor, and equality comparison.\hypertarget{regular_type_autotoc_md26}{}\doxysection{C++ regular types}\label{regular_type_autotoc_md26}
+In C++, a class {\ttfamily X} (object type) that is a {\ttfamily Regular\+Type} if it has the following operations (overload set)\+:
+
+
+\begin{DoxyEnumerate}
+\item Assignment\+: {\ttfamily bool operator=(const X\&)} must be implemented.
+\item Default constructor\+: {\ttfamily X\+::\+X()} must be implemented.
+\item Copy constructor\+: {\ttfamily X\+::\+X(const X\&)} must be implemented.
+\item Equality\+: {\ttfamily bool operator==(const X\&)} must be implemented.
+\end{DoxyEnumerate}
+
+For example, the following code snippet must compile successfully.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{X x;                        // default constructor}
+\DoxyCodeLine{X y(x);                     // copy constructor}
+\DoxyCodeLine{std::static\_assert(y == x); // equality comparison}
+\DoxyCodeLine{y = x;                      // assignment}
+
+\end{DoxyCode}
+ 

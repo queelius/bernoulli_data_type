@@ -1,195 +1,165 @@
 # Bernoulli maps
 
-The bernoulli map quantifies a certain kind of approximation error that is compatible with many algorithms, particularly data types that depend on hashing.
+The bernoulli map quantifies a certain kind of approximation error that is compatible
+with many algorithms, particularly data types that depend on hashing.
 
-Suppose we have a function $p : X \mapsto Y$.
-and a function $p' : X \mapsto Y$ such that $p'(x) \neq p(x)$ with probability $\epsilon(x)$.
-We name this concept the Bernoulli approximation model.
+Suppose we have a *latent* function `p : X -> Y` and an observale approximation or
+noisy version of `p`, denoted by `p* : X -> Y`, such that `p*(x) != p(x)` with
+probability `e(x)`, where `{e(x) : x in X}` are apriori statistically independent
+random variables.
 
-- A first-order Bernoulli approximation is given by a constant $\epsilon(x)$, i.e., $\epsilon(x) = \epsilon$ for all $x \in X$.
-- A second order approximation partitions $X$ into two sets, say $A$ and $A'$, such that $p'(a) \neq p(a)$ with probability $\epsilon(a) = \epsilon(A)$ for all $a \in A$ and over $p'(b) \neq p(b)$ with probability $\epsilon(b) = \epsilon(B)$ for all $b \in B$.
-- More generally, an $n$-th order Bernoulli approximation model partitions $X$ into $n$ sets, $A_1,\ldots,A_n$, such that $p'(a_j) \neq p(a_j)$ with probability $\epsilon(a_j) = \epsilon(A_j)$ for all $a_j \in A_j$ for $j=1,\ldots,n$.
+When we observe `p*`, we know that it is a noisy model of some function `X -> Y`, but
+we do not know which one with certainty. If we are given no other prior information,
+then the best estimator of `p` is `p*`.
 
-## Set-indicator function $1_A : X \mapsto \{0,1\}$
+Let the functions of type `X -> Y` be named `p1, p2, ..., pn`, where `n` is the
+total number of functions in `X -> Y`, which if no other information is given, is
+given by the cardinality of `X -> Y`, which is just `n = |Y|^|X|`.
 
-The set-indicator function for $A$, denoted by $1_A$, is defined as $1_A(x) = 1$ if $x \in A$ and $1_A(x) = 0$ if $x \notin A$.
+Let us show the confusion matrix for `p1, p2, p3, p4` (`n=4`, e.g., `bool -> bool`),
+where the rows represent the latent functions, and the columns represent the observed
+functions that may be generated from the latent function, say by introducing some
+error or rate distortion.
 
-If $1_A'$ is a first-order Bernoulli approximation, then $\epsilon(x) = \epsilon$ for any $x \in X$.
+latent \ observed | `p1`  | `p2`  | `p3`  | `p4` |
+------------------|-------|-------|-------|------|
+`p1`              | `q11` | `q12` | `q13` | `q14`|
+`p2`              | `q21` | `q22` | `q23` | `q24`|
+`p3`              | `q31` | `q32` | `q33` | `q34`|
+`p4`              | `q41` | `q42` | `q43` | `q44`|
 
-This is related to the noisy *binary symmetric channel* in the following way.
-Suppose we have a set $C$ and a universal set $U = \{x_1,\ldots,x_n\}$. We may model $C$ using $n$ bits, $b_1 \cdots b_n$ where $b_j := 1_C(x_j)$ for $j=1,\ldots,n$. Then, $1_C(x) := b_j$.
+In the matrix above, `qij` represents the probability that function `pi` is observed
+as function `pj`. Since each row must sum to 1, there are at maximum of `n * (n-1)`
+degrees of freedom, which in this case is `4 * (4-1) = 12`.
 
-If we transmit $b_1 \cdots b_n$ over a noisy binary symmetric channel with error rate $\epsilon$, then each bit may be flipped with probability $\epsilon$. Conceptually, this is a random process that maps $b_1 \cdots b_n$ to $b_1' \cdots b_n'$ where $\Pr\{b_j \neq b_j'\} = \epsilon$.
+We call this degree-of-freedom the *order* of the Bernoulli Model for `X -> Y`.
+In many cases, the order is 1, e.g., where most of the probability is assigned to
+the diagonal, and the off-diagonal elements are nearly zero (or zero) but all
+equal.
 
-If we define the characteristic function $1_C'(x_j) = b_j'$, then this models a first-order Bernoulli approximation of $1_C$. In general, the class of sets constructed in this way is the first-order Bernoulli model, which may be denoted by a pair of functions, the function being Bernoulli approximated, and the error rate function. In this case, $(\in, \epsilon)$ where $\epsilon$ is a constant function between 0 and 1.
+Since we are only given `p*`, we do not know which `p` is the true latent function.
+We say that `p*` is a *Bernoulli approximation* of `p`, and we deote this by
+writing `p* ~ bernoulli<X->Y>{p}`, i.e., we observe `p*` but we know that it is
+a random observation from a conditional distribution where we are conditioning
+on the latent function `p` to generate `p*`.
 
-### Induced errors
-
-Observe that other set-theoretic predicates, like subset, may be defined with respect to $\in$, e.g.,
-$$
-  A \subset B := x \in A \implies x \in B
-$$
-for all $x \in A$.
-
-If we replace $\in$ with $(\in,\epsilon)$, then $\subset$ is mapped to $(\subset,\epsilon_A)$ where $\epsilon_A = 1-(1-\epsilon)^{|A^c|}$.
-Thus, we see that $(\in,\epsilon)$ may _induce_ other Bernoulli approximations.
-
-Note that $\subset$ is of type $2^U \times 2^U \mapsto \{0,1\}$ and $\epsilon_A$ partitions $2^U$ into $n=|U|$ sets where there are $\binom{n}{k}$ sets of size $k$ and $\sum_k \binom{n}{k} = 2^n$.
-Therefore, $(\subset,\epsilon_A)$ is an $n$-th order Bernoulli approximation over $2^U$, where the larger the set $A$ the smaller the error rate.
-At one extreme, $\epsilon(\emptyset) = 1-(1-\epsilon)^n \approx 1$, and at the other extreme, $\epsilon(U) = 1-(1-\epsilon)^0 = 0$.
-
-If we fix $A$ in $A \subset B$, e.g., $p := \lambda B.(A \subset B)$,then replacing $\subset$ with $(\subset,\epsilon_A)$ constructs $p'$, which is a f
-
-## Second-order model
-
-Suppose that for any given set $A \subset U$, we partition $U$ into $A$ and $A^c$ such that for any $x \in A$, the error rate is $\omega$ and for any $x \in A^c$, the error rate is $\epsilon$.
-This represents a second-order Bernoulli model, denoted by
-
-$$
-  (\in, \epsilon(x))
-$$
-where $x \in A \implies \epsilon(x) = \omega$ and $x \in A^c \implies \epsilon(x) = \epsilon$.
-If $\omega = 0$, then we denote this by a special name, the positive Bernoulli set.
-There are many examples in computer science for this type of Bernoulli model, e.g., Bloom filters.
-
-## Extended computational basis
-There is nothing to prevent having a Bernoulli model with a computational basis over multiple functions, rather than just one like $\in$.
-
-For instance, it may be desirable to support both $\in$ and $=$, where $\in$ may be a second-order and $=$ may be first-order.
-We denote this situation with the notation
-
-$$
-  \left(\{\epsilon_{\in}(x,A),\epsilon_{=}(A,B)\}\right)
-$$
-where $\epsilon_{\in(x,A)} = 
-
-
-
-If the computational basis is $\{f_1,\ldots,f_k\}$, where $f_j$ is some function of any type
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## Inducing different kinds of Bernoulli types
-
-If we have a function `f : bool -> bool`, then the space of all possible functions
-is given by Table 1.
-
-Table 1: All possible functions `f : bool -> bool`
-
-| f     | f(true) | f(false) |
-|-------|---------|----------|
-| id    | true    | false    |
-| not   | false   | true     |
-| true  | true    | true     |
-| false | false   | false    |
-
-It may be interesting to consider what happens when we replace the Boolean inputs
-with Bernoulli boolean values and ask the question, "What is the probability that
-`f(bernoulli<bool,1>{x}) == f(x)`?" Notice that `bernoulli<bool,1>{x}` is `x`
-with some probability, but we don't actually know whether the origional `x` was
-`true` or `false`. We only *observe* `bernoulli<bool,1>{x}`, where `x` is
-a latent Boolean variable. If we know `p`, then we can compute the probability
-that `f(bernoulli<bool,1>{x}) == f(x)`, which will depend on `f` and `x`.
-Depending upon which function in this space we choose, we may either get the same function, or a different function.
-
-For the constant fuctions, `true` and `false`, we get the same
-function, i.e., `true(bernoulli<bool,1>{true}) == true` since `true : bool -> bool`
-always outputs `true`, and similiarly for `false : bool -> bool`.
-
-However, the `id` and `not` functions are different. For instance, suppose
-`Pr{bernoulli<bool,1>{x} == x} = p`. Then, when we input `bernoulli<bool,1>{true}`
-into `id`, we get the correct output `true` with probability `p` and the incorrect
-output `false` with probability `1-p`. Likewise, when we input `bernoulli<bool,1>{false}` into `id`, we get the correct output `false` with probability `p` and
-the incorrect output `true` with probability `1-p`.
-
-Since we can think of these outputs as either correct or incorrect with probability
-`p`, we can call them Bernoulli Boolean values too,
+If we observe a realization of `p* ~ bernoulli<X->Y>{p}`, where `p` is latent, and we
+know that it is a Bernoulli approximation, then we say that `p*` is of the type
 ```cpp
-    bernoulli<bool,1> : bool -> bernoulli<bool,1>
+X -> bernoulli<Y>
 ```
-or even as a noisy `id` function,
+
+Normally the order of the Bernoulli Model is not that important, but it may be, e.g.,
+if we are trying to estimate the latent function `p` from `p*`, and we know that
+the order is 1, then we can estimate the confusion matrix more easily given an
+i.i.d. sample of observations.
+
+A more *interesting* property, that can be read off the confusion matrix, is the
+entropy of the distribution `bernoulli<X->Y>`. This is given by
 ```cpp
-    bernoulli_id<1> : bool -> bernoulli<bool,1>
+H(bernoulli<X->Y>) = -sum_{i=1}^n sum_{j=1}^n qij log(qij)
 ```
+where `qij` is the probability that `pi` is observed as `pj`.
 
-Notice that when we consider `bernoull_id`, we are not talking about whether the
-value (in this case, a function) is Bernoulli over equality, but in this case,
-it is Bernoulli over its output's equality. It is a subtle yet important
-distinction that will be more important for composite typpes, like `bernoulli_pair`
-or `bernoulli_set`, both of which are just special kinds of `bernoulli_map` types.
-
-Let's fix `p` and consider the total space of functions for `id : bool -> bool`.
-
-Table 2: `bernoulli_id<1> : bool -> bernoulli<bool,1>`
-
-| id    | `Pr{bernoulli_id(x)} = x` | `Pr{bernoulli_id(x)} != x` |
-|-------|---------------------------|----------------------------|
-| true  | p                         | 1-p                        |
-| false | p                         | 1-p                        | 
-
-Let's consider `bernoulli_id<2> : bool -> bernoulli<bool,2>`.
-
-Table 3: `bernoulli_id<2> : bool -> bernoulli<bool,2>`
-
-| id    | `Pr{bernoulli_id(x)} = x` | `Pr{bernoulli_id(x)} != x` |
-|-------|---------------------------|----------------------------|
-| true  | true positive rate        | false negative rate        |
-| false | true negative rate        | false positive rate        |
-
-
-
-## Binary functions
-For completeness, let's consider the set of binary functions
-`f : (bool, bool) -> bool`. 
-
-There are 2^2 = 4 possible functions `f : bool -> bool` since for each possible
-input, `true` or `false`, we have two possible outputs, `true` or `false`.
-More generally, if we have `f : X -> Y`, then we have `|Y|^|X|` possible functions,
-where `|.|` denotes the cardinality of a set. For instance, if `X = (bool, bool)`
-and `Y = bool`, then we have `2^4 = 16` possible functions, since `|X| = 4`
-and `|Y| = 2`.
-
-Each of these functions has a designated name, which we can use to refer to them,
-like `and`, `xor`, etc. However, we are just going to look at `and`.
-
-Table 4: `and : (bool, bool) -> bool`
-
-| `x1` | `x2` | `and(x1, x2)` |
-|------|------|---------------|
-| true | true | true          |
-| true | false| false         |
-| false| true | false         |
-| false| false| false         |
-
-Now, let's consider
+We can also consider the conditional entropy distribution, `bernoulli<X->Y|pi>`,
+where `pi` is the latent function. This is given by
+```cpp
+H(bernoulli<X->Y|pi>) = -sum_{j=1}^n qij log(qij)
 ```
-and : (bernoulli<bool,1>, bernoulli<bool,1>) -> bernoulli_bool<?>`
+where `qij` is the probability that `pi` is observed as `pj`.
+
+Often, we apriori *know* the confusion matrix, or at least various properties of this
+matrix, as a result of the distortion being the result of some known process, e.g.,
+a noisy channel, or a noisy sensor, or a noisy measurement. A noisy channel also
+includes things like a program that introduces some loss as a way of compressing
+the data, or it may be the result of some homomorphic encryption scheme or a
+homomophorism for an oblivious data structure where we represent values as 
+the product of trapdoors, one-way hashes.
+
+## Bernoulli Maps
+
+A Bernoulli Map is just a way of generating a Bernoulli approximation of a function.
+By the equivalence that data is code and code is data, any function can be represented
+as a data structure, and any data structure can be represented as a function.
+Therefore, theoretically, we can model any data structure as a map, and then we
+can generate a Bernoulli approximation of that map, which means we have a Bernoulli
+approximation of the data structure.
+
+Often, we have more efficient and interesting ways to generate particular kinds of
+Bernoulli approximations of data structures. Probably, the most popular example
+are sets, like Bloom filters.
+
+### Set-indicator function `1_A : X -> bool`
+
+The set-indicator function for `A`, denoted by `1_A`, where `1_A(x)` is `true` if
+`x` is in `A`, and `false` otherwise. When we apply a Bernoulli Model to `1_A`,
+we get a function of type `X -> bernoulli<bool>`. We observe `bernoulli<X->bool>{1_A}`
+but we do not know `A` with certainty. This is a *Bernoulli approximation* of `1_A`,
+and common examples of this kind of approximation are *bloom filters* and *counting
+bloom filters*. In this project, we introduce the Bernoulli Map, which is an algorithm
+that can generate any kind of approximation of computable functions, including
+set-indicator functions.
+
+### Primality test: `is_prime : integer -> bernoulli<bool>`
+
+We know how to exactly determine whether an integer is prime. We can, for instance,
+check for divisibility by all integers less than the integer. There are many
+ways to more efficiently compute this, but the point is that we know how to
+compute it exactly.
+
+However, the function is still *latent* in the sense that the time required to
+compute it exactly for any input of interest is prohibitive, and so in practice we do
+not know its extension. It is still, in this sense, latent.
+
+So, instead, we can use a randomized algorithm to estimate the function and be able
+to compute it for any desired input in a reasonable amount of time. 
+
+#### The Miller-Rabin primality test
+The Miller-Rabin primality test is based on the concept of Fermat's Little Theorem,
+which states that if `p` is a prime number and `a` is any positive integer less than
+`p`, then `a^(p-1)` is congruent to 1 modulo `p`.
+
+The Miller-Rabin test works by randomly selecting values of `a` and checking whether
+the congruence holds. If the congruence fails for a particular `a`, then `p` is
+definitely not prime. However, if the congruence holds for some `a`, then `p` may
+or may not be prime but we say that it is prime, which has some specifiable
+probability of error (false positive rate).
+
+In essence, a particular seed value (for the PRNG) draws a sample function, a Bernoulli
+map, from `is_prime* ~ bernoulli<integer -> bool>{is_prime}`.
+
+## Computational basis
+
+If we have a set of functions `F = { f1, ..., fk }`, then we
+can define a Bernoulli model over `F` by simply generating realizations of
+`bernoulli{f1}, ... bernoulli{fk}` which we may denote as `bernoulli{F}`.
+
+For instance, it may be desirable to support both `in` and `==` for sets.
+One approach is to generate a Bernoulli aproximation for each element in `F`.
+However, if we define `==` in terms of `in`, then that *induces* a Bernoulli
+Model of `==` through its dependence on `in`.
+
+
+
+## Regular types
+
+It is interesting to note that Bernoulli Models are not in general regular types,
+since it is often the case that, say, a Bernoulli set `A` can have countably
+infinite representations, and it is impossible (in general) to determine if
+two Bernoulli sets are the same.
+
+This does not even entertain the discussion about which latent set is being
+approximately modeled by a Bernoulli set, which can of course also vary. If we
+consider this perspective, then equality on Bernoulli sets vs sets is not of
+type
+```cpp
+(bernoulli<set>, set) -> bool
 ```
-
-We will go row by row, and examine the probability that the output is correct for
-each pair of inputs.
-
-Firt, if `x1 = bernoulli<bool,1>{true}` (the latent variable is `true`, an but apriori
-), and `x2 = bernoulli<bool,1>{true}`, then the output is
-
-Table 5: `and : (bernoulli<bool,1>, bernoulli<bool,1>) -> bernoulli_bool<?>`
-
-| `x1` | `x2` | `Pr{and(x1, x2)} == and(x1, x2)` |
-|------|------|----------------------------------|
-| true | true | p                                |
-| true | false| 1-p                              |
-| false| true | 1-p                              |
-| false| false| 1-p                              |
-
-
+but of type
+```cpp
+(bernoulli<set>, set) -> bernoulli<bool>
+```
+and likewise for other variations on this pattern, i.e., we can only say what the
+probability that a Bernoulli set represetns a given latent set. This is normally
+a much less interesting and informative question than set-membership, but it is
+still a question that can be asked.
