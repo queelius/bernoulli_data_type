@@ -1,7 +1,5 @@
 var NAVTREEINDEX0 =
 {
-"codec.html":[3],
-"codec.html#autotoc_md19":[3,0],
 "index.html":[],
 "md_BERNOULLI_BOOL.html":[0],
 "md_BERNOULLI_BOOL.html#autotoc_md1":[0,0],
@@ -23,8 +21,10 @@ var NAVTREEINDEX0 =
 "md_BERNOULLI_MAP.html#autotoc_md17":[1,1],
 "md_BERNOULLI_MAP.html#autotoc_md18":[1,2],
 "md_BERNOULLI_SET.html":[2],
+"md_CODEC.html":[3],
+"md_CODEC.html#autotoc_md19":[3,0],
 "md_README.html":[4],
-"pages.html":[],
-"regular_type.html":[5],
-"regular_type.html#autotoc_md20":[5,0]
+"md_REGULAR_TYPE_CONCEPT.html":[5],
+"md_REGULAR_TYPE_CONCEPT.html#autotoc_md20":[5,0],
+"pages.html":[]
 };
