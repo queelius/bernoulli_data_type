@@ -1,5 +1,5 @@
-Concept: Codec {#codec}
-=======================
+Concept: Codec
+==============
 
 A *datum* is a sequence of bits. A *value* is a sequence of bits and its interpretation. A *value type* is a set of values sharing a common interpretation.
 

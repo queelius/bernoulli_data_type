@@ -1,5 +1,5 @@
-Concept: RegularType {#regular_type}
-====================================
+Concept: Regular Type
+=====================
 
 A `RegularType` is a concept that requires the following. Consider an object type `X`. If `X` is a `RegularType`, then at minimum it implements assignment, default constructor, copy constructor, and equality comparison.
 
