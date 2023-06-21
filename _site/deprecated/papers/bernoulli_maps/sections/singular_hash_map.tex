@@ -1,0 +1,409 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+\section{A first-order rate-distorted map}
+We present a \emph{theoretical} data type, denoted the \emph{entropy map} that have several key properties:
+\begin{enumerate}
+\item Perfect model of the \emph{first-order} random approximate map.
+\item Bit-length of in-place encoding is a random variable $\RV{L}$ that is expected to obtain the theoretical lower-bound.
+\item In-place encoding has maximum conditional entropy (when conditioning on a few parameters like expected false positive rate).
+\end{enumerate}
+Note that we know a priori what the distribution of the random number of trials $\RV{N}$ needed to produce a result that satisfies the rate-distortion constraints where a parameterized Goulumb code is expected to compress the representation.
+However, this representation is not \emph{in-place} and is thus only useful as a \emph{serialization} format.
+
+We consider sets in which the universe of elements is given by the \emph{countably infinite} set of all bit strings.
+\begin{definition}
+The countably infinite set of all bit strings is denoted by
+\begin{equation}
+    \BitSet^* = \left\{b \colon b \in \left\{0,1\right\}^*\right\}\,,
+\end{equation}
+where $*$ denotes all non-negative integers.
+\end{definition}
+A \emph{finite} subset of $\BitSet^*$ is given by the following definition.
+\begin{definition}
+The \emph{finite set} of all bit strings of length $n$ is denoted by
+\begin{equation}
+    \BitSet^n = \left\{b \colon b \in \left\{0,1\right\}^n\right\}
+\end{equation}
+with a cardinality given by
+\begin{equation}
+    \Card{\BitSet^n} = 2^n\,.
+\end{equation}
+\end{definition}
+
+A \emph{hash function} is related to countable sets $\BitSet^*$ and $\BitSet^n$ and is given by the following definition.
+\begin{definition}
+A \emph{hash function} of type $\BitSet^* \mapsto \BitSet^n$ maps (hashes) bit strings of arbitrary-length to bit strings of fixed-length $n$.
+\end{definition}
+
+The random oracle is given by the following definition.
+\begin{definition}
+\label{def:randomoracle}
+A random oracle $\hash \colon \BitSet^* \mapsto \BitSet^{\infty}$ is a theoretical \emph{hash function} whose output is uniformly distributed over its codomain.
+\end{definition}
+
+The bit length of objects is given by the following definition.
+\begin{definition}
+The bit length of an object $x$ is denoted by
+\begin{equation}
+    \BL(x)\,.
+\end{equation}
+\end{definition}
+For example, the bit length of an object $x \in \BitSet^n$ is $\BL(x) = n$.
+
+The set of rationals in $[0,1]$ is denoted by $\FancySet{P}$ and the set of power-of-two probabilities is denoted by
+\begin{equation}
+	\FancySet{R} \coloneqq \SetBuilder{2^{-k} \in \RatSet}{k \in \IntSet_{\geq 0}} \subset \FancySet{P}\,.
+\end{equation}
+
+
+
+Suppose we a prefix-free encoder-decoder for values of type $\Set{Y}$ denoted respectively by $\Encode_{\Set{Y}} \colon \Set{Y} \mapsto \BitSet^*$ and $\Decode_{\Set{Y}} \colon \BitSet^* \mapsto \Maybe{\Set{Y}}$.
+
+If we are given a (possibly infinite) sequence of bits $b_1 b_2 \ldots b_k b_{k+1} \ldots$ and $b_1 b_2 \ldots b_k$ is a (prefix-free) code for some $y$ in $\Set{Y}$, then $\Decode_{\Set{Y}}(b_1 b_2 \ldots b_k b_{k+1} \ldots)$ maps to $y$.
+Inversely, $\Encode_{\Set{Y}}(y)$ maps to $b_1 b_2 \ldots b_k$.
+
+The singular hash map models a \emph{first-order} random approximate map where the approximation error is due to \emph{rate-distortion}.
+\emph{Rate-distortion} is a result of two different parameter choices:
+\begin{enumerate}
+	\item\label{itm1} Distortion due to \emph{insufficient} bits.
+	\item\label{itm1} Distortion due to accepting any false negative rate less than some lower-bound.
+	\item Distortion due to specifying a false positive rate, which causes elements not in the set to be mapped to be mapped to some uncertain value that is a function of the prefix-free encoder-decoder. If codes assume a uniform distribution, then randomly choose a $Y$.
+\end{enumerate}
+
+In the singular hash map, \cref{itm1} is dueo to either a larger \emph{false positive rate} $\fprate = 2^{-k}$ by increasing $k$ or restricting the search to a maximum finite number trials (and choosing the trial that resulted in the minimum loss according to some distance function).
+
+In either case, the end result is an expected smaller encoding length, but in the first case we are directly motivated by a rate limit in the form of an upper-bound on the bit length and in the second case we are satisfied with greater approximation error but impose no upper-bound.
+
+In the metric space $(\Set{X}, \Fun{d})$, if $\Fun{d}$ is defined as $\Fun{d}(a,a) = 1$ and otherwise $\Fun{d}(a,b) = 0$, $a \neq b$, we get the 
+
+The probability of success given a rate-distortion $\fnrate$ on positives and $\fprate$ on negatives is given by
+\begin{equation}
+	\Fun{p}(\fprate,\fnrate) = \binom{m}{(1-\fnrate)m} \fprate^{m(1-\fnrate)} (1-\fprate)^{m \fnrate}\,.
+\end{equation}
+
+Each trial is geometrically distributed, $\RV{T} \sim \geodist(\Fun{p}(\fprate,\fnrate))$.
+
+
+
+The expected number of trials is $\Expect{\RV{T}} = \frac{1}{\Fun{p}(\fprate,\fnrate)}$.
+The expected code size is $\Expect{\log_2 \RV{T}}$, which is non-linear and problematic but may be approximated with
+\begin{equation}
+	-\Fun{H}_b(\fnrate) - \fnrate \log_2 (1-\fprate) - (1-\fnrate) \log_2 \fprate
+\end{equation}
+bits per element where $\Fun{H}_b(p) \coloneqq (1-p)\log_2(1-p) + p \log_2 p$ is the binary entropy function.
+
+This result is not the result of computing $\Expect{\log_2 \RV{T}}$, nor the expectation of its Taylor approximation.
+It is simply $\log_2 \Expect{\RV{T}}$.
+
+If $\fnrate$ and $\fprate$ are near $0$, then this simplifies to $\fnrate \log_2 \fnrate - $
+
+If we let $\fnrate \coloneqq 0$, the above simplifies to $\log_2 \fprate$, which is the lower-bound for \emph{first-order} random positive approximate sets over countably infinite universes with a false positive rate $\fprate$.
+
+
+NB
+---
+
+Talk about NB distribution.
+
+If we are satisfied with false negatives, we are no longer requiring all $m$ to succeed.
+
+Negative binomial: given $n$ trials, what is the probability $k$ succeeds? If $k=m$, we are back to the previous solution with $\fnr = 0$.
+
+The expected false negative rate is just not due to one trial, but an expectation
+\begin{equation}
+	\sum_{k=0}^{m} \Prob{\RV{T} = k} 
+\end{equation}
+
+If $\RV{T}$ realizes $\fnr$ that means after $n$ trials, the best was $\fnr$.
+
+
+---
+
+
+
+%We consider a family of \emph{approximate maps} which are given by the output of the random oracle applied to the input $x \in \Dom(\Fun{f})$ concatenated %with a bit string $b \in \BitSet^*$ such that all $x \in \Dom(\Fun{f})$ map to the same hash.
+%The function is given by the following definition.
+
+
+\subsection{Maybe monad}
+Suppose the encoder-decoder has the pair $\Encode_{\Set{X}} \colon \Set{X} \mapsto \PS{\BitSet^*}$ and $\Decode_{\Set{X}} \colon \BitSet^* \pfun \Set{X}$.
+
+We consider a specialization of the algorithm that, given a function $\Fun{f} \colon \Set{X} \mapsto \Set{Y}$ generates rate-distorted maps $\APFun{f}[\fprate][\fnrate] \colon \Set{X} \mapsto \Maybe{\Set{Y}}$.
+The encoder-decoder only applies to elements of $\Set{X}$ which test as positive, at which point the elements are mapped to values as previously.
+
+In other words, and assuming no rate-distortion, it maps values in the domain of definition of $\Fun{f}\!\!\restriction_{\Set{A}}$ to \emph{nothing} with probability $\fnrate$ and otherwise maps it correctly and it maps values not in its domain of definition to \emph{nothing} with probability $\fprate$ and value $y$ with probability
+\begin{equation}
+	\Fun{p}_{\RV{Y}}(y) \coloneqq \!\!\!\!\! \sum_{z \in \Encode_{\Set{Y}}(y)} \!\!\!\!\! 2^{-\BL(z)}\,.
+\end{equation}
+
+The function $\GenerateSeeds \colon (\Set{X} \mapsto \Maybe{\Set{Y})} \times \PS{\Set{X}} \times \FancySet{R} \mapsto \PS{\BitSet^* \times \FancySet{P}}$ is defined as
+\begin{equation}
+	\GenerateSeeds(\Fun{f}, \Set{A}, \fprate) \coloneqq \PlainSet{T}
+	\end{equation}
+where
+\begin{equation}
+\begin{split}
+	m_a						&\coloneqq \Card{\Set{A}}\,,\\
+	k						&\coloneqq -\log_2 \fprate\,,\\
+	\Fun{h}(x \Given n,k)	&\coloneqq \trunc(\hash(x' \cat n'),k)\,,\\	
+	\Match(x \Given n,k)	&\coloneqq \Fun{h}(x \Given n,k)\,,\\
+	\PlainSet{H} 			&\coloneqq \SetBuilder{\Match(x \Given n,k) \in \BitSet^{k}}{x \in \Set{X}}\,.
+\end{split}
+\end{equation}
+
+
+
+
+%
+%\begin{definition}
+%	The \emph{data type} for the \emph{random approximate map} under consideration, denoted the \emph{singular hash map}, is defined as $\SHS \coloneqq \BitSet^* \times \NatSet$ with a value constructor $\MakeSHM \colon (\Set{X} \pfun \Set{Y}) \times \PS{\Set{X}} \times [0,1] \times [0,1] \mapsto \SHS$ defined as
+%	\begin{equation}
+%	\MakeSHM(\Fun{f}, \Set{A}, \fprate, \fprate) \coloneqq \Tuple{\text{tuple here}}
+%	\end{equation}
+%	where
+%	\begin{equation}
+%	\begin{split}
+%	m				&\coloneqq \Card{\Set{X}}\,,\\
+%	N 				&\coloneqq \lceil m / r \rceil\,,\\
+%	k				&\coloneqq \lceil\log_2 N\rceil\,,\\
+%	\Fun{c}(x,n)	&\coloneqq \trunc(\hash(x' \cat n'),k)' \mod N\,,\\	
+%	\beta(x,n) 		&\coloneqq \trunc(\hash(x' \cat n'),k)' \mod N\,,\\
+%	\Set{Y}[n] 		&\coloneqq \SetBuilder{\beta(x,n) \in \{0,\ldots,N-1\}}{x \in \Set{X}}\,,\\
+%	n 				& \coloneqq \min{\SetBuilder{ j \in \NatSet }{ \Set{Y}[j] \in \PS{\NatSet} \land \Card{\Set{Y}[j]} = m}}\,.
+%	\end{split}
+%	\end{equation}
+%\end{definition}
+%
+%
+%
+\begin{algorithm}
+	\caption{Implementation of \protect\MakeSingularHashMap over a universal set $\Set{X}$}
+	\label{alg:makeset}
+	\DontPrintSemicolon
+	\SetKwProg{func}{function}{}{}
+	\KwIn
+	{
+		$\Set{A}$ is a subset of a universal set $\Set{X}$.
+		$\fprate$ is the false positive rate.
+		$t$ is the maximum number of trials.
+	}
+	\KwOut
+	{
+		$\ASet{A}[\fprate]$, a rate-distorted approximate set of $\Set{A}$, .
+	}
+	\func{\MakeSingularHashMap{$\Set{A}$, $\fprate$, $t$}}
+	{
+		$\Set{A}_{\BitSet^*} \coloneqq \SetBuilder{\Encode_{\Set{X}}(a) \in \BitSet^*}{a \in \Set{A}}$\;
+		\For{$n \gets 0$ \KwTo $t$}
+		{
+			\For{$j \gets 1$ \KwTo $2^n$}
+			{
+				$\found \gets \True$\;
+%				\tcp{To increase \emph{entropy} we try bit strings of length 
+%					$n$ in random order.}
+				$b_n \gets $ a bit string randomly drawn from $\BitSet^n$ without replacement\;
+				$h_k \gets \Nothing$\;
+				\For{$x \in \Set{A}_{\BitSet^*}$}
+				{
+					\If{$h_k = \Nothing$}
+					{
+						$h_k \gets \trunc(\hash(x \cat b_n), k)$\;
+					}
+					\ElseIf{$h_k \neq \trunc(\hash(x \cat b_n), k)$} 
+					{
+						$\found \gets \False$\;
+					}
+				}
+				\If{\found}
+				{
+					\Return $\Tuple{h_k, b_n}$\;
+				}
+			}
+		}
+	}
+\end{algorithm}
+
+
+\begin{algorithm}
+	\caption{Implementation of \protect\MakeSingularHashMap over a universal set $\Set{X}$}
+	\label{alg:makeset}
+	\DontPrintSemicolon
+	\SetKwProg{func}{function}{}{}
+	\KwIn
+	{
+		$\Set{A}$ is a subset of a universal set $\Set{X}$.
+		$\fprate$ is the false positive rate.
+		$t$ is the maximum number of trials.
+	}
+	\KwOut
+	{
+		$\ASet{A}[\fprate]$, a rate-distorted approximate set of $\Set{A}$, .
+	}
+	\func{\MakeSingularHashMap{$\Set{A}$, $\fprate$, $t$}}
+	{
+		$\Set{A}_{\BitSet^*} \coloneqq \SetBuilder{\Encode_{\Set{X}}(a) \in \BitSet^*}{a \in \Set{A}}$\;
+		\For{$i \gets 0$ \KwTo $t$}
+		{
+			$\found \gets \True$\;
+%			\tcp{To maximize \emph{entropy} we try bit strings in random order.}
+			$b \gets $ a bit string randomly drawn from $\BitSet^{\leq t}$ without replacement\;
+			$h_k \gets \Nothing$\;
+			\For{$x \in \Set{A}_{\BitSet^*}$}
+			{
+				\If{$h_k = \Nothing$}
+				{
+					$h_k \gets \trunc(\hash(x \cat b), k)$\;
+				}
+				\ElseIf{$h_k \neq \trunc(\hash(x \cat b), k)$} 
+				{
+					$\found \gets \False$\;
+				}
+			}
+			\If{\found}
+			{
+				\Return $\Tuple{h_k, b_n}$\;
+			}
+		}
+	}
+\end{algorithm}
+
+
+
+
+
+\begin{algorithm}
+	\caption{Implementation of \protect\MakeSingularHashMap over a universal set $\Set{X}$}
+	\label{alg:makeset}
+	\DontPrintSemicolon
+	\SetKwProg{func}{function}{}{}
+	\KwIn
+	{
+		$\Set{A}$ is a subset of a universal set $\Set{X}$.
+		$\fprate$ is the false positive rate.
+		$t$ is the maximum number of trials.
+	}
+	\KwOut
+	{
+		$\ASet{A}[\fprate]$, a rate-distorted approximate set of $\Set{A}$, .
+	}
+	\func{\MakeSingularHashMap{$\Set{A}$, $\fprate$, $t$}}
+	{
+		$\Set{A}_{\BitSet^*} \coloneqq \SetBuilder{\Encode_{\Set{X}}(a) \in \BitSet^*}{a \in \Set{A}}$\;
+		\For{$n \gets 0$ \KwTo $t$}
+		{
+			$\PlainSet{H} \gets \EmptySet$\;
+			\For{$b \in \Set{A}_{\BitSet^*}$}
+			{
+				$\PlainSet{H} \gets \PlainSet{H} \SetUnion \{\trunc(\hash(b \cat n'), k)\}$\;
+			}
+		}
+	}
+\end{algorithm}
+
+
+
+\begin{figure}
+    \centering
+    %\input{img/fig_shmap.tex}
+    \caption{\emph{Singular Hash Map}}
+    \label{fig:shmap}
+\end{figure}
+
+
+
+In \Cref{alg:shmap} on \Cref{line:selfterm}, the value $v_i$ has a \emph{self-terminating} encoding. Thus, we need only check that the bit string that encodes $v_i$ is equal to a hash of the key (concatenated with another $1$ and another bit string $b$).
+
+
+The space required for the \emph{singular hash map} found by \Cref{alg:shmap} is of the order of the length $n$ of the bit string $b$. Therefore, for space efficiency, the algorithm exhaustively searches for a bit string in the order of increasing size $n$.
+
+\subsection{Theoretical analysis}
+The \emph{singular hash set} proves that the keys in $\APFun{f}$ are an \emph{approximate set} of the keys in $\Fun{f}$.
+
+\begin{theorem}
+The probability that a particular bit string $b \in \BitSet^*$ successfully codes the \emph{singular hash map} is given by
+\begin{equation}
+    p(m,\fprate,\mu) = \frac{\fprate^{m-1}}{2^{m \mu}}\,.
+\end{equation}
+\end{theorem}
+\begin{proof}
+In \cref{alg:shmap}, for a particular bit string $b_n$, the joint probability that every key in $\Fun{f}$ collides and for each key $k$ in $\Fun{f}$, the concatenation of $1$ and $k$ has a hash in which the first $\BL(v)$ bits collide with mapped value $v$ is given by the following reasoning.
+
+Suppose we have a set $\Fun{f} \coloneqq \{(k_1,v_1),\ldots,(k_m,v_m)\}$ and $k_1$ hashes to $y = \hash(k_1) \mod t$, where $\hash \colon \BitSet^* \mapsto \BitSet^N$ is a random hash function that uniformly distributes over its domain of $2^N$ possibilities and $N < \max{\BL(v_1),\ldots,\BL(v_m)}$.
+
+The probability that $\hash(1 \cat k_1) \mod \BL(v_1) = v_1$ is given by
+\begin{equation}
+    \frac{1}{2^{\BL(v_1)}}\,.
+\end{equation}
+Since $y$ is a particular element in $\BitSet^k$, the probability that $k_j, j \neq 1$, hashes to $y$ is given by
+\begin{equation}
+    \frac{1}{2^k}\,.
+\end{equation}
+The probability that $1 \cat k_j, j \neq 1$ hashes to $v_j$ is given by
+\begin{equation}
+    \frac{1}{2^{\BL(v_j)}}\,.
+\end{equation}
+Since $\hash$ is a random hash function, every one of these probabilities are independent, and thus the joint probability is just the product given by
+\begin{align}
+    p &= \frac{1}{2^{k(m-1)}} \prod_{j=1}^{m} \frac{1}{2^{\BL(v_j)}}\\
+      &= \fprate^{m-1} \frac{1}{2^{\sum_{j=1}^{m} \BL(v_j)}}\,.
+\end{align}
+The average bit length per key is given by
+\begin{equation}
+    \mu = \frac{1}{m} \sum_{j=1}^{m} \BL(v_j)
+\end{equation}
+and thus the probability $p$ may be parameterized as
+\begin{equation}
+    p = \frac{\fprate^{m-1}}{2^{m \mu}}\,.
+\end{equation}
+\end{proof}
+
+\begin{theorem}
+Given \emph{false positive} and \emph{false negative} domain error rates given by $\fprate$ and $\fnrate$ respectively, and a mean bit length $\mu$ of encodings of elements in the image of $\APFun{f}$, the \emph{expected} bit length of the Singular Hash Map asymptotically obtains a space complexity with a lower-bound given by
+\begin{equation}
+    -(1 - \fnrate) \log_2 \fprate + (1 - \fnrate) \mu \; \si{bits \per element}\,,
+\end{equation}
+which occurs when the encodings have uniformly distributed bit lengths, and an upper-bound given by
+\begin{equation}
+    -(1 - \fnrate) \log_2 \fprate + \mu \; \si{bits \per element}\,,
+\end{equation}
+which occurs when the encodings have degenerate bit lengths. The greater the entropy of the bit lengths, the smaller the expected bit length given a mean of $\mu$. 
+\end{theorem}
+\begin{proof}
+The space required for the singular hash set found by \Cref{alg:makeset} is of the order of the length $n$ of the bit string $b_n$.
+Therefore, for space efficiency, the algorithm exhaustively searches for a bit string in the order of increasing size $n$.
+
+We are interested in the first case when a success occurs, which is a geometric distribution with probability of success $p$ as given by
+\begin{equation}
+    \RV{Q} \sim \geodist\!\left(p = \frac{\fprate^{m-1}}{2^{m \mu}}\right)\,.
+\end{equation}
+The expected number of trials for the geometric distribution is given by
+\begin{equation}
+\label{eq:exp_trials}
+    \Expect{\RV{Q}} = \frac{2^{m \mu}}{\fprate^{m-1}}\,.
+\end{equation}
+By \Cref{def:mapping}, the $n$-th trial uniquely maps to a bit string of length $m = \lfloor \log_2 n \rfloor$.
+Thus, the expected bit length is given approximately by
+\begin{equation}
+    \Expect{\log_2 \RV{Q}} = \log_2 \frac{2^{m \mu}}{\fprate^{m-1}}\; \si{bits}\,.
+\end{equation}
+Dividing by $m$ and simplifying results in
+\begin{equation}
+    -\frac{m-1}{m} \log_2 \fprate + \mu\; \si{bits \per element}\,.
+\end{equation}
+Asymptotically, as $m \to \infty$, the bits per element goes to
+\begin{equation}
+    -\log_2 \fprate + \mu\,.
+\end{equation}
+\end{proof}
+
+The smaller the bit lengths generated by the encoder, the smaller the \emph{Singular Hash Map}.
+However, optimal encoders \emph{reveal} information about the values in the \emph{Singular Hash Map}, which goes against the principle of the \emph{obvlivious function}.
+For instance, if each input $x$ mapped to a list of numbers, then an optimal encoder will generate codes that minimize the length of the list, say a Huffman code.
+However, by analyzing the Huffman codes produced by the encoder, we may infer the distribution of the lists.
+Thus, for the sake of maintaining an \emph{oblivious} state, the encoder should generate codes as though the values were \emph{uniformly} distributed.
+
+\subsection{Entropy}
+
+
+\end{document}

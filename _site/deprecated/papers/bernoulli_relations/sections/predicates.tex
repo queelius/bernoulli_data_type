@@ -1,0 +1,298 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+
+\newcommand{\tsr}{\gamma}
+
+\begin{document}
+\section{Binary relations: subset, equality}
+The \emph{subset} relation has a predicate
+\begin{equation}
+	\subseteq \colon \PS{\Set{U}} \times \PS{\Set{U}} \mapsto \{0,1\}
+\end{equation}
+defined as
+\begin{equation}
+	\Set{A} \subseteq \Set{B} = \prod_{x \in \Set{A}} 
+	\SetIndicator{\Set{B}}(x)\,.
+\end{equation}
+Suppose $\Set{A} \subseteq \Set{B}$.
+If we substitute $\Set{A}$ with $\ASet{A}[\tprate_1][\fprate_1]$ and $\Set{B}$ with $\ASet{B}[\tprate_2][\fprate_2]$, the result is a Boolean random variable defined as
+\begin{equation}
+	\RV{Y} = \prod_{x \in \ASet{A}} \SetIndicator{\ASet{B}}(x)\,,
+\end{equation}
+which is \emph{Bernoulli} distributed, i.e.,
+\begin{equation}
+	\RV{Y} \sim \berdist(p)
+\end{equation}
+where
+\begin{equation}
+	p = \left(1 - \tprate_1 \fnrate_2 \right)^{\Card{\Set{A}}}
+\left(1 - \fprate_1\fnrate_2\right)^{\Card{\Set{B}} - \Card{\Set{A}}}
+\left(1 - \fprate_1 \tnrate_2\right)^{\Card{\Set{U}} - 
+	\Card{\Set{B}}}\,.
+\end{equation}
+By definition, the probability that the Bernoulli trial ``succeeds'' is $p$, thus
+\begin{equation}
+	\Prob{\prod_{x \in \ASet{A}} \SetIndicator{\Set{B}}(x) = 1} = p\,.
+\end{equation}
+Recall in \cref{sec:powerset} we had shown that the power set of a random approximate set is a \emph{constrained} random approximate set with a member-of relation on the subsets of the universal set, i.e., a probabilistic subset relation is induced.
+Here, we show that, more generally, the probabilistic subset relation is induced by the probabilistic member-of relation.
+
+However, the induced probabilistic subset relation is not trivially defined and is a function of many other characteristics, i.e., cardinality of each of the involved sets.
+
+The probabilistic \emph{member-of} relation in the random approximate set model \emph{induces} other probabilistic relations. For instance, we claim without proof that if $\Set{A} \subseteq \Set{B}$, then the subset relation $\ASet{X}(\tprate_1,\fprate_1) \subseteq \ASet{Y}(\tprate_2,\fprate_2)$ holds with a probability given by
+\begin{equation}
+\left(1 - \tprate_1 \fnrate_2 \right)^{\Card{\Set{A}}}
+\left(1 - \fprate_1\fnrate_2\right)^{\Card{\Set{B}} - \Card{\Set{A}}}
+\left(1 - \fprate_1 \tnrate_2\right)^{\Card{\Set{U}} - 
+	\Card{\Set{B}}}
+\end{equation}
+and, similarly, two independent observations of a random approximate set of $\Set{A}$ hold the equality relation with a probability given by
+\begin{equation}
+(\tprate_1 \tprate_2 + \fnrate_1 \fnrate_2 - \tprate_1 \tprate_2 \fnrate_1 \fnrate_2)^{\Card{\Set{A}}} (\fprate_1 \fprate_2 + \tnrate_1 \tnrate_2 - \fprate_1 \fprate_2 \tnrate_1 \tnrate_2)^{\Card{\Set{U}} - \Card{\Set{A}}}
+\end{equation}
+where $\fnrate_2 = 1 - \tprate_2$ and $\tnrate_2 = 1 - \fprate_2$.
+
+Relations like equality and subset have many structural properties, like transitivity, e.g., if $\Set{A} \subseteq \Set{B}$ and $\Set{B} \subseteq \Set{C}$, then $\Set{A} \subseteq \Set{C}$.
+In the random approximate set model, such relationships \emph{continue} to hold with some negligible probability when compared to the false positive and false negative rates of the member-of relations.
+
+In \cref{sec:bool_search}, we are \emph{primarily} interested in two particular relations.
+\begin{theorem}[True subset rate]
+	Given a non-random approximate set $\Set{A}$ that is a subset of $\Set{B}$, $\Set{A}$ is a subset of a random approximate set $\ASet{B}(\tprate,\,\cdot\,)$ with probability $\tprate^k$, $k=\Card{\Set{A}}$.
+\end{theorem}
+\begin{proof}
+	?
+\end{proof}
+
+If $\fprate_1 > 0$ (and $\tnrate > 0$), as $\Card{\Set{U}} \to \infty$ the conditional probability
+\begin{equation}
+\Prob{\ASet{A}(\tprate_1,\fprate_1) \subseteq \ASet{B}(\tprate_2,\fprate_2) \Given \Set{A} \subseteq \Set{B}}
+\end{equation}
+goes to $0$.
+
+The conditional probability
+\begin{equation}
+\Prob{\ASet{X}(\tprate_1,\fprate_1) \subseteq \PASet{Y}(\fprate_2) \Given \Set{X} \subseteq \Set{Y}}
+\end{equation}
+is given by
+\begin{equation}
+\left(1 - \fprate_1(1 - \fprate_2)\right)^{\Card{\Set{U}} - \Card{\Set{Y}}}\,.
+\end{equation}
+
+
+\begin{equation}
+\Prob{\PASet{X}(\fprate_1) = \PASet{Y}(\fprate_2) \Given \Set{X} = \Set{Y}}
+\end{equation}
+is given by
+\begin{equation}
+\left[\left(1 - \fprate_1 + \fprate_2^2\right)\left(1 - \fprate_2 + \fprate_1^2\right)\right]^{\Card{\Set{U}} - \Card{\Set{X}}}\,.
+\end{equation}
+
+If $\fprate = \fprate_1 = \fprate_2$, then the above simplifies to
+\begin{equation}
+\left(1 - \fprate + \fprate^2\right)^{2 (\Card{\Set{U}} - \Card{\Set{X}})}\,.
+\end{equation}
+
+
+%If $\Card{\Set{Y}} \ll \Card{\Set{U}}$, then for any non-zero false positive 
+%rate, the rate grows as $\mathcal{O}\left(1 - \fprate_1 + \fprate_1 
+%\fprate_2\right)^\Card{\Set{U}}$.
+
+
+%\begin{corollary}
+%    Given a universal set $\Set{U}$ and $\Set{X} \subseteq \Set{Y}$,  
+%    $\PASet{X}(\fprate_1) \subseteq \PASet{Y}(\fprate_2)$ with probability
+%    \begin{equation}
+%    \left(1 - \fprate_1(1 - \fprate_2)\right)^{\Card{\Set{U}} - \Card{\Set{Y}}}
+%    \end{equation}
+%    and $\NASet{X}(\tprate_1) \subseteq \NASet{Y}(\tprate_2)$ with probability
+%    \begin{equation}
+%    \left(1 - \tprate_1(1 - \tprate_2)\right)^{\Card{\Set{X}}}\,.
+%    \end{equation}
+%\end{corollary}
+
+%\begin{corollary}
+%Given a universal set $\Set{U}$ and $\Set{X} \subseteq \Set{Y}$, $\Set{X} 
+%\subseteq \ASet{Y}(\fprate,\tprate)$ with probability 
+%$\tprate^{\Card{\Set{X}}}$.
+%\end{corollary}
+%\begin{proof}
+%Since $\Set{X}$ is not an approximate set, its true positive rate is unity and 
+%its false posiive rate is zero. Making these substitutions into \cref{??} 
+%yields the result.
+%\end{proof}
+
+
+
+%TODO: move the interval material to this section.
+%Now also do a treatment on intervals so that we don't need to a priori know 
+%%%the 
+%size of the sets, their intersections, and so on. This will mean moving some 
+%%%of 
+%the interval stuff here, which is fine.%
+
+
+%\begin{theorem}
+%Given a universal set $\Set{U}$ and $\Set{X} \not\subset \Set{Y}$, 
+%$\ASet{X}(\tprate_x,\fprate_x) \subset \ASet{Y}(\tprate_y,\fprate_y)$ 
+%with a probability in the interval
+%\begin{equation}
+%    [\fprate^k, \fprate \tprate^{k-1}]\,,
+%\end{equation}
+%where $k = \Card{\Set{X}}$.
+%\end{theorem}
+%\begin{proof}
+%TODO: maybe move this to after the induced random approximate sets, since that 
+%provides a general way to do this sort of proof.
+%\end{proof}
+
+Suppose set $\Set{X} = \{x_{j_1},\ldots,x_{j_k}\}$. The false 
+subset rate is given by the probability
+\begin{equation}
+\fprate_k = \Prob{\Set{X} \subseteq \ASet{S} \Given 
+	\Set{X} \not\subseteq \Set{S}}\,,
+\end{equation}
+which may be rewritten as
+\begin{equation}
+\fprate_k = \Prob{\RV{B_{j_1}} \cap \cdots \cap \RV{B_{j_k}}
+	\Given \neg \left(\RV{A_{j_1}} \cap \cdots \cap 
+	\RV{A_{j_k}}\right)}\,.
+\end{equation}
+By \cref{?}, $\RV{B_1},\ldots,\RV{B_u}$ are statistically 
+independent. Making this simplification results in
+\begin{equation}
+\fprate_k = \prod_{p=1}^{k} \Prob{\RV{B_{j_p}} \Given 
+	\SetComplement[\RV{A_{j_1}} \cap \cdots \cap \RV{A_{j_k}}]}\,.
+\end{equation}
+
+Proof of theorem~\ref{thm:subset}.
+By \cref{thm:true_subset_rate},
+\begin{equation}
+\tsr = \Prob{\ASet{X} \subseteq \ASet{Y} \Given \Set{X} \subseteq 
+	\Set{Y}}\,.
+\end{equation}
+
+Note that in the Boolean vector representation, $\Set{X}$ is a subset of $\Set{Y}$ if $x_j \implies y_j$, i.e., if $x_j$ then $y_j$, otherwise $y_j$ can 
+be either true or false.
+An equivalent expression for $x_j \implies y_j$ is $\neg (x_j \land \neg y_j)$.
+	
+Switching to the Boolean vector representation, we may rewrite $\gamma$ as
+\begin{equation}
+\tsr = \Prob{\bigcap_{j=1}^{u} \neg \left(\AVecComp{X}[j] \land \neg 
+	\AVecComp{Y}[j]\right) \Given E}
+\end{equation}
+where $E$ is the set of Boolean vectors satisfying $x_k \implies y_k$ for $k=1,\ldots,u$.
+
+By the axioms of the approximate set model, each of these events are independent, in which case the probability of the intersection of the events is equal to the product of the probabilities of the events,
+\begin{align}
+\tsr
+&= \prod_{j=1}^{u} \Prob{\neg\left(\AVecComp{X}[j] 
+	\land \neg \AVecComp{Y}[j]\right) \Given E}\\
+&= \prod_{j=1}^{u} \left(1 - \Prob{\AVecComp{X}[j] 
+	\land \neg \AVecComp{Y}[j] \Given E}\right)\,.
+\end{align}
+By the axioms of the approximate set model, $\AVecComp{Y}[j]$ is only dependent on $y_j$ and $\AVecComp{X}[j]$ is only dependent on $x_j$.
+Thus, we may rewrite 
+$\tsr$ as
+\begin{equation}
+\tsr = \prod_{j=1}^{u}\left(
+1 - \Prob{\AVecComp{X}[j] \Given x_j}
+\Prob{\neg \AVecComp{Y}[j] \Given y_j}\right)\,,
+\end{equation}
+where $x_j$ and $y_j$ are Boolean values satisying $E$.
+
+Since $\Set{X} \subseteq \Set{Y}$, an exhaustive, mutually exclusive set of sets is given by $\Set{X}$, $\SetDiff[\Set{Y}][\Set{X}]$, and $\SetComplement[\Set{Y}]$.
+
+Let set $\Set{I}$ index the elements in $\Set{X}$, set $\Set{J}$ index the elements in $\SetDiff[\Set{Y}][\Set{X}]$, and set $\Set{K}$ index the elements in $\SetComplement[\Set{Y}]$.
+
+The elements indexed by $\Set{I}$ are members of $\Set{X}$ and $\Set{Y}$, i.e., $x_i$ and $y_i$ are both true.
+
+The elements indexed by $\Set{J}$ are members of $\Set{Y}$ but not $\Set{X}$, i.e., $x_j$ is false and $y_j$ is true.
+
+The elements indexed by $\Set{K}$ are members of neither, i.e., $x_j$ and $y_j$ are false.
+
+%%% THIS IS NOT FINISHED
+\begin{equation}
+\begin{split}
+\tsr =
+&\prod_{i \in \Set{I}}
+\left(1-\Prob{\AVecComp{X}[i] \Given x_i}
+\Prob{\neg \AVecComp{Y}[i] \Given y_i}\right)
+\prod_{j \in \Set{J}}
+\left(1-\Prob{\AVecComp{X}[j] \Given \neg x_j}
+\Prob{\neg \AVecComp{Y}[j] \Given y_j}\right)\\
+&\qquad \prod_{k \in \Set{K}}
+\left(1-\Prob{\AVecComp{X}[k] \Given \neg x_k}
+\Prob{\neg \AVecComp{Y}[k] \Given \neg y_k}\right)\,.  
+\end{split}    
+\end{equation}
+
+
+
+\begin{equation}
+\tsr =
+\prod_{i \in \Set{I}}
+\left(1 - \tprate_1
+(1 - \tprate_2)\right)
+\prod_{j \in \Set{J}}
+\left(1 - \fprate_1
+(1 - \tprate_2)\right)
+\prod_{k \in \Set{K}}
+\left(1 - \fprate_1
+(1 - \fprate_2)\right)
+\end{equation}
+
+
+
+\begin{equation}
+\tsr =
+\prod_{i \in \Set{I}}
+\left(1 - \tprate_1
+(1 - \tprate_2)\right)
+\prod_{j \in \Set{J}}
+\left(1 - \fprate_1
+(1 - \tprate_2)\right)
+\prod_{k \in \Set{K}}
+\left(1 - \fprate_1
+(1 - \fprate_2)\right)
+\end{equation}
+
+
+
+By \cref{dummyrefs}, $\Prob{x \in \ASet{X} \Given x \in \Set{X}} = \tprate_1$, 
+$\Prob{x \in \ASet{X} \Given x \notin \Set{X}} = \fprate_1$, $\Prob{x \in 
+	\ASet{Y} \Given x \in \Set{Y}} = \tprate_2$, and $\Prob{x \in \ASet{Y} \Given x 
+	\notin \Set{Y}} = \fprate_1$. Making these substitutions yields the result
+\begin{equation}
+\begin{split}
+\tsr =
+&\prod_{x \in \Set{V}[1]}
+\left(1 -
+\tprate_1
+(1 - \tprate_2)
+\right)\\
+&\prod_{x \in \Set{V}[2]}
+\left(1 -
+\fprate_1
+(1 - \tprate_2)
+\right)\\
+&\prod_{x \in \Set{V}[3]}
+\left(1 -
+\fprate_1
+(1 - \fprate_2)
+\right)\,.  
+\end{split}    
+\end{equation}
+Each of the above products is just repeated multiplication and thus may be 
+replaced by powers,
+\begin{equation}
+\begin{split}
+\tsr &=
+\left(1 - \tprate_1(1 - \tprate_2)\right)^{\Card{\Set{V}[1]}}\\
+&\qquad \left(1 - \fprate_1(1 - \tprate_2)\right)^{\Card{\Set{V}[2]}}
+\left(1 - \fprate_1(1 - \fprate_2)\right)^{\Card{\Set{V}[3]}}\,.  
+\end{split}
+\end{equation}
+
+
+
+\end{document}

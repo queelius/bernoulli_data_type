@@ -1,0 +1,54 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+\section{Abstract data type}
+A \emph{type} is a set and the elements of the set are called the \emph{values} of the type. An \emph{abstract data type} is a type and a set of operations on values of the type. For example, the \emph{integer} abstract data type is defined by the set of integers and standard operations like addition and subtraction. A \emph{data structure} is a particular way of organizing data and may implement one or more abstract data types. An \emph{immutable} data structure has static state; once constructed, its state does not change until it is destroyed.
+
+The abstract data type of the random approximate map is given by the following definition.
+\begin{definition}
+	\label{def:approx_map}
+	The concept of the \emph{approximate map} of type $X \mapsto Y$, where $X$ is the domain and $Y$ is the codomain, has the following computational basis:
+	\begin{enumerate}
+		\item Given an element in the domain, the corresponding element in the codomain is computed by the evaluation function
+		\begin{equation}
+		\FuncSty{eval} \colon T \times X \mapsto Y\,,
+		\end{equation}
+		then by definition \Find{$\APFun{f}$, $x$}, $x \in \Set{X}$, returns $\APFun{f}(x)$ if $x \in \Dom(\APFun{f})$ and otherwise returns $\Null$.
+	\end{enumerate}
+	
+	Given a map $\Fun{f} \colon \Set{X} \mapsto \Set{Y}$, we denote any approximate map of $\Fun{f}$ by $\APFun{f}$. The two primary interfaces to maps are given by the \HasKey function, which may be used to test whether a particular key is in the map, i.e., \HasKey{$\APFun{f}$,$x$}, $x \in \Set{X}$, returns \True if $x \in \Dom(\APFun)$ and otherwise returns \False, and the \Find function, which may be used to determine the value associated with a key, i.e., if $x \in \Dom(\APFun{f})$, then $\Find(\APFun{f},x) \equiv \APFun(x)$. If a key has no associated value, the \emph{null value} is returned, which does not compare equal to any value in $\Set{Y}$.
+	
+	The map $\APFun{f}$ is an approximate map of $\Fun{f}$ with a false positive rate $\fprate$ and false negative rate $\fnrate$, $\fprate + \fnrate > 0$,\footnote{These inequalities guarantee that $\APFun{f}$ is not with certainty equivalent to $\Fun{f}$.
+		That is, as $\fprate \to 0$ and $\fnrate \to 0$, $\APFun{f}$ converges to $\Fun{f}$.} if the following conditions hold:
+	\begin{enumerate}[(i)]
+		\item Let a key that is selected uniformly at random from the universe $\Set{X}$ be denoted by $\RV{X}$. If $\RV{X}$ is a member of $\Dom(\Fun{f})$, it is not a member of $\Dom(\APFun{f})$ with a probability $\fnrate$,
+		\begin{equation}
+		\Prob{\neg \HasKey\!\left(\APFun,\RV{X}\right) \Given \HasKey\!\left(\Fun{f},\RV{X}\right)} = \fnrate\,.
+		\end{equation}
+		
+		\item Let an element that is selected uniformly at random from the universe $\Set{X}$ be denoted by $\RV{X}$. If $\RV{X}$ is \emph{not} a member of $\Dom(\Fun{f})$, it is a member of $\Dom(\APFun{f})$ with a probability $\fprate$,
+		\begin{equation}
+		\Prob{\Dom\!\left(\APFun{f},\RV{X}\right) \Given \neg \Dom\!\left(\Fun{f},\RV{X}\right)} = \fprate\,.
+		\end{equation}
+	\end{enumerate}
+\end{definition}
+
+Since a function is a relation, the number of mappings is a \emph{cardinality}.
+In the case of a random approximate map, it may be estimated by
+\begin{equation}
+\Card{\APFun{f}} = \fprate \Card{\Set{X}} + (1 - \fnrate - \fprate) \Card{\Dom(\Fun{f})}\,.
+\end{equation}
+
+
+
+
+
+The \emph{random approximate map} is a \emph{probabilistic} model.
+This probability comes in two parts.
+
+Given an objective function $\Fun{f} \colon X \pfun Y$, an approximate map of $\Fun{f}$, denoted by $\APFun{f}[\tprate][\fprate]$ has the 
+\begin{enumerate}
+	\item The probability that an element in the domain of definition of $\Fun{f}$ is in the domain of definition $x \in \Dod(\Fun{f})$.
+\end{enumerate}
+
+\end{document}

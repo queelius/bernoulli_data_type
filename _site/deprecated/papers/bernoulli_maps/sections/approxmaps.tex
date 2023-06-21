@@ -1,0 +1,120 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+
+\begin{document}
+\section{Approximate maps}
+\label{sec:}
+\label{sec:map}
+The concept of a \emph{map} is dependent upon the concept of a \emph{set}.
+\begin{definition}
+	A set is an unordered collection of distinct elements from a universe of elements.
+\end{definition}
+
+A countable set is a \emph{finite set} or a \emph{countably infinite set}. A \emph{finite set} has a finite number of elements. For example,
+\[
+\Set{S} = \{ 1, 3, 5 \}
+\]
+is a finite set with three elements. A \emph{countably infinite set} can be put in one-to-one correspondence with the set of natural numbers.
+
+The cardinality of a set $\Set{S}$ is a measure of the number of elements in the set, denoted by
+\begin{equation}
+\Card{\Set{\Set{S}}}\,.
+\end{equation}
+The cardinality of a \emph{finite set} is a non-negative integer and counts the number of elements in the set, e.g.,
+\[
+\Card{\left\{ 1, 3, 5\right\}} = 3\,.
+\]
+
+\begin{definition}[Cartesian product]
+	Let $\Set{A}$ and $\Set{B}$ be sets. The set $\Set{A} \times \Set{B}= \left\{(a, b) \colon a \in \Set{A} \land b \in \Set{B}\right\}$ is called the Cartesian product of the sets $\Set{A}$ and $\Set{B}$.
+\end{definition}
+
+\begin{definition}[Binary relation]
+	Let $\Set{A}$ and $\Set{B}$ be sets. By a relation $\mathcal{R}$ on $\Set{A}$ and $\Set{B}$, we mean a subset of the Cartesian product $\Set{A} \times \Set{B}$. Since the Cartesian product is over two sets, we denote this relation a \emph{binary} relation.
+\end{definition}
+Relations may be generalized to $n$-ary relations, which are subsets of the Cartesian product over $n$ sets. We consider only \emph{binary relations} known as \emph{maps} as given by the following definition.
+\begin{definition}
+	A \emph{map} $\Fun{f} \colon \Set{X} \mapsto \Set{Y}$ is a binary relation on $\Set{X} \times \Set{Y}$ with the constraint that the first element in the set of ordered pairs is \emph{unique}.
+\end{definition}
+Such a map is also known as a \emph{partial function}.
+
+
+
+Consider discrete partial maps of type $\Set{X} \pfun \Set{Y}$.
+Any function $\Fun{f}$ of this type may be \emph{lifted} to the type $\Set{X} \mapsto \Maybe{\Set{Y}}$ where elements not in $\Dod(\Fun{f})$ map to a special value denoted by \Nothing that is not a member of $\Set{Y}$.
+
+
+
+
+Given a map, by convention, in an ordered pair $(x, y)$, the first element $x$ is denoted a \emph{key} and the second element $y$ is denoted the \emph{value} associated with that (unique) key. The value $y$ associated with key $x$ may be denoted by
+\begin{equation}
+\Fun{f}(x)\,.
+\end{equation}
+The set of keys in the map is denoted by $\Dom(\Fun{f}) \subseteq \Set{X}$ and the set of values is denoted by $\Codom(\Fun{f}) \subseteq \Set{Y}$. Given these definitions, a map $\Fun{f}$ is given by the set of ordered key-value pairs
+\begin{equation}
+\Fun{f} \colon \Set{X} \mapsto \Set{Y} = \left\{
+\left(x, \Fun{f}(x)\right) \in \Set{X} \times \Set{Y} \colon x \in \Dom(\Fun{f})
+\right\}\,.
+\end{equation}
+
+A map $\Fun{f} \colon \Set{X} \mapsto \Set{Y}$ may represent \emph{many}-to-\emph{one} relationships, where many keys may be related to the same value. Consequently, denoting a particular key by its associated value is not generally possible.
+
+A \emph{table} is a convenient way to represent a map, where each key $x \in \Dom(\Fun{f})$ is associated with $\Fun{f}(x) \in \Codom(\Fun{f})$. The column for the keys consists of \emph{unique} values from $\Set{X}$ and column for the values consists of (possibly repeated) values from $\Set{Y}$.
+\begin{example}
+	Suppose we have a map $\Fun{f} \colon \{1,3,7\} \mapsto \{2,7\}$ defined by the set of ordered key-value pairs
+	\begin{equation}
+	\left\{(3,2),(1,5),(7,2)\right\}\,.
+	\end{equation}
+	We see that $\Dom(\Fun{f}) = \{3,1,7\}$, $\Codom(\Fun{f}) = \{2,5\}$, $\Fun{f}(3) = 2$, $\Fun{f}(1) = 4$, and $\Fun{f}(7) = 2$. Notice that both $3$ and $7$ map to $2$. Elements may be repeated in the \nth{2} index of ordered pairs, but elements in the \nth{1} index must be unique.
+	
+	\Cref{tbl:tabfunc} also depicts $\Fun{f}$ where the \emph{keys} column must consist of unique elements from $\Set{Z}$ and the \emph{values} column must consist of (possibly repeated) elements from $\Set{Z}$.
+	\begin{table}[h]
+		\centering
+		\caption{A table representing map $\Fun{f} \colon \Set{Z} \mapsto \Set{Z}$.}
+		\label{tbl:tabfunc}
+		\begin{tabular}{@{} l l @{}} 
+			\toprule
+			domain & range\\
+			\midrule
+			$3$ & $2$\\
+			$1$ & $5$\\
+			$7$ & $2$\\
+			\bottomrule
+		\end{tabular}
+	\end{table}
+\end{example}
+
+\subsection{Rate-distortion}
+\label{sec:error}
+Suppose we have the discrete metric space $(\Maybe{\Set{Y}}, \Fun{d})$ where $\Fun{d} \colon \Maybe{\Set{Y}} \times \Maybe{\Set{Y}} \mapsto \RealSet_{\geq 0}$.
+If we have a distribution $\RV{X}$ with a sample space $\Set{X}$ then the \emph{expected} distance with respect to $\Fun{f}$ and $\Fun{g}$ is given by
+\begin{equation}
+\Expect{\Fun{d}(\Fun{f},\Fun{g})}[\RV{X}] = \sum_{x \in \Set{X}} \Fun{p}_{\RV{X}}(x) \Fun{d}(\Fun{f}(x),\Fun{g}(x))\,.
+\end{equation}
+If $\Fun{p}_{\RV{X}}$ is uniformly distributed, then $\Expect{\Fun{d}(\Fun{f},\Fun{g})}[\RV{X}]$ is the \emph{average} distance $\Fun{\bar{d}}(\Fun{f},\Fun{g})$ over all values.\footnote{One way of defining a related discrete metric space $(\Maybe{\Set{Y}}^{\Set{X}}, \Fun{d})$ where $\Fun{d} \colon (\Set{X} \mapsto \Maybe{\Set{Y}}) \times (\Set{X} \mapsto \Maybe{\Set{Y}}) \mapsto \RealSet_{\geq 0}$ is given by letting $\Fun{d}(\Fun{f},\Fun{g}) \coloneqq \Card{\Set{X}} \Fun{\bar{d}}(\Fun{f},\Fun{g})$.}
+
+Suppose we have an objective map $\Fun{f} \colon \Set{X} \mapsto \Maybe{\Set{Y}}$ and an approximation of $\Fun{f}$ denoted by $\Fun{\AT{f}} \colon \Set{X} \mapsto \Maybe{\Set{Y}}$.
+Then, we call $\Fun{d}$ on the metric space $(\Maybe{\Set{Y}},\Fun{d})$ a \emph{loss} function where the expected loss of the approximate function $\Fun{g}$ of the objective function $\Fun{f}$ is given by
+\begin{equation}
+\Fun{\ell}_{\RV{X}}(\Fun{g} \Given \Fun{f}) = \Expect{\Fun{d}(\Fun{f},\Fun{g})}[\RV{X}]\,.
+\end{equation}
+
+By the axioms of probability, if it is given that the random variable $\RV{X} \in \FancySet{A}$ where $\FancySet{A}$ is a subset of sample space $\Set{X}$, then the conditional loss, denoted by $\Fun{\ell}_{\RV{X} \Given \FancySet{A}}$, is given by
+\begin{equation}
+\Fun{\ell}_{\RV{X} \Given \FancySet{A}}(\Fun{g} \Given \Fun{f}) = \Expect{\Fun{d}(\Fun{f},\Fun{g})}[\RV{X} \Given \FancySet{A}]
+\end{equation}
+where $\Fun{p}_{\RV{X} \Given \FancySet{A}}$ is normalized over $\FancySet{A}$.
+
+Suppose the domain $\PlainSet{X}$ may be partitioned into $n$ disjoint sets $\PlainSet{X}[1],\ldots,\PlainSet{X}[n]$.
+The expected loss may be rewritten as
+\begin{equation}
+\label{eq:disj_loss}
+\Fun{\ell}_{\RV{X} \Given \FancySet{K}}(g \Given f) =
+\sum_{i=1}^{n} \Fun{\ell}_{\RV{X} \Given \SetIntersection[\FancySet{K}][\PlainSet{X}[i]]}(g \Given f)\,.
+\end{equation}
+
+Ideally, an approximation $\Fun{g}$ of $\Fun{f}$ is selected or chosen such that $\Fun{\ell}_{\RV{X} \Given \FancySet{A}}(\Fun{g} \Given \Fun{f})$ is minimized over some subset $\FancySet{A} \subseteq \PlainSet{X}$ of interest.
+However, the expected loss may not obtain $0$ due to \emph{rate-distortion}, incomplete knowledge, noise, and memory or computing constraints.
+
+
+\end{document}

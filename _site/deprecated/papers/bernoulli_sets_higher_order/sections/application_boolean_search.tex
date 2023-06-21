@@ -1,0 +1,126 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+
+\SetKwFunction{MakeIndex}{index}
+\SetKwFunction{MakeApproxIndex}{index$^\sigma$}
+\SetKwFunction{OrOp}{or}
+\SetKwFunction{NotOp}{not}
+\SetKwFunction{AndOp}{and}
+%\SetKwFunction{EncryptedFind}{hidden\_find$^\sigma$}
+
+\begin{document}
+\section{Application: approximating Boolean search}
+\label{sec:bool_search}
+%TODO: let's do the subset relation instead! just to make it a little more sophisticated/interesting. refer to oblivious types also, i.e., a hidden query
+%      is an oblivious type and the secure indexes are oblivious sets of the oblivious types. in this case, the oblivious types represent elements of the
+%      powerset of keys up to k-graphs?     
+
+An information retrieval process begins when a user submits a \emph{query} to an information system, where a query represents an \emph{information need}.
+In response, the information system returns a set of relevant documents that satisfy the query.
+
+Boolean search is an information retrieval model given by the following definition.
+\begin{definition}
+A document in the collection is either \emph{relevant} or \emph{non-relevant} to a Boolean query.
+\end{definition}
+We do not specify the structure of documents since we are only interested in being able to specify documents in a collection by some \emph{label}, e.g., a file name.
+We specify the universal set of document labels by $\Set{D}$ and therefore a \emph{particular} collection of interest is a subset of $\Set{D}$.
+
+We consider queries over the Boolean algebra $Q = \left(\PS{\Set{K}}, \land, \lor, \neg, \epsilon, \Set{K}\right)$, where $\Set{K}$ denotes a set of \emph{search keys}, e.g., units of information like English words.\footnote{This is isomorphic to the Boolean algebra $\left(\{0,1\}^k, \land,\lor,\neg,0^k,1^k\right)$ where $k=\Card{\Set{K}}$.}
+Without loss of generality, we transform Boolean queries over $Q$ to the BNF
+\begin{align*}
+\langle\text{query} \rangle & \coloneqq
+	\text{``} \langle \text{key} \rangle\text{''} \mid \neg \left(\langle \text{query} \rangle \right) \mid\\
+	& \qquad \lor \left(\langle \text{query} \rangle\,,\langle \text{query} \rangle\right) \mid\\
+	& \qquad \land \left(\langle \text{query} \rangle\,,\langle \text{query} \rangle\right)\\
+\langle\text{key}\rangle & \coloneqq \text{a key in $\Set{K}$}\,.
+\end{align*}
+
+\emph{Search indexes} may be used to quickly compute whether a given document is relevant to a given query.
+Since we are using a Boolean search query model $Q$, search indexes may be efficiently represented  by \emph{sets} over $\Set{K}$ in the Boolean algebra $S = (\PS{\Set{K}}, \SetIntersection, \SetUnion, \SetComplement, \EmptySet, \Set{K})$.
+In particular, let $\MakeIndex \colon \Set{D} \mapsto \PS{\Set{K}}$ be a function that maps documents to search indexes with a definition given by
+\begin{equation}
+	\MakeIndex(d) \coloneqq \SetBuilder{k \in \Set{K}}{	\text{$k$ is relevant to $d$}}\,.
+\end{equation}
+
+The set of relevant documents to a query is denoted the query's \emph{result set}.
+The result sets form the Boolean algebra $R = (\PS{\Set{D}}, \SetIntersection, \SetUnion, \SetComplement, \EmptySet, \Set{D})$.
+
+A bijection from $Q$ to $S$ is given by $\land \mapsto \SetIntersection$, $\lor \mapsto \SetUnion$, $\neg \mapsto \SetComplement$, $\epsilon \mapsto \EmptySet$, and $\Set{K} \mapsto \Set{K}$.
+Let $\Find \colon Q \times \PS{\Set{D}} \mapsto \PS{\Set{D}}$ be the function that maps queries in $Q$ to result sets in $R$ by using the collection of corresponding search indexes in $S$,
+\begin{equation}
+\Find(q,ds) \coloneqq
+\begin{cases}
+	\SetComplement\left(\Find{$t$,$ds$}\right) & \text{if $h = \neg$} \\
+	\SetUnion
+		\left(
+			\Find{\Left{$t$},$ds$},
+			\Find{\Right{$t$},$ds$}
+		\right) & \text{if $h = \lor$} \\
+	\SetIntersection
+		\left(
+			\Find{\Left{$t$},$ds$},
+			\Find{\Right{$t$},$ds$}
+		\right) & \text{if $h = \land$} \\
+	\SetBuilder{d \in ds}{h \in \MakeIndex(d)} & \text{otherwise}\,,
+\end{cases}	
+\end{equation}
+where $h = \Head(q)$, $t = \Tail(q)$, $\Head \colon Q \mapsto \SetUnion[\{\neg,\lor,\land\}][\Set{K}]$ maps any given query $q$ to the next \emph{Boolean} operation or \emph{key} in $q$, $\Tail \colon Q \mapsto Q$ maps any given query $q$ to nested sub-queries in $q$, e.g., $\Tail(\lor(q_1,q_2)) = ?$, \Left maps $\operatorname{f}(x,y)$ to $x$ and $\Right$ maps $\Fun{f}(x,y)$ to $y$.
+
+%TODO: x xor y = (x or y) and not (x and y)
+% blindly apply the transformation rules for AND, OR, and NOT, we get:
+%     (x + y - xy)(1 - xy) = x + y - xy - x^2y - xy^2 +x^2y^2
+% replace v^2 by v
+%     x + y - xy - xy - xy + xy = x + y - 2xy
+% other rules: x^2 = x, (x + x) = x .. so, hmm? seems like it should be x + y - xy?
+%
+% better approach: Karnaugh maps. use this algorithm and other properties (empty set + A = A)
+% to simplfy any boolean expression as much as possible,
+% then use some ordering relation to order the connectives and terminal sets so that any two equivalent
+% set-theoretic expressions on the same sets reduce to the same form.
+
+
+
+%
+% what is the iterated function f applied repeated to approximate set A',B'? it converges
+% to something... particular examples: f is union, then U. intersection: empty set.
+% if pos approximate set and f union, f(f(...f(A',B'))) = U, intersection -> AB.
+%
+
+\subsection{Random approximate Boolean search}
+We consider an \emph{approximation} of the set-theoretic \emph{Boolean search} model where the Boolean search indexes are replaced by \emph{random approximate sets}, i.e., $\MakeIndex \colon \Set{D} \mapsto \PS{\Set{K}}$ is replaced with $\MakeIndex^{\sigma} \colon \Set{D} \mapsto \ASetType{\PS{\Set{K}}}$.
+We denote the transformed find function by $\Find^\sigma$ as opposed to the objective function $\Find$.
+
+This replacement \emph{induces} random approximate \emph{result sets} as given by the following theorem.
+\begin{theorem}
+$\Find^\sigma$ is an \emph{approximation} of $\Find$ where $\Find^\sigma(q,ds)$ is a random approximate set of $\Find(q,ds)$ for all $q$ in $Q$ and all $ds \in \PS{\Set{D}}$.
+\end{theorem}
+\begin{proof}
+An approximate search index $\ASet{S}[\fnrate][\fprate]$ is relevant to a key $x$ if the key $x$ tests positive in it.
+A false positive occurs if the key $x$ is not in $\Set{S}$ but is in $\ASet{S}$, which occurs with some probability $\fprate \geq 0$.
+A false negative occurs if a key $x$ is in $\Set{S}$ but is not in $\ASet{S}$, which occurs with some probability $\fnrate \geq 0$.
+
+We have established that the result sets of a single atomic key are approximate result sets. We may now apply the set-theoretic results in \cref{dummyref} to implement the full set-theoretic model for approximate sets.
+
+Continue proof here.
+\end{proof}
+
+$\Find^\sigma$ is a function and therefore produces the same output (result set) for the same input (query).
+However, it still obeys the axioms of the random approximate set model since as described in \cref{dummyref}. 
+
+\begin{example}
+Suppose the search indexes are positive approximate sets each with a false positive rate $\fprate$. A common type of Boolean query is the \emph{intersection} (conjunction) of atomic keys. Consider a conjunctive query of $k$ keys, $x_1,\ldots,x_k$. The result set $\PASet{R}\left(\{x_1\} \cap \cdots \cap \{x_k\}\right) = \Find\!\left(\SetComplement[\SetComplement[x_1] \cup \cdots \cup \SetComplement[x_k]]\right)$ is a positive approximate set with an uncertain false positive rate $[\fprate_k] = [\fprate^k, \fprate]$.
+\begin{proof}
+Let the approximate result set for key $x_j$ be denoted by $\PASet{R}[x_j]$. The result set is given by
+\begin{equation}
+    \PASet{R}[\Set{X}] = \bigcap_{j=1}^{k} \PASet{R}[j]\,.
+\end{equation}
+By \cref{cor:fprate_atomic_search}, $\PASet{R}[j]$ has a false positive rate $\fprate$ for $j \in [1,\ldots,k]$. By \cref{dummyref}, $\SetIntersection[\PASet{R}[1]][\PASet{R}[2]]$ has a false positive rate $[\fprate^2,\fprate]$. Similarly,
+\begin{equation}
+\SetIntersection[\left(\SetIntersection[\PASet{R}[1]][\PASet{R}[2]]\right)][\PASet{R}[3]] = \PASet{R}[1] \cap \PASet{R}[2] \cap \PASet{R}[3]    
+\end{equation}
+has a false positive rate $[\fprate^3,\fprate]$. Continuing in this fashion, we see that $\PASet{R}[\Set{X}] = \PASet{R}[1] \cap \cdots \cap \PASet{R}[k]$ has a false positive rate $[\fprate^k,\fprate]$.
+\end{proof}
+\end{example}
+
+To quantify the performance measure of the information retrieval system, we may use the binary classification results in \cref{sec:perf}.
+\end{document}

@@ -1,0 +1,151 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+
+\SetKwFunction{RankOrderedSearch}{rank\_ordered\_search}
+\SetKwFunction{Rank}{rank}
+\SetKwFunction{OkapiBM}{okapi\_bm}
+
+\begin{document}
+\section{Application: rank-ordered search}
+An information retrieval process begins when a user submits a \emph{query} to an information system, where a query represents an \emph{information need}. In response, the information system returns a set of relevant documents that satisfy the information need.
+\begin{assumption}
+A \emph{document} is a sequence of \emph{words} that provides information.
+\end{assumption}
+The collection (set) of documents being searched over is denoted by the $\Set{D}$.
+
+\begin{assumption}
+A query is a \emph{bag-of-words} (set), where \emph{words} are denoted \emph{search keys}.
+\end{assumption}
+The universe of \emph{search keys} is denoted by $\Set{K}$. Consequently, as a bag-of-words, the universe of queries is the \emph{powerset} of $\Set{K}$.
+
+Rank-ordered search is an information retrieval model given by the following definition.
+\begin{definition}
+In rank-ordered search, given a query, each document in the collection $\Set{D}$ has a \emph{rank} (measure of relevancy) with respect to satisfying the information need represented by the query.
+\end{definition}
+Each query is mapped to a \emph{result set} of key-value pairs, where the \emph{key} is a document reference and the \emph{value} is a rank. As a set of key-value pairs, the result set is a \emph{map}. The function that maps queries to result sets is given by
+\begin{equation}
+    \RankOrderedSearch \colon \PS{\Set{K}} \mapsto \Set{D} \times \Set{R}\,.
+\end{equation}
+We denote the result set of a query $\Set{X} \in \PS{\Set{K}}$ by $\ResultSet{\Set{X}}$, and thus the rank of a document $d$ to a query $\Set{X}$ is denoted by $\ResultSet{\Set{X}}(d)$.
+
+The function that computes the rank of a document with respect to a query is denoted by
+\begin{equation}
+    \Rank \colon \PS{\Set{K}} \times \Set{D} \mapsto \Set{R}\,.
+\end{equation}
+\begin{assumption}
+The ranking function returns a value equal to or larger than zero, where a rank of zero denotes non-relevance and is thus omitted from the result set. If a document does not contain any of the search keys in a query, the document is non-relevant.
+\end{assumption}
+
+To facilitate efficient search operations, documents in the collection are typically represented by \emph{search indexes}.
+\begin{assumption}
+Each document in the collection is independently represented by a search index based on maps.
+\end{assumption}
+This is not necessarily the most efficient representation, but it turns out to be an appropriate choice in Encrypted Search. A general outline of rank-ordered search under this model is given by \cref{alg:ranked_search}.
+\begin{algorithm}[h]
+    \caption{Implementation of \protect\RankOrderedSearch}
+    \label{alg:ranked_search}
+    \SetKwProg{func}{function}{}{}
+    \parameters
+    {
+        $\Set{D}$ is the collection (universe) of rank-ordered search indexes using approximate maps.
+    }
+    \KwIn
+    {
+        $\Set{X}$ is a bag-of-words query, $\Set{X} \in \PS{\Set{K}}$.
+    }
+    \KwOut
+    {
+        A rank-ordered result set $\ResultSet{\Set{X}}$.
+    }
+    \func{\RankOrderedSearch{$\Set{X}$}}
+    {
+        $\ResultSet{\Set{X}} \gets \emptyset$\;
+        \ForEach{$\Fun \in \Set{D}$}
+        {
+            $s \gets \Rank(\Fun, \Set{X})$\;
+            $\ResultSet{\Set{X}} \gets \ResultSet{\Set{X}} \cup \left\{(\Ref(\Fun), s)\right\}$\;
+        }
+        \Return $\ResultSet{\Set{X}}$\;
+    }
+\end{algorithm}
+
+TODO: Redo this in terms of a \emph{relation}. Each document is represented as a relation. Do a diagram. Show a relation for each document with $n$ \emph{named} attributes, e.g., one attribute may be \emph{multiplicity} and the \emph{key} is a search key. (Relation may not be best for a postings list, although a postings could include an attribute that is a \emph{key} into another relation, and either this relation ...)
+
+Different ranking functions require different kinds of information about the documents. For instance, a well-known choice for a ranking function is known as the \emph{Okapi BM25} scoring algorithm, which requires information about the \emph{multiplicty} of search keys in a document. The implementation of \OkapiBM is given by \Cref{alg:bm25}.
+\begin{algorithm}[h]
+    \caption{Implementation of \protect\OkapiBM}
+    \label{alg:bm25}
+    \SetKwProg{func}{function}{}{}
+    \DontPrintSemicolon    
+    \parameters
+    {
+        $\beta$ is the \emph{average} document length in the collection $\Set{D}$. $k$ and $b$ are free parameters chosen to optimize some performance measure (like mean average precision).
+    }
+    \KwIn
+    {
+        $\Fun{f}$ is an approximate map of a document which maps the \emph{search keys} that it contains to \emph{frequencies}.
+        $\Set{X}$ is a bag-of-words query.
+    }
+    \KwOut
+    {
+        A rank $r$.
+    }
+    \func{\OkapiBM{$\Fun{f}$, $\Set{X}$}}
+    {
+        \tcp{$d$ stores the \emph{length} (as a sequence of words) of the document being reprsented by the search index $\Fun{f}$.}
+        $d \gets \Length(\Fun{f})$\;    
+        \tcp{$s$ stores the \emph{score} of the search index implemented by a map $\Fun{f}$.}
+        $s \gets 0$\;
+        \ForEach{$x \in \Set{X}$}
+        {
+            \If{$\HasKey(\Fun{f},x)$}
+            {
+                \tcp{$r$ stores the \emph{frequency} of search key $x$ in the search index.}            
+                $r \gets \Find(\Fun{f}, x)$\;
+                \tcp{\IDF is a function, \emph{inverse document frequency}, usually implemented as
+                \[
+                    \IDF(x) = \log \frac{N - \operatorname{n}(x) + \frac{1}{2}}{n \operatorname{n}(x) + \frac{1}{2}}\,,
+                \]
+                where $N$ is the number of documents in the collection and $\operatorname{n}(x)$ denotes the number of documents in the collection that contain $x$.}
+                $s \gets s + \IDF(x) \frac{r (k + 1)}{r + k\left(1 - b + b \frac{d}{\beta}\right)}$\;
+            }
+        }
+        \Return s\;
+    }
+\end{algorithm}
+
+\subsection{Approximate rank-ordered result sets}
+We consider an \emph{approximation} of the \emph{rank-ordered search} model where the search indexes are based on \emph{approximate maps}.
+\begin{assumption}
+Each search index is based on a \emph{positive approximate map} which maps \emph{search keys} to \emph{values} of some type with a false positive rate $\fprate$.
+\end{assumption}
+The \emph{approximate map} is an appropriate data structure in \emph{rank-ordered Encrypted Search}\cite{es} where typical search indexes reveal too much information about the collection. See \Cref{dummyref} for more on Encrypted Search.
+
+
+If we replace the \emph{search indices} based on maps with \emph{approximate maps}, approximate result sets are generated. The approximate result set of a query $\Set{X}$ is denoted by $\AResultSet{\Set{X}}$.
+
+There are two types of errors to consider:
+\begin{enumerate}
+    \item A false positive occurs when a non-relevant document $d$ is a member of the approximate result set. Let $\RV{D}$ denote a document reference randomly selected from the universe of documents $\Set{D}$. The \emph{false positive rate} is given by
+    \begin{equation}
+        \Prob{\HasKey\left(\AResultSet{\Set{X}}, \RV{D}\right) \Given \neg \HasKey\left(\ResultSet{\Set{X}}, \RV{D}\right)} = \fprate_k\,,
+    \end{equation}
+    where $k = \Card{\Set{X}}$.
+    
+    The false positive rate $\fprate_k$ is a function of the cardinality of the query $\Set{X}$ and the false negative rate of the underling approximate maps of the search indices.
+
+    \item A true positive document $d$ has a rank $\AResultSet{\Set{X}}(d)$ that diverges from its true rank $\ResultSet{\Set{X}}(d)$. A measure of the divergence is given by a \emph{loss function}, such as the \emph{squared error}
+    \begin{equation}
+        \left(\AResultSet{\Set{X}}(d) - \ResultSet{\Set{X}}(d)\right)^2\,.
+    \end{equation}
+    
+    The degree of divergence may be computed, either by analyzing actual data or by analyzing the scoring method with respect to the false positive and false negative rates of the underlying approximate maps of the search indices.
+
+    Compared to rank-ordered search based on \emph{exact} maps, the approximate result set may map a document reference to an \emph{approximate} value. [Compute the probability that the value is different than the true value.]  This is a different type of error than false positives and false negatives, and thus the approximate result sets are not \emph{approximate maps}.
+\end{enumerate}
+
+\subsection{Fuzzy set-theoretic rank-ordered search}
+Hedge functions, degree-of-memberships, or as a max, and as a min, etc. Then derive as approximate maps induced by the stuff?
+
+
+\end{document}

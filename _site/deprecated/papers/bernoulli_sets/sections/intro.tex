@@ -1,0 +1,35 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+\section{Introduction}
+% the queries may also be rate distorted. or approximate.
+
+%The (approximate) logical functions $\land \colon \Bool^{\fnrate}_{\fprate} \times \Bool^{\fnrate}_{\fprate} \mapsto \Bool^{\fnrate}_{\fprate}$ and $\neg \colon \Bool^{\fnrate}_{\fprate} \mapsto \Bool^{\fnrate}_{\fprate}$ are also random, e.g., assuming $\neg$ does not introduce an \emph{independent} source of error, $\neg \True^{\fnrate}$ and $\neg \False^{\fprate}$ are respectively distributed as $\False^{\fnrate}$ and $\True^{\tprate}$.
+
+
+Conceptually, an \emph{approximate set} is a set that approximates some other set that is of objective interest.
+That is to say, the approximation has \emph{errors} with respect to its \emph{member-of} relations.
+Ideally, no errors would occur, but typically, we either apply lossy data compression techniques to reduce bit rate (or bit length), which introduce errors (rate-distortion), or apply data redundancy techniques to reduce errors caused by noise, which increases bit rate (or bit length).
+
+%It is \emph{approximate} because with respect to the objective set, there are two types of errors, \emph{false %positives} and \emph{false negatives}.
+The \emph{Bloom filter} is a popular example of a data structure and algorithm that models the concpet of generating approximate sets that only includes \emph{false positives} due to \emph{rate distortion}.
+
+In \cref{sec:setalgebra}, we define the algebra of sets.
+
+In \cref{sec:asets}, we provide a formal definition of the \emph{Bernoulli set} model, in which the error rates, such as false positive or false negative rates, are \emph{expectations}.
+
+We describe the axioms of the Bernoulli set model such that, if satisfied, also satisfy the axioms of the approximate algebra of sets.
+
+We further derive the probability distribution of Bernoulli sets entailed by the axioms.
+
+In \cref{sec:characteristics}, we derive the random variables that are fundamental to the Bernoulli set model.
+
+In \cref{sec:func_rand_asets}, we provide a detailed treatment on distributions that are induced by functions that depend on random approximate sets, e.g., in \cref{sec:set_theory} we derive the probability distribution of random approximate sets that are generated from arbitrary set-theoretic operations on random approximate sets and in \cref{sec:perf} we derive several well-known binary classification performance measures of random approximate sets as a function of their error rates, such as \emph{positive predictive value}.
+
+In \cref{sec:intervals}, we provide the probabilistic model for random approximate sets with \emph{uncertain} rate distortions, such as an uncertain false positive rate.
+
+In \cref{sec:adt}, we provide a treatment on the random approximate set model as an abstract data type and show how that, if the generative algorithm of an approximate set model is deterministic, the random approximate set model quantifies our ignorance or uncertainty.
+
+Finally, in \cref{sec:bool_search}, we consider Encrypted Search with secure indexes based on random approximate sets.
+To prove various properties of this model, such as expected precision, we only need to show that the \emph{result sets} are approximate sets of the \emph{objective} results and all the results immediately follow.
+\end{document}

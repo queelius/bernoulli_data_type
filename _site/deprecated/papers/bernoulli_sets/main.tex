@@ -1,0 +1,115 @@
+\documentclass[10pt,final,hidelinks]{article}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[activate={true,nocompatibility},final,tracking=true,kerning=true,
+    spacing=true,factor=1100,stretch=10,shrink=10]{microtype}
+\microtypecontext{spacing=nonfrench}
+\usepackage[margin=.5in]{geometry}
+\usepackage{graphicx}
+\graphicspath{{img/}} 
+\usepackage[noend]{algorithm2e}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{mathtools}
+\usepackage{subfiles}
+\usepackage{enumitem}
+\usepackage{commath}
+\usepackage{appendix}
+\renewcommand\appendixtocname{Appendices}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+%\usepackage[intoc,english]{nomencl}
+%\makenomenclature
+\usepackage{pgfplots}
+\usepackage{tabu} 
+\usepackage{tikz}
+\usepackage{tikzscale}
+\usepackage[square,numbers]{natbib}
+\bibliographystyle{plain}
+\usepackage{siunitx}
+\numberwithin{equation}{section}
+\usepackage{hyperref}
+\usepackage{cleveref}
+
+\pgfplotsset{compat=newest}
+
+\newcommand{\COMMENT}[1]{}
+
+\usepackage{functionnotation}
+\usepackage{algorithmnotation}
+\usepackage{matrixnotation}
+\usepackage[fancy]{setnotation}
+\usepackage[fancy]{relationnotation}
+\usepackage{approxsetnotation}
+\usepackage{approxrelationnotation}
+\usepackage[section]{envnotation}
+
+\hypersetup{
+    pdftitle={Bernoulli sets and their corresponding random binary classification measures.},
+    pdfauthor={Alexander Towell},               % author
+    pdfsubject={computer science},              % subject of the %document
+    pdfkeywords={
+        probabilistic data structure,
+        abstract data type,
+        approximate set,
+        bloom filter,
+        perfect hash function,
+        perfect hash filter},                   % keywords
+    colorlinks=true,                            % false: boxed links;
+    linkcolor=magenta,
+    citecolor=green,                            % color of links to 
+    filecolor=blue,                             % color of file links
+    urlcolor=green                              % color of external
+}
+
+\title
+{
+    Bernoulli sets: a model for modeling sets with random errors\\
+    \large and corresponding random binary classification measures.
+}
+\author
+{
+    Alexander Towell\\
+    \texttt{atowell@siue.edu}
+}
+\date{}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+We define a \emph{random approximate set} model and the probability space that 
+follows.
+A random approximate set is a \emph{probabilistic} set generated to \emph{approximate} another set of objective interest.
+We derive several properties that follow from this definition, such as the expected \emph{precision} in information retrieval.
+Finally, we demonstrate an application of approximate sets, approximate Encrypted Search with queries as a Boolean algebra, which generates random approximate result sets.
+\end{abstract}
+
+%\microtypesetup{protrusion=false}
+\tableofcontents
+%\microtypesetup{protrusion=true}
+%\listoftables
+%\listoffigures
+
+%\include{nom}
+%\printnomenclature
+
+\subfile{sections/intro}
+\subfile{sections/algebra_of_sets}
+%\subfile{sections/aset_model}
+\subfile{sections/bernoulli_model}
+\subfile{sections/first_order_model}
+\subfile{sections/second_order_pos_neg_model}
+\subfile{sections/derived_distributions}
+\subfile{sections/relational}
+\subfile{sections/interval}
+\subfile{sections/aset_adt}
+\subfile{sections/appendix}
+
+\bibliography{references}
+
+\end{document}

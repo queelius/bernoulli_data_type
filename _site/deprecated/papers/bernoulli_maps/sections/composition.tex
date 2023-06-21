@@ -1,0 +1,133 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+	
+\section{Higher-order random approximate maps}
+Typically, a data structure models a \emph{first-order} random approximate map where the approximation error is due to \emph{rate-distortion}.
+Then, through algebraic operations on first-order maps, such as composition, \emph{higher-order} approximate maps are the natural result.
+
+We discuss some of these higher-order models in this section.
+
+
+\subsection{Algebra of relations}
+
+\subsection{Algebra of sets}
+The \emph{set-complement}, \emph{set-intersection}, and \emph{set-union} operators have set-indicator functions defined respectively as
+\begin{align}
+	\SetIndicator{\SetComplement[\Set{A}]} 				&\coloneqq 1-\SetIndicator{\Set{A}}(x)\,,\\
+	\SetIndicator{\Set{A} \SetIntersection \Set{B}}(x) 	&\coloneqq \SetIndicator{\Set{A}}(x) \SetIndicator{\Set{B}}(x)\,,\\
+	\SetIndicator{\Set{A} \SetUnion \Set{B}}(x) 		&\coloneqq \SetIndicator{\Set{A}}(x) + \SetIndicator{\Set{B}}(x) - \SetIndicator{\Set{A}}(x) \SetIndicator{\Set{B}}(x)\,.
+\end{align}
+
+
+\subsection{Composition}
+\label{sec:comp_map}
+Composition of first-order approximate maps yields (potentially) a higher-order approximate map where elements in the negative set are not identically distributed.
+
+The higher the order of the approximation, the greater the number of different distributions.
+
+The positive set is more difficult to quantify since an algorithm may try to generate maps that yield minimal error.
+
+If the ...
+
+
+
+
+Compose should return a function that is the composition of a list of functions of arbitrary length. Each function is called on the return value of the function that follows. You can think of compose as moving right to left through its arguments.
+
+Let $\APFun{f}[\fprate_1][\fnrate_1] \colon \Set{X} \mapsto \Set{Y}$ be an approximate map with a false positive rate $\fprate_1$ and false negative rate $\fnrate_1$ and let $\APFun{g}[\fprate_2][\fnrate_2] \colon \Set{Y} \mapsto \Set{Z}$ be an approximate map with a false positive rate $\fprate_2$ and false negative rate $\fnrate_2$.
+
+Then, the composition $\APFun{g} \circ \APFun{f} \colon \Set{X} \mapsto \Set{Z}$ is an approximate map.
+
+\begin{assumption}
+When composing $\APFun{f}$ with $\APFun{g}$, if $x \in \Dom(\Fun{f})$, then $\Fun{f}(x) \in \Dom\!\left(\Fun{g}\right)$. Otherwise, the composition is undefined.
+\end{assumption}
+Let $\RV{X}$ denote a randomly chosen element from $\Set{X}$. Under \cref{dummyref}, what is the probability that $\RV{X}$ results in undefined behavior when used as the input in the composition $\APFun{f}[\fprate][\fnrate] \circ \APFun{g}[\fprate][\fnrate]$?
+
+
+$\ATL{\mapsto}$
+
+$\ATL{\pfun}[\fprate]$
+
+$\ATL{\mapsto}[\fprate][\fnrate]$
+
+
+$\ATOverUnder{\AT{\ATL{\Set{A}}[\fprate_1][\fnrate_2]}[\fprate_2][\fnrate_2]}[\fprate_3][\fnrate_3]$
+
+$\ATOverUnder{\Set{A}}[\fprate][\fnrate]$
+
+
+$\ATL{\Set{A}}[\fprate][\fnrate] \times \ATL{\Set{A}}[\fprate][\fnrate]$
+
+
+$\ATL{\Set{A}}$
+
+${}^{\pm} \! \Set{A}$
+
+
+
+Suppose $\fnrate_1 = \fnrate_2 = 0$. If it is given that $\RV{X} \in \Dom(\Fun{f})$, the probability of a false positive is zero. Otherwise, a false positive occurs if:
+\begin{enumerate}
+    \item $\RV{X} \in \Dom(\APFun{f}[\fprate][\fnrate])$ and $\APFun{f}[\fprate][\fnrate](\RV{X})$ maps to a value $\RV{Y} \in \Dom(\APFun{g}[\fprate][\fnrate])$.
+\end{enumerate}
+
+
+
+Suppose we have an approximate map where the keys are from the tuple of $n$ elements given by the type
+\begin{equation}
+    \Set{X} = \Set{X}_1 \times \cdots \times \Set{X}_n
+\end{equation}
+and the values are from the tuple of $m$ elements given by the type
+\begin{equation}
+    \Set{Y} = \Set{Y}_1 \times \cdots \times \Set{Y}_m\,.
+\end{equation}
+
+\begin{example}
+Let the keys be of the type
+\begin{equation}
+    \Set{X} = \{1,2\} \times \{a,b\}
+\end{equation}
+and the values be of the type
+\begin{equation}
+    \Set{Y} = \{c,d\} \times \{1,2\}\,.
+\end{equation}
+Since these are small sets, for may enumerate the universe of keys and values.
+The universe of keys is given by
+\begin{equation}
+    (1,a),(1,b),(2,a),(2,b)
+\end{equation}
+and the universe of values is given by
+\begin{equation}
+    (c,1),(c,2),(d,1),(d,2)\,.
+\end{equation}
+\end{example}
+
+
+Then, the map $\Fun{f} \colon \Set{X} \mapsto \Set{Y}$ maps tuples of the form $(x_1,\ldots,x_n), x_j \in \Set{X}_j$ to values of  $(y_1,\ldots,y_m),y_j \in \Set{Y}_j$.
+
+Currying is a way of constructing functions that allows partial application of a function’s arguments.
+
+
+\begin{example}
+Let the approximate map $\Fun{f} \colon \Set{Z} \times \Set{Z} \mapsto \Set{Q} \times \Set{Z}$ be defined by the rule
+\begin{equation}
+    \Fun{f}(x_1,x_2) = \left(\frac{x_2}{2},x_1\right)
+\end{equation}
+for $(x_1,x_2) \in \{(1,1),(2,2),(3,4)\}$.
+The set of ordered pairs defining $\Fun{f}$ is thus given by
+\begin{equation}
+    \left\{
+        \left((1,1),\left(\frac{1}{2},1\right)\right),
+        \left((2,2),\left(1,2\right)\right),
+        \left((3,4),\left(\frac{3}{2},4\right)\right)
+    \right\}\,.
+\end{equation}
+\end{example}
+
+Define composition of functions. Then, talk about how a composition of functions with approximate domains result in composition of functions with approximate domains. Talk about how the false positive rate increases. Relate this to an error measure?
+
+
+One kind of composition is fuzzy hedge functions?
+
+
+\end{document}

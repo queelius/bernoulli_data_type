@@ -1,0 +1,107 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+
+Given an approximate set $\ASet{S}$ with a false positive rate $\fprate$ and a false negative rate $\fnrate$, the \emph{method of moments} estimator of the cardinality of $\Set{S}$ is given by
+\begin{equation}
+\label{eq:exp_St_finite}
+    \hat{m} = \frac{\Card{\ASet{S}} - \fprate u}{1 - \fprate - \fnrate}\,.
+\end{equation}
+
+
+Since the optimal space complexity is $-\log_2 \fprate$ per element, any data structure that implements an approximate set with a false positive rate $\fprate$ obtains the maximum entropy, i.e., the maximum entropy per element is given by
+\begin{equation}
+    -\log_2 \fprate \; \si{bits \per element}\,.
+\end{equation}
+Thus, the \emph{entropy} of an implementation of the approximate set is given by
+\begin{equation}
+    \frac{H(\PASet{S})}{m} = -\log_2 \fprate
+\end{equation}
+
+
+
+
+\begin{theorem}
+An unbiased estimator of the cardinality of a \emph{countably infinite} approximate set $\PASet{S}$ of a set $\Set{S}$ with a false positive rate $\fprate$ is given by
+\begin{equation}
+    \hat{m} = \frac{\BL\!\left(\PASet{S}\right)}{b}\,,
+\end{equation}
+were $\BL$ is the bit length function and $b$ is the \emph{expected} bits per element.
+\end{theorem}
+\begin{proof}
+The \emph{expected} bit length is given by
+\begin{equation*}
+    -m b
+\end{equation*}
+where $m$ is the cardinality of $\Set{S}$. Thus, the \emph{method of moments} estimator is given by assuming the bit length realizes the expected value,
+\begin{equation}
+    \BL(\PASet{S}) = m b\,.
+\end{equation}
+Solving for $m$ results in the estimator
+\begin{equation}
+    \hat{m} = \frac{\BL(\PASet{S})}{b}\,.
+\end{equation}
+\end{proof}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Given an approximate set $\ASet{S}$ with a false positive rate $\fprate$ and a false negative rate $\fnrate$, the \emph{method of moments} estimator of the cardinality of $\Set{S}$ is given by
+\begin{equation}
+\label{eq:exp_St_finite}
+    \hat{m} = \frac{\Card{\ASet{S}} - \fprate u}{1 - \fprate - \fnrate}\,.
+\end{equation}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+NOTE: The exact oblivious set bit length reveals nothing about the size of set $\Set{S}$ since it only depends on $\Card{\Set{U}}$.
+
+
+By Kerckhoffs's principle, we assume the algorithms are known. For instance, we assume the \emph{space complexity} with respect to the cardinality of the \emph{exact} set is known.
+
+Thus, the \emph{cardinality}, a unary function of $\OT{\ASet{S}}$, may be estimated by using the information about the \emph{expected} bit length. If the expected bit length as a function of $m$ is given by $\Fun{f}(m)$, where $m$ is the cardinality of the exact set, then a \emph{method of moments} estimator is given by assuming the bit length realizes the expected value,
+\begin{equation}
+    \BL(\OT{\ASet{S}}) = \Fun{f}(m)\,,
+\end{equation}
+and solving for $m$, resulting in the estimator
+\begin{equation}
+    \hat{m} = \Fun{f}^{-1}\!\left(\BL(\OT{\ASet{S}})\right)\,.
+\end{equation}
+
+Consider the following example of the \emph{Perfect Hash Filter}\cite{phf}.
+\begin{example}
+The \emph{optimal} \emph{Perfect Hash Filter} has a space complexity given by
+\begin{equation}
+    \BL(\OT{\ASet{S}}) = m \log_2 \frac{e}{\fprate}\,.
+\end{equation}
+Solving for $m$ results in the estimator
+\begin{equation}
+    \hat{m} = \frac{\BL(\OT{\ASet{S}})}{\log_2 \frac{e}{\fprate}}\,.
+\end{equation}
+\end{example}
+Depending on the entropy of the random bit length of the oblivious set object type, cardinality estimators with very low variance may be obtainable. Thus, in order to increase the uncertainty, we must artificially inflate the bit length of $\OT{\ASet{S}}$. One simple way of achieving this is to randomly sample a positive integer from $0$ to $N$, and insert 
+
+
+\end{document}

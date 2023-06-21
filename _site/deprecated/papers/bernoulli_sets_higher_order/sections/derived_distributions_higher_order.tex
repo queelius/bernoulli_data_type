@@ -1,0 +1,159 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+\section{Probability distributions of parameters for \emph{higher-order} approximations}
+\label{sec:characteristics2}
+
+%Higher-order random approximate sets are less trivial, and a full probabilistic model, while tractable, is generally not as useful.
+
+The false negative rate is a random variable that is a mixture? of binomially distributed random variables and likewise for the false positive rate.
+We characterize their error rates by their expected values and variance and show their normal approximation when the sampling distribution of these rates are important.
+
+\subsection{Compositions of random approximate sets}
+\label{sec:set_theory}
+The union of two first-order random approximate sets is given by the following theorem.
+\begin{theorem}
+	%\begin{equation}
+	%	\Prob{\SetIndicator{\ASet{A}}(a) \cap \SetIndicator{\ASet{A}}(b) \Given \SetIndicator{\Set{A}}(a) \cap \SetIndicator{\Set{A}}(b)} = 
+	%	\Prob{\SetIndicator{\ASet{A}}(a) \Given \SetIndicator{\Set{A}}(a)} \Prob{\SetIndicator{\ASet{A}}(b) \Given \SetIndicator{\Set{A}}(b)}
+	%\end{equation}
+	The union of first-order random approximate sets $\ASetFO{A}[\epsilon_1]$ and $\ASetFO{B}[\epsilon_2]$ is up to a \emph{third-order} random approximate set with a random error rate given by
+	\begin{equation}
+		\Delta = \sum_{i=1}^{3} \alpha_j \RV{X_j}
+	\end{equation}
+	with an expectation 
+	\begin{equation}
+		\epsilon = \alpha_1 (1-\epsilon_1)\epsilon_2 + \alpha_2 (1-\epsilon_2)\epsilon_1 + (1-\alpha_1 - \alpha_2 - \alpha_3)\epsilon_1 \epsilon_2\,,
+	\end{equation}
+	a \emph{false negative rate}
+	\begin{equation}
+		\fnrate = \epsilon_1 \epsilon_2
+	\end{equation}
+	and a \emph{false positive rate}
+	\begin{equation}
+		\fprate = \epsilon_1 \epsilon_2\,,
+	\end{equation}
+	where $\alpha_1 \coloneqq \frac{\Card{\Set{A} \SetDiff \Set{B}}}{\Card{\Set{U}}}$, $\alpha_2 \coloneqq \frac{\Card{\Set{B} \SetDiff \Set{A}}}{\Card{\Set{U}}}$, and $\alpha_3 \coloneqq \frac{\Card{\Set{A} \SetIntersection \Set{B}}}{\Card{\Set{U}}}$.
+\end{theorem}
+
+
+
+
+
+
+The set of $n$-arity operations on set $\Set{X}$ is given by $\Set{X}^n \mapsto \Set{X}$.
+In this section, we consider binary operations on $\PS{\Set{U}}$, like $\SetUnion \colon \PS{\Set{U}} \times \PS{\Set{U}} \mapsto \PS{\Set{U}}$, and the result of providing \emph{random approximate sets} as input.
+
+%Even though we are generating random approximate sets from random approximate sets, we do not consider the compositions in this section to be higher-order approximations since we have zero control over the distribution of the parameters, like the false positive rate.
+%Instead, such characteristics are a function of the random approximate sets being composed.
+
+Given the Boolean algebra
+$\left(\PS{\Set{U}}, \SetIntersection, \SetUnion, \SetComplement, \EmptySet, \Set{U}\right)
+$
+we derive the random approximate sets that result from the union (join) or complement of random approximate sets.
+Since unions and complements form a \emph{complete basis} for Boolean algebras, we may express other Boolean operations as a composition of these two operations, e.g., $\SetDiff[\ASet{A}][\ASet{B}] = \SetComplement[\SetUnion[\SetComplement[\ASet{A}]][\ASet{B}]]$.
+
+The random approximate sets that result from union operations on random approximate sets are given by the following theorems.
+\begin{theorem}
+	\label{thm:union_fp}
+	The union of two random approximate sets respectively with true negative rates $\tnrate_1$ and $\tnrate_2$ is a random approximate set with a true negative rate 
+	$\tnrate_1 \tnrate_2$.
+\end{theorem}
+\begin{proof}
+	Suppose we have two sets $\Set{A}$ and $\Set{B}$ with false positive rates $\fprate_1$ and $\fprate_2$. The false positive rate $\fprate$ of $\SetUnion[\ASet{A}][\ASet{B}]$ is a probability conditioned on a negative for $\SetUnion[\Set{A}][\Set{B}]$ being a positive for $\SetUnion[\ASet{A}][\ASet{B}]$.
+	
+	Switching to the Boolean vector representation, suppose we randomly select an element from the universe, denoted by $x_j$, such that $\neg \RV{A}_j \lor \neg \RV{B}_j$ is true.
+	
+	The expected false positive rate of the union is defined by the probability
+	\begin{equation}
+	\fprate = \Prob{\AVecComp{A} \cup \AVecComp{B} \Given B_1 \cap B_2}\,.
+	\end{equation}
+	By DeMorgan's law, the union of sets is the complement of the intersection of their complements. That is,
+	\begin{equation}
+	\label{eq:proof_union_fp_1}
+	A_1 \cup A_2 \equiv \left(A_1' \cap A_2'\right)'
+	\end{equation}
+	and thus
+	\begin{equation}
+	\label{eq:proof_union_fp_2}
+	\fprate = \Prob{\left(A_1' \cap A_2'\right)' \Given B_1 \cap B_2}\,.
+	\end{equation}
+	Since either an event or the \emph{complement} of the event is certain to occur, $\Prob{E} + \Prob{E'} = 1$, the above equation may be rewritten as
+	\begin{equation}
+	\label{eq:proof_union_fp_3}
+	\fprate = 1 - \Prob{A_1' \cap A_2' \Given B_1 \cap B_2}\,.
+	\end{equation}
+	Since $A_1'$ and $A_2'$ are independent,
+	\begin{equation}
+	\fprate = 1 - \Prob{A_1' \Given B_1 \cap B_2} \Prob{A_2' \Given B_1 \cap 
+		B_2}\,.
+	\end{equation}
+	Since $A_1$ is conditionally independent of $B_2$ and $A_2$ is conditionally independent of $B_1$, we may rewrite the above equation as
+	\begin{equation}
+	\fprate = 1 - \Prob{A_1' \Given B_1} \Prob{A_2' \Given B_2}\,.
+	\end{equation}
+	$A_j$ denotes $\RV{X} \in \ASet{S}[j]$, therefore $A_j'$ denotes $\RV{X} \notin \ASet{S}[j]$. Substituting the definition of $A_1'$, $A_2'$, $B_1$, and $B_2$ into the above equation gives
+	\begin{equation}
+	\fprate = 1 - \Prob{\RV{X} \in \ASet{A} \Given \RV{X} \notin \Set{A}} 
+	\Prob{\RV{X} \notin \ASet{B} \Given \RV{X} \notin \Set{B}}\,.
+	\end{equation}
+	By definition, $\Prob{\RV{X} \notin \ASet{A} \Given \RV{X} \notin 
+		\Set{A}}$ is the true negative rate $\tnrate_1$ and likewise for $\ASet{B}$. Thus,
+	\begin{equation}
+	\fprate = 1 - \tnrate_1\tnrate_2\,.
+	\end{equation}
+\end{proof}
+
+The limiting probability distribution of the uncertain true negative rate of the union of $\ASet{A}$ and $\ASet{B}$ is thus
+\begin{equation}
+\TNR_\n \sim \normdist\!\left(\tnrate_1 \tnrate_2, \frac{\tnrate_1 \tnrate_2 (1-\tnrate_1 \tnrate_2)}{\n}\right)
+\end{equation}
+where the number of negatives $\n = u - \Card{\SetUnion[\Set{A}][\Set{B}]} \leq u$, which is a value between $0$ and $u$. Since this is a limiting distribution, presumably $\n$ is large, and as $\n \to \infty$ the distribution converges in probability to $\tprate_1 \tprate_2$.  % = u - \Card{\Set{A}} - \Card{\Set{B}} + \Card{\Set{A} \cap \Set{B}}$.
+
+Generally, the number of negatives $\n$ or positives $\p$ is not known, and so this serves a more analytic function, i.e., given around $\n$ negatives, what true negative rate $\tnrate$ provides the desired level of confidence that the true negative rate will not realize a value less than some specified value?
+
+
+
+
+\begin{theorem}
+	\label{thm:union_fn_rate}
+	The union of $\ASet{A}[\tnrate_1][\fnrate_1]$ and $\ASet{B}[\tnrate_2][\fnrate_2]$ is a random approximate set with an expected false negative rate
+	\begin{equation}
+	\label{eq:union_fn_rate}
+	\fnrate =
+	\alpha_1 \fnrate_1 \tnrate_2 + \alpha_2 \tnrate_1\fnrate_2\\
+	+ (1 - \alpha_1 - \alpha_2) \fnrate_1 \fnrate_2\,,
+	\end{equation}
+	where
+	\begin{equation}
+	\begin{split}
+	\label{eq:union_fn_rate_alpha}
+	0 &\leq \alpha_1 = \frac{\Card{\SetDiff[\Set{A}][\Set{B}]}}{\Card{\SetUnion[\Set{A}][\Set{B}]}}\,,\\
+	0 &\leq \alpha_2 = \frac{\Card{\SetDiff[\Set{B}][\Set{A}]}}{\Card{\SetUnion[\Set{A}][\Set{B}]}}\,,\\
+	\alpha_1 + \alpha_2 &\leq 1\,.
+	\end{split}
+	\end{equation}
+\end{theorem}
+See \cref{sec:union_fn_rate} for a proof of \cref{thm:union_fn_rate}.
+
+The complement of an approximate set is given by the following theorem.
+\begin{theorem}
+	\label{thm:asetcompl}
+	The \emph{complement} of a random approximate set with a false positive rate $\fprate$ and false negative rate $\fnrate$ is an approximate set with a false positive rate $\fnrate$ and a false negative rate $\fprate$.
+\end{theorem}
+\begin{proof}
+	The false positives in an approximate set are false negatives in its complement;
+	likewise, the false negatives in an approximate set are the false positives in its complement set.
+\end{proof}
+
+%Since many operations in $\PS{\Set{U}} \times \PS{\Set{U}} \mapsto \PS{\Set{U}}$ may be defined as a composition of unions and complements, 
+%\cref{thm:union_fp,thm:union_fn_rate,thm:asetcompl} may be used to derive many other random approximate sets, such as intersections and set-difference.
+
+\begin{remark}
+	Consider a sequence $\PASet{A}[\fprate_1],\ldots,\PASet{A}[\fprate_n]$.
+	Any \emph{subsequence} contains strictly less information about $\Set{A}$.
+	That is, positive approximate sets are strictly \emph{additive}, and as $n \to \infty$, $\cap_{i=1}^{n} \PASet{A}[\fprate_i]$ converges almost surely to $\Set{A}$.\footnote{Likewise, for negative approximate sets, as $n \to \infty$, $\cup_{i=1}^{n} 
+		\NASet{A}[\fnrate_i]$ converges almost surely to $\Set{A}$.}
+\end{remark}
+
+\end{document}

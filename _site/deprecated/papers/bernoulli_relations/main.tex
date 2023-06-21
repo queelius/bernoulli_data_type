@@ -1,0 +1,121 @@
+%\documentclass[final,journal,compsoc,hidelinks]{article}
+\documentclass[11pt,final,hidelinks]{article}
+\usepackage{lmodern}
+\usepackage[nohints]{minitoc}
+\usepackage[margin=1in]{geometry}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage[activate={true,nocompatibility},final,tracking=true,kerning=true,spacing=true,factor=1100,stretch=10,shrink=10]{microtype}
+\microtypecontext{spacing=nonfrench}
+\usepackage[noend]{algorithm2e}
+\usepackage{caption}
+\usepackage{mathtools}
+\usepackage{commath}
+\usepackage{minted}
+\usepackage{enumerate}
+\usepackage{amsmath}
+\usepackage{subfiles}
+\usepackage{booktabs}
+\usepackage[xindy,toc,acronyms,symbols]{glossaries}
+\usepackage{latexsym}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{pgfplots}
+\usepackage{wasysym}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usepackage{tikzscale}
+\usepackage[square,numbers]{natbib}
+\bibliographystyle{plainnat}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{cleveref}
+\usepackage[super]{nth}
+\usepackage{siunitx}
+\usepackage[section]{placeins}
+\usepackage{subcaption}
+
+%\usepackage{alexmisc}
+\usepackage{functionnotation}
+\usepackage[plain]{setnotation}
+\usepackage{approxsetnotation}
+\usepackage{probabilitynotation}
+\usepackage[fancy]{relationnotation}
+\usepackage{approxrelationnotation}
+\usepackage[section]{envnotation}
+%\usepackage{algorithmnotation}
+%\usepackage{alexmisc}
+
+\hypersetup{
+    pdftitle={The random approximate relation abstract data type},
+    pdfauthor={Alexander Towell},               % author
+    pdfsubject={computer science},              % subject of the document
+    pdfkeywords={
+        probabilistic data structure,
+        partial function,
+        random approximate set,
+        random approximate data type,
+        random approximate relation,
+        random approximate map,
+        relation,
+        set        
+	},                    % keywords
+    colorlinks=false,                           % false: boxed links;
+    citecolor=green,                            % color of links to 
+    filecolor=magenta,                          % color of file links
+    urlcolor=green                              % color of external
+}
+
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{naturalnames}{hyperref}
+\pgfplotsset{compat=1.14} 
+
+\graphicspath{img}
+
+
+\title
+{
+    The abstract data type of the \emph{approximate relation}
+}
+\author
+{
+    Alexander Towell\\
+    \texttt{atowell@siue.edu}
+}
+\date{}
+
+%\include{defs}
+%\loadglsentries{gloss}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+We define the semantics of \emph{approximate relation}, which follows naturally from the \emph{approximate set}. It is a \emph{probabilistic} relation that \emph{approximates} another relation of objective interest with the possibility of \emph{false correspondences} and \emph{false complementary correspondences}. A special-case of the approximate relation is the approximate partial function (unary partial functions are more widely known as dictionaries). Given specified error rates of these kind, we derive the expected lower-bound on the bits per relation. Furthermore, we consider how these errors \emph{propagate} through relational operators like \emph{join} and \emph{project}, and consider the special case of partial function \emph{composition}. Following from that, we consider an implementation of the approximate relation based on approximate sets. Following from that, we consider an implemention which efficiently permits projections on the relations down to specific attributes based on perfect hash functions, denoted the \emph{perfect hash map}, which is especially useful for implementing approximate unary approximate partial functions. Finally, we demonstrate an application, \emph{oblivious databases}, which we use to implement rank-ordered Encrypted Search with extensions for the fuzzy set-theoretic model.
+\end{abstract}
+
+
+\microtypesetup{protrusion=false}
+\tableofcontents
+\microtypesetup{protrusion=true}
+
+
+\newcommand{\ExactMap}[1]{M(#1)}
+
+
+%\listoffigures
+%\listofalgorithms
+
+
+\subfile{sections/intro}
+\subfile{sections/relations}
+\subfile{sections/approx_rel_model}
+\subfile{sections/rel_algebra}
+\subfile{sections/properties}
+\subfile{sections/predicates}
+\subfile{sections/test}
+\subfile{sections/unused/optimality}
+\subfile{sections/unused/oblivious_rel_model}
+%\subfile{sections/appendix}
+\printglossary
+\bibliography{references}
+\end{document}

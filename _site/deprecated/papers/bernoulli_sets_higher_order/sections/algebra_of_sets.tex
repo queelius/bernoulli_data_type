@@ -1,0 +1,150 @@
+\documentclass[../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+\section{Algebra of sets} 
+\label{sec:setalgebra}
+A \emph{set}\index{set} is an unordered collection of distinct elements.
+If we know the elements in a set, we may denote the set by these elements, e.g., $\{a,c,b\}$ denotes a set whose members are exactly $a$, $b$, and $c$.
+
+Two sets of particular importance are the empty set, denoted by $\EmptySet$, which has no members, and the \emph{universal set}, in which every element of interest is a member.
+
+A \emph{finite set} has a finite number of elements.
+For example, $\{ 1, 3, 5 \}$ is a finite set with three elements.
+When sets $\Set{A}$ and $\Set{B}$ are \emph{isomorphic}, denoted by $\Set{A} 
+\cong \Set{B}$, they can be put into a one-to-one correspondence (bijection), e.g., $\{b,a,c\} \cong \{1,2,3\}$.
+
+The cardinality of a finite set $\Set{A}$ is the number of elements in the set, denoted by $\Card{\Set{A}}$, e.g., $\Card{\left\{ 1, 3, 5\right\}} = 3$.
+A \emph{countably infinite set} is isomorphic to the set of \emph{natural numbers} $\NatSet \coloneqq \{1,2,3,4,5,\ldots\}$.
+
+
+Given two elements $a$ and $b$, an ordered pair of $a$ then $b$ is denoted by $\Pair{a}{b}$, where $\Pair{a}{b} = \Pair{c}{d}$ \emph{if and only if} $a = c$ and $b = d$.
+Ordered pairs are non-commutative and non-associative, i.e., $\Pair{a}{b} \neq \Pair{b}{a}$ if $a \neq b$ and $\Pair{a}{\Pair{b}{c}} \neq \Pair{\Pair{b}{a}}{c}$.
+
+Related to the ordered pair is the Cartesian product.
+\begin{definition}
+	The set $\Set{X} \times \Set{Y} \coloneqq \left\{\Pair{x}{y} \colon x \in 
+	\Set{X} \land y \in \Set{Y}\right\}$ is the Cartesian product of sets $\Set{X}$ 
+	and $\Set{Y}$.
+\end{definition}
+By the non-commutative and non-associative property of ordered pairs, the Cartesian product is non-commutative and non-associative.
+However, they are isomorphic, i.e., $\Set{X} \times \Set{Y} \cong \Set{Y} \times \Set{X}$.
+
+A \emph{tuple} is a generalization of order pairs which can consist of an arbitrary number of elements, e.g., $\Tuple{x_1,x_2,\ldots,x_n}$.
+\begin{definition}[$n$-fold Cartesian product]
+	The $n$-ary Cartesian product of sets $\Set{X}[1],\ldots,\Set{X}[n]$, is given by $\Set{X}[1] \times \cdots \times \Set{X}[n] = \left\{\Tuple{x_1,\ldots,x_n} \colon x_1 \in \Set{X}[1] \land \cdots \land x_n \in \Set{X}[n]\right\}$.
+\end{definition}
+Note that
+	$\Set{X}[1] \times \Set{X}[2] \times \Set{X}[3] \cong \Set{X}[1] \times \left(\Set{X}[2] \times \Set{X}[3]\right) \cong \left(\Set{X}[1] \times \Set{X}[2]\right) \times \Set{X}[3]$,
+thus we may implicitly convert between them without ambiguity.
+
+If each set in the $n$-ary Cartesian product is the same, the power notation may be used, e.g., $\Set{X}^3 \coloneqq \Set{X} \times \Set{X} \times \Set{X}$.
+As special cases, $\Set{X}^0 \coloneqq \{ \EmptySet \}$ and $\Set{X}^1 \coloneqq \Set{X}$.
+
+A \emph{binary relation} over sets $\Set{A}$ and $\Set{B}$ is any subset of $\Set{A} \times \Set{B}$.
+A fundamental relation is the member-of relation, where $\SetContains[x][\Set{A}]$ denotes that an object $x$ is a member of a set $\Set{A}$.
+A set $\Set{A}$ is a \emph{subset} of a set $\Set{B}$ if every member of $\Set{A}$ is a member $\Set{B}$, denoted by $\Set{A} \subseteq \Set{B}$.
+The subset relation forms a \emph{partial order}, i.e., if $\Set{A} \subseteq \Set{B}$ and $\Set{B} \subseteq \Set{C}$ then $\Set{A} \subseteq \Set{C}$ and 
+if $\Set{A} \subseteq \Set{B}$ and $\Set{B} \subseteq \Set{A}$ then $\Set{A}$ and $\Set{B}$ are \emph{equal}, denoted by $\Set{A} = \Set{B}$.
+
+
+\begin{definition}
+	Set builder notation
+\end{definition}
+
+
+\begin{definition}
+	A \emph{function} of type $\Set{X} \mapsto \Set{Y}$ is a binary relation on $\Set{X} \times \Set{Y}$ with the constraint that each $x \in \Set{X}$ is paired with exactly one $y \in \Set{Y}$.
+\end{definition}
+A function of type $\Set{X} \mapsto \Set{Y}$ has a domain $\Set{X}$ and a codomain $\Set{Y}$.
+Since every $x \in \Set{X}$, given a pair $\Pair{x}{y} \in \Fun{f}$, $y$ may also be denoted by $\Fun{f}(x)$.
+
+The \emph{power set} of a set $\Set{A}$, denoted by $\PS{\Set{A}}$, is the set of sets that contains all of the possible subsets of $\Set{A}$, e.g., $\PS{\{a, b\}}= \left\{ \EmptySet, \{a\}, \{b\}, \{a, b\} \right\}$.
+
+A predicate is a function that maps elements in its domain to true (denoted by $1$) or false (denoted by $0$).
+A predicate function of particular importance is the indicator function
+\begin{equation}
+	\SetIndicator{\Set{A}} \colon \Set{X} \mapsto \{0,1\}
+\end{equation}
+defined as
+\begin{equation}
+	\SetIndicator{\Set{A}}(x) \coloneqq
+	\begin{cases}
+		0 & \text{if $x \notin \Set{A}$}\,,\\
+		1 & \text{if $x \in \Set{A}$}\,.
+	\end{cases}
+\end{equation}
+
+The indicator function admits the construction of predicates for any relation, e.g., a binary predicate $\operatorname{P}$ for a binary relation $\Set{R} \subseteq \Set{A} \times \Set{B}$ is defined as $\operatorname{P}(x_1,x_2) \coloneqq \SetIndicator{\Set{R}}(\Pair{x_1}{x_2})$.
+Denoting the \emph{universal set} by $\Set{X}$, all the relations mentioned previously are \emph{binary predicates}, such as $\SetContains \colon \Set{X} \times \PS{\Set{X}} \mapsto \{0,1\}$ and $\subseteq \colon \PS{\Set{X}} \times \PS{\Set{X}} \mapsto \{0,1\}$.
+
+Some important operations on sets are described next.
+The \emph{union} operator, $\SetUnion \colon \PS{\Set{X}} \times \PS{\Set{X}} \mapsto \PS{\Set{X}}$, is defined as
+\begin{equation}
+\SetUnion[\Set{A}][\Set{B}] \coloneqq \SetBuilder{ x \in \Set{X}}{x \in \Set{A} 
+\lor x \in \Set{B}}
+\end{equation}
+where $\lor$ is the logical-connective \emph{or}. The \emph{intersection} operator, $\SetIntersection \colon \PS{\Set{X}} \times \PS{\Set{X}} \mapsto \PS{\Set{X}}$, is defined as
+\begin{equation}
+\SetIntersection[\Set{A}][\Set{B}] \coloneqq \SetBuilder{ x \in \Set{X}}{x \in \Set{A} 
+\land x \in \Set{B}}
+\end{equation}
+where $\land$ is the logical-connective \emph{and}. If $\SetIntersection[\Set{A}][\Set{B}] = \EmptySet$, then we say $\Set{A}$ and $\Set{B}$ are \emph{disjoint} sets.
+
+The \emph{relative complement} (set-difference) operator, $\SetDiff \colon \PS{\Set{X}} \times \PS{\Set{X}} \mapsto \PS{\Set{X}}$, is defined as
+\begin{equation}
+\SetDiff[\Set{A}][\Set{B}] \coloneqq \SetBuilder{ x \in \Set{X}}{x \in \Set{A} 
+\land x \notin \Set{B}}\,.
+\end{equation}
+The relative complement $\SetDiff[\Set{X}][\Set{A}]$ is denoted by $\SetComplement[\Set{A}]$ and is called the \emph{complement} of $\Set{A}$.
+
+\subsection{Boolean algebras}
+An \emph{algebra} denotes a mathematical structure in which a certain set of axioms hold.
+A \emph{Boolean algebra} is given by the following definition.
+
+\newcommand{\meet}{\land}
+\newcommand{\join}{\lor}
+
+\begin{definition}
+\label{def:boolalg}
+A Boolean algebra is a six-tuple $(\Set{A},\meet,\join,\neg,0,1)$ where 
+$\Set{A}$ is a set, $\meet$ is the
+binary \emph{meet} operation, $\join$ is the binary \emph{join} operation, 
+$\neg$ is the unary \emph{complement} operation, $0$ is the \emph{bottom} 
+element, and $1$ is the \emph{top} element such that $\forall a,b,c \in 
+\Set{A}$ the following axioms hold:
+\begin{enumerate}
+\item Associativity: $a \join (b \join c) = (a \join b) \join c$ and $a \meet 
+(b \meet c) = (a \meet b) \meet c$.	
+\item Commutativity: $a \join b = b \join a$ and $a \meet b = b \meet a$.
+\item Identity: $a \join 0 = a$ and $a \meet 1 = a$.
+\item Distributivity: $a \join (b \meet c) = (a \join b) \meet (a \join c)$ 
+and $a \meet (b \join c) = (a \meet b) \join (a \meet c)$.
+\item Complementation: $a \join \neg a = 1$ and $a \meet \neg a= 0$.
+\end{enumerate}
+\end{definition}
+Every valid proposition in a Boolean algebra is derivable from the axioms in 
+\cref{def:boolalg}. A particularly useful result is \emph{De Morgan's laws},
+\begin{equation}
+a \join b = \neg (\neg a \meet \neg b)
+\end{equation}
+and
+\begin{equation}
+a \meet b = \neg (\neg a \join \neg b)\,.
+\end{equation}
+
+\begin{postulate}
+Given the universal set $\Set{U}$ and a set $\Sigma \subseteq \PS{\Set{U}}$ that is closed under unions, intersections, and complements, $(\Sigma,\SetUnion,\SetIntersection,\SetComplement,\EmptySet,\Set{U})$ is a Boolean algebra.
+\end{postulate}
+Trivially, $\Sigma = \PS{\Set{U}}$ forms a Boolean algebra\index{Boolean algebra}, but later we demonstrate that implementations of the \emph{random approximate set} model may form a Boolean algebra over some closed subset $\Sigma \subset \PS{\Set{U}}$.
+
+The algebra of bit-wise operations on vectors of $u$ bits is given by $(\{0,1\}^u,\land,\lor,\neg,\vec{0},\vec{1})$ where $\land$ is bit-wise \emph{and}, $\lor$ is bit-wise \emph{or}, $\neg$ is bit-wise \emph{negation}, $\vec{0}$ is vector of all zeros, and $\vec{1}$ is vector of all ones.
+
+A bijection between the algebra of sets and the algebra of bit vectors is given by the following definition.
+\begin{definition}
+\label{def:bijection}
+Suppose there is some total order on $\Set{U}$, $u=\Card{U}$, such that the $j$-th ranked element may be denoted by $x_{(j)}$. A bijection between the Boolean algebras $\left(\PS{\Set{U}},\SetIntersection,\SetUnion,\SetComplement,\EmptySet,\Set{U}\right)$ and $(\{0,1\}^u,\land,\lor,\neg,\vec{0},\vec{1})$ is given by mapping
+$\Set{X} \in \PS{\Set{U}}$ to $\vec{a} \in \{0,1\}^u$ where $a_j = \SetIndicator{\Set{X}}(x_{(j)})$.
+Additionally, $\lor \leftrightarrow \SetUnion$, $\land \leftrightarrow \SetIntersection$, $\neg \leftrightarrow \SetComplement$, $\vec{0} \leftrightarrow \EmptySet$, and $\vec{1} \leftrightarrow \Set{U}$.
+\end{definition}
+This bijection allows us to use either representation interchangeably.
+\end{document}

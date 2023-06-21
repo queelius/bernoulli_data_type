@@ -1,0 +1,251 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+\section{Distribution of binary classification measures}
+\label{sec:perf}
+%\label{sec:func_rand_asets}
+Suppose we have some other function $\Fun{g} \colon \PS{\Set{X}} \mapsto \Set{Y}$ that is not a \emph{constant}, then the composition $\Fun{g} \circ \APFun{id}[\fprate][\tprate]$ is some probability distribution over the codomain $\Set{Y}$.
+That is, $\left(\Fun{g} \circ \APFun{id}[\fprate][\tprate]\right)(\Set{A})$ is a \emph{random variable}.
+\begin{example}
+%Suppose we are interested in subsets of $\{0,1\}$ given by $\PS{\{0,1\}} = \left\{\EmptySet,\{0\},\{1\},\{0,1\}\right\}$.
+%The random approximate set $\ASetStyle{\{0\}}[0.25][0.75]$ has a probability mass function $\Fun{p}[\ASetStyle{\{0\}}] \colon \PS{\{0,1\}} \mapsto [0,1]$ %given by
+%\begin{equation}
+%\Fun{p}[\ASetStyle{\{0\}}](\Set{B}) =
+%\begin{cases}
+%\frac{3}{16} & \Set{B} = \EmptySet\,,\\
+%\frac{9}{16} & \Set{B} = \{0\}\,,\\
+%\frac{1}{16} & \Set{B} = \{1\}\,,\\
+%\frac{3}{16} & \Set{B} = \{0,1\}\,.
+%\end{cases}
+%\end{equation}
+Let $\Fun{f} \colon \PS{\{0,1\}} \mapsto \{0,1\}$ be defined as
+\begin{equation}
+\Fun{f}(\Set{A}) \coloneqq
+\begin{cases}
+	1 & \Set{A} \in \left\{\{1\},\{0,1\}\right\}\,,\\
+	0 & \text{otherwise.}
+\end{cases}
+\end{equation}
+The composition $\Fun{f} \circ \APFun{id}[\mathsmaller{.25}][\mathsmaller{.75}]$ generates Bernoulli distribution random variables, e.g., $\left(\Fun{f} \circ \APFun{id}[\mathsmaller{.25}][\mathsmaller{.75}]\right)(\{0\}) \sim \berdist(0.25)$.
+%As a function of a random variable, $\Fun{f}(\ASetStyle{\{0\}})$ is a random variable with a support $\{0,1\}$ given by the codomain of $\Fun{f}$.
+%To determine the distribution over $\{0,1\}$, observe that on inputs $\{1\}$ and $\{0,1\}$, $\Fun{f}$ maps to $1$.
+%Otherwise, $\Fun{f}$ maps to $0$.
+
+%The random approximate set $\ASetStyle{\{0\}}$ maps to $\{1\}$ or $\{0,1\}$ with probability $0.25$.
+%Therefore, $\Fun{f}(\ASetStyle{\{0\}})$ maps to $1$ with probability $0.25$ and maps to $1$ with probability $0.75$.
+%Since $\Fun{f}$ is a Boolean function and each application of $\Fun{f}$ to $\ASetStyle{\{0\}}$ is independent and identically distributed, %$\Fun{f}(\ASetStyle{\{0\}})$ must be \emph{bernoulli distributed}, , i.e., $\Fun{f}(\ASetStyle{\{0\}}) \sim \berdist\left(0.25\right)$.
+\end{example}
+
+We consider several classes of functions and the distributions induced by replacing the inputs with random approximate sets, e.g., operators like set-union or binary performance measures like positive predictive value.
+In \cref{sec:bool_search}, we consider a more sophisticated example in Boolean search where queries map to \emph{random approximate result sets}.
+
+%Most set-theoretic operations, such as the subset or power set, may be defined with respect to the \emph{member-of} relation. Thus, the \emph{approximate} member-of relation induces other kinds of approximate relations.
+
+In the approximate set model, the distribution of random variables like the false positive, false negatives, true positives, and true negative rates are given respectively by parameters $\fprate$, $\fnrate$, $\tprate$, and $\tnrate$.
+These parameters belong to a more general class of \emph{binary performance measures}.
+
+The above parameters are statements about the distribution of random approximate sets given corresponding objective sets of interest, e.g.,
+\begin{equation}
+\Prob{\SetIndicator{\ASet{A}[\fprate][\tprate]}(x) \Given 
+	\SetIndicator{\Set{A}}(x)} = \tprate\,.
+\end{equation}
+%\begin{equation}
+%    \Prob{x \in \ASet{S}(\fprate,\tprate) \Given x \in \Set{S}} = \tprate\,.
+%\end{equation}
+
+The accuracy of \emph{predictions} about objective sets given a corresponding approximate set is usually the more relevant performance measure.
+The \emph{positive predictive value} is given by the following definition.
+\begin{definition}
+	The \emph{positive predictive value} is a performance measure defined as 
+	\begin{equation}
+	\ppv = \frac{t_p}{t_p + f_p}
+	\end{equation}
+	where $t_p$ is the number of \emph{true positives} and $f_p$ is the number 
+	of \emph{false positives}.
+\end{definition}
+
+The positive predictive value of random approximate sets is a random variable given by the following theorem.
+\begin{theorem}
+	\label{thm:approx_expected_precision}
+	Given $\n$ negatives, $\p$ positives, and a random approximate set with false positive and true positive rates $\fprate$ and $\tprate$ respectively, the \emph{positive predictive value} is a random variable
+	\begin{equation}
+		\PPV = \frac{\TP_{\p}}{\TP_{\p} + \FP_{\n}}
+	\end{equation}
+	with an \emph{expectation} given \emph{approximately} by
+	\begin{equation}
+		\label{eq:approx_expected_precision}
+		\ppv(\tprate, \fprate, \p, \n) \approx 
+		\frac{\overline{t}_\p}{\overline{t}_\p + \overline{f}_\p} +
+		\frac{\overline{t}_\p \sigma_{\!f_\p}^2 - \overline{f}_\p 
+		\sigma_{\!t_\p}^2}{\left(\overline{t}_\p + \overline{f}_\p\right)^3}\,,
+	\end{equation}
+	where $\overline{t}_\p = \p \tprate$ is the expected \emph{true positive} frequency, $\overline{f}_\p =  \n \fprate$ is the expected \emph{false positive} frequency, $\sigma_{\!t_\p}^2 = (1-\tprate) \overline{t}_\p$ is the variance of the \emph{true positive} frequency, and $\sigma_{\!f_\p}^2 = (1-\fprate) \overline{t}_\p$ is the variance of \emph{false positive} frequency.
+\end{theorem}
+See \cref{sec:proof_approx_expected_precision} for a proof of 
+\cref{thm:approx_expected_precision}.
+
+\begin{figure}
+	\def\svgwidth{\columnwidth}
+	%\def\svgscale{0.75}
+	\centering
+	\captionsetup{justification=centering}
+	\caption
+	{
+		Relative frequency of positive predicitive values for several different parameterizations of the false positive and true positive rates given $\n = 900$ negatives and $\p=100$ positives.
+	}    
+	\input{img/out.pdf_tex}
+	\label{fig:prec_vs_fprate_and_fnrate}
+\end{figure}
+
+We make the following observations about \cref{eq:approx_expected_precision}:
+\begin{enumerate}
+	\item For sufficiently large approximate sets, $\ppv \approx 
+	\overline{t}_\p / (\overline{t}_\p + \overline{f}_\p)$.
+	\item If $\fprate \neq 0$, as $\n \to \infty$, $\ppv \to 0$.
+	\item As $\fprate \to 0$, $\ppv \to 1$.
+\end{enumerate}
+
+\emph{Accuracy} is given by the following definition.
+\begin{definition}
+	The \emph{accuracy} is the proportion of true results (both \emph{true 
+	positives} and \emph{true negatives}) in the universe of positives and 
+	negatives, $(t_p + t_n)/(\p + \n)$, where $t_p$, $t_n$, $\p$, and $\n$ are 
+	respectively the number of \emph{true positives}, \emph{true negatives}, 
+	\emph{positives}, and \emph{negatives}.
+\end{definition}
+
+The \emph{expected} accuracy is given by the following theorem.
+\begin{theorem}
+	\label{thm:approx_expected_accuracy}
+	Given $\p$ positives and $\n$ negatives, a random approximate set with an 
+	\emph{expected} false positive rate $\fprate$ and an \emph{expected} true 
+	positive rate $\tprate$ is a random variable given by
+	\begin{equation}
+		\ACC_{\p + \n} = \lambda \TPR_\p + (1 - \lambda) \TNR_\n\,.
+	\end{equation}	
+	has an \emph{expected} accuracy
+	\begin{equation}
+	\label{eq:approx_expected_accuracy}
+	\acc(\tprate,\fprate,\n,\p) = \lambda \tprate + (1-\lambda) \tnrate
+	\end{equation}
+	with a variance
+	\begin{equation}
+	\frac{\lambda \fnrate \tprate + (1 - \lambda)\fprate 
+		\tnrate}{\p+\n}\,,   
+	\end{equation}
+	where $\lambda = \p / (\p + \n)$.
+\end{theorem}
+\begin{proof}
+	Suppose there the $u$ elements in the universe can be partitioned into $\p$ 
+	positives and $\n$ negatives. An approximate set $\ASet{S}$ with a false 
+	positive rate $\fprate$ and false negative rate $\fnrate$ has an uncertain 
+	accuracy
+	\begin{equation}
+	\ACC_{\p + \n} = \frac{\TP_\p + \TN_\n}{\p + \n}\,.
+	\end{equation}
+	The expected accuracy is given by the expectation
+	\begin{align}
+	\Expect{\ACC_{\p + \n}}
+	&= \Expect{\frac{\TP_\p + \TN_\n}{\p + \n}}\\
+	&= \frac{\p (1 - \fnrate) + \n (1 - \fprate)}{\p + \n}\,.
+	\end{align}
+	Noting that $\n/(\p+\n) = 1 - \p/(\p+\n)$ and letting $\lambda = \p/(\p + 
+	\n)$,
+	\begin{equation}
+	\Expect{\ACC_{\p + \n}} = \lambda (1 - \fnrate) + (1 - \lambda) (1 - 
+	\fprate)\,.
+	\end{equation}
+	The variance
+	\begin{align}
+	\Var{\ACC_{\p + \n}}
+	&= \Var{\frac{\TP_\p}{\p + \n}} + \Var{\frac{\TN_\n}{\p + \n}}\\
+	&= \frac{1}{(\p + \n)^2}\Var{\TP_\p} + \frac{1}{(\p + \n)^2}\Var{\TN_\n}\\
+	&= \frac{\p \fnrate (1 - \fnrate)}{(\p + \n)^2} + \frac{\n \fprate (1 - 
+	\fprate)}{(\p + \n)^2}\\
+	&= \frac{\lambda \fnrate \tprate + (1 - \lambda)\fprate 
+		\tnrate}{\p+\n}\,.
+	\end{align}
+\end{proof}
+
+\emph{Negative predictive value} is given by the following definition.
+\begin{definition}
+	\begin{equation}
+	\npv = \frac{t_n}{t_n + f_n}
+	\end{equation}
+	where $t_n$ and $f_n$ are respectively he number of \emph{true negatives} 
+	and \emph{false negatives} 
+\end{definition}
+The expected negative predictive value is given by the following theorem.
+\begin{theorem}
+	\label{thm:npv_approx}
+	Given $\p$ positives, $\n$ negatives, and a random approximate set with false positive and true positive rates $\fprate$ and $\tprate$ respectively, the negative predictive value is a \emph{random variable}
+	\begin{equation}
+		\NPV = \frac{\TN_{\n}}{\TN_{\n} + \FN_{\p}}
+	\end{equation}
+	with an \emph{expectation} given approximately by
+	\begin{equation}
+	\label{eq:npv_approx}
+	\npv(\tprate, \fprate , \p, \n) \approx 
+	\frac{\overline{t}_n}{\overline{t}_n + \overline{f}_{\!n}} +
+	\frac{\overline{t}_n \sigma_{\!f_n}^2 - \overline{f}_{\!n} 
+	\sigma_{\!t_n}^2}{\left(\overline{t}_n + \overline{f}_{\!n}\right)^3}\,,
+	\end{equation}
+	where $\overline{t}_\n = \n(1-\fprate)$ is the expected \emph{true negative} frequency, $\overline{f}_{\!\n} =  \p(1-\tprate)$ is the expected \emph{false negative} frequency, $\sigma_{\!t_\n}^2 = \fprate \overline{t}_\n$ is the variance of the \emph{true negative} frequency, and $\sigma_{\!f_\n}^2 = \tprate\overline{f}_{\!\n}$ is the variance of the \emph{false negative} frequency.
+\end{theorem}
+The proof for \cref{thm:npv_approx} follows the same pattern as the proof for \cref{thm:approx_expected_precision}.
+
+Youden's $J$ statistic is a measure of the performance of a binary test, defined as
+\begin{equation}
+    J = \frac{t_p}{t_p + f_n} + \frac{t_n}{t_n + f_p} - 1\,,
+\end{equation}
+with a range $[0,1]$.
+In the case of the random approximate set model, $J$ is a random variable
+\begin{equation}
+	\RV{J} = \TPR_\p - \FPR_\n\,,
+\end{equation}
+which has an \emph{expectation}
+\begin{equation}
+	\Expect{\RV{J}} = \tprate - \fprate\,.
+\end{equation}
+
+\begin{table}
+	\centering
+	\caption{Various \emph{expected} performance measures.}
+	\label{tbl:perf_sum}    
+	\begin{tabular}{@{} l l l @{}}
+		\toprule
+		\textbf{measure} & \textbf{parameter} & \textbf{expected value}\\
+		\midrule
+		true positive rate & $\tpr(\tprate)$ & $\tprate$\\
+		false positive rate & $\fpr(\fprate)$ & $\fprate$\\
+		false negative rate & $\fnr(\tprate)$ & $1-\tprate$\\
+		true negative rate & $\tnr(\fprate)$ & $1-\fprate$\\
+		accuracy & $\acc$ & \cref{eq:approx_expected_accuracy}\\        
+		positive predictive value & $\ppv$ & \cref{eq:approx_expected_precision}\\
+		negative predictive value & $\npv$ & \cref{eq:npv_approx}\\        
+		false discovery rate & $\fdr$ & $1-\ppv$\\
+		false omission rate & $\forFn$ & $1-\npv$\\
+		\bottomrule
+	\end{tabular}
+\end{table}
+\Cref{tbl:perf_sum} may be used to reparameterize an approximate set.
+\begin{example}
+	Suppose we seek a \emph{positive approximate set} with an expected accuracy 
+	$\gamma$. By \cref{tbl:perf_sum},
+	\begin{equation}
+	\gamma = \acc(\fprate,\fnrate=0,\lambda) = 1 - \fprate(1 - \lambda)\,.
+	\end{equation}
+	% Y = 1 - e(1- lam)
+	% (1-Y)/(1-lam) = e
+	Solving for $\fprate$ in terms of $\gamma$ yields the result
+	\begin{equation}
+	\fprate(\gamma, \lambda) = \frac{1 - \gamma}{1 - 
+		\lambda}\
+	\end{equation}
+	subject to $0 \leq \lambda \leq \gamma \leq 1$ and $\lambda < 1$.
+	Under this parameterization of the 	positive approximate set, $\lambda$ 
+	must be known (or estimated).
+	Note that if $\lambda = 1$ then $\fprate(\gamma, \lambda=1)$ is undefined as expected, but as $\lambda$ goes to $1$, $\fprate(\,\cdot\,; \lambda)$ goes to $1$ and $\gamma$ goes to $1$, which logically follows since if there are no negatives, there can be no false positives.
+\end{example}
+
+\end{document}

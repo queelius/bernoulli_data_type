@@ -1,0 +1,15 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+\section{Discrete partial functions}
+
+\subsection{$0$-ary functions (constants)}
+The special case of the $0$-ary predicate is a \emph{constant} $\True$ or $\False$.
+This may be useful in some cases, notably \emph{cipher} value types.
+To put it simply, if we have a constant function $\Fun{f} \colon \Set{1} \mapsto \Set{X}$, then $\Fun{f}(1) \coloneqq y$ and $\APFun{f}(1)$ is equal to $y$ with probability $1-\fnrate$ and some other value with probability $\fnrate$.
+
+Basically, approximate constants.
+In \emph{algebraic data types}, the approximate constant is fundamental.
+We may compose such things to generate other types, e.g., the Boolean type $\BitSet$ is just $\APFun{f}(1) + \APFun{g}(1)$, yielding an approximate Boolean type.
+
+\end{document}

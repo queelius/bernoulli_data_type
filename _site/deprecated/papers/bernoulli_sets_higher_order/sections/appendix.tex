@@ -1,0 +1,303 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+%\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\tsr}{\tprate_{\ASet{X} \subseteq \ASet{Y}}}
+
+\begin{document}	
+%\appendixpage
+\appendices
+{
+%\section{Additional proofs}
+%In what follows, we show additional or more rigorous proofs that are not necessarily central to the paper but warrant mention.
+
+\section{Proof of corollary~\ref{cor:fpr_as_vareps}}
+\label{app:cor_fpr_as_vareps}
+To say that the sequence $\FPR_1,\FPR_2,\ldots$ converges almost surely to $\fprate$ means that
+\begin{equation}
+\Prob{\lim _{\n \to \infty} \FPR_\n = \fprate} = 1\,.
+\end{equation}
+
+By \cref{cor:fpr_as_vareps}, given \emph{countably infinite} negatives, a random approximate set with a false positive rate $\fprate$ is \emph{certain} to obtain $\fprate$.
+\begin{proof}
+Hoeffding's inequality\cite{hoeffding} provides that $\FP_\n$ is concentrated around its mean $\n \fprate$ as given by
+\begin{equation}
+\Prob{(\fprate -\epsilon) \n \leq \FP_\n \leq (\fprate + \epsilon )\n}
+\geq 1 - 2 \exp\!\left(-2\epsilon ^{2} \n\right)\,,
+\end{equation}
+where $\epsilon > 0$.
+We are interested in the limiting probability
+\begin{equation}
+\begin{split}
+\lim_{\n \to \infty} \Pr\!\left[(\fprate -\epsilon) \n \leq 
+\FP_\n \leq (\fprate + \epsilon)\n\right] =\\
+\lim_{\n \to \infty} \left\{ 1 - 
+2 \exp\!\left(-2\epsilon ^{2} \n\right) \right\} = 1\,.
+\end{split}
+\end{equation}
+As $\epsilon$ goes to $0$, $\lim_{\n \to \infty} \FP_\n$ converges almost surely to $\fprate \n$ and therefore $\lim_{\n \to \infty} \FP_\n / \n$ converges almost surely to $\fprate$.
+\end{proof}
+
+\section{Proof of theorem~\ref{thm:approx_expected_precision}}
+\label{sec:proof_approx_expected_precision}
+Given $\p$ positives and $\n$ negatives, by \cref{cor:approx_expected_precision} an approximate set with a false positive rate $\fprate$ and a false negative rate $\fnrate$ has an \emph{expected} precision given \emph{approximately} by
+\begin{equation*}
+    \ppv(\fnrate, \fprate ; \n, \p) \approx \frac{\overline{t}_p}{\overline{t}_p + \overline{f}_p} +
+    \frac{\overline{t}_p \sigma_{\!f_p}^2 - \overline{f}_p \sigma_{\!t_p}^2}{\left(\overline{t}_p + \overline{f}_p\right)^3}\,,
+    \tag{\ref{eq:cor_approx_expected_precision} revisited}
+\end{equation*}
+where $\overline{t}_p = \p \tprate$ is the \emph{expected} number of \emph{true positives}, $\overline{f}_p =  \n \fprate$ is the \emph{expected} number of \emph{false positives}, $\sigma_{\!t_p}^2 = \p \fnrate \tprate$ is the variance of the number of \emph{true positives}, and $\sigma_{\!f_p}^2 = \n \fprate \fnrate$ is the variance of the number of \emph{false positives}.
+\begin{proof}
+The positive predictive value is a random variable given by
+\begin{equation}
+    \frac{\TP_{\p}}{\TP_{\p} + \FP_{\n}}\,.
+\end{equation}
+We are interested in the \emph{expected} positive predictive value,
+\begin{equation}
+    \ppv(\fprate,\tprate) = \Expect{\frac{\TP_{\p}}{\TP_{\p} + \FP_{\n}}}\,.
+\end{equation}
+This expectation is of a non-linear function of random variables, which is problematic so we choose to approximate the expectation.
+
+Let the \emph{positive predictive value} function be denoted by
+\begin{equation}
+    \operatorname{f}(t_p, f_p) = \frac{t_p}{t_p + f_p}\,,
+\end{equation}
+where $t_p$ is the number of true positives and $f_p$ is the number of false positives.
+We approximate this function with a second-order Taylor series. The gradient of $\operatorname{f}$ is given by
+\begin{equation}
+    \nabla{\operatorname{f}}(t_p,f_p) =
+    \frac{1}{(t_p + f_p)^2}
+    \begin{bmatrix}
+        f_p\\
+        -t_p\\
+    \end{bmatrix}
+\end{equation}
+and the Hessian of $\operatorname{f}$ is given by
+\begin{equation}
+    \mathcal{H}(t_p,f_p) =
+    \frac{1}{(t_p + f_p)^3}
+    \begin{bmatrix}
+        -2 f_p & t_p-f_p\\
+        t_p-f_p & 2 t_p \\
+    \end{bmatrix}\,.
+\end{equation}
+
+A linear approximation $\operatorname{g}$ of $\operatorname{f}$ that is reasonably accurate near the expected value of $\TP_\p$, denoted by $\overline{t}_p$, and the expected value of $\FP_\n$, denoted by $\overline{f}_p$, is given by
+\begin{equation}
+    \operatorname{g}(t_p,f_p) =
+    \operatorname{f}\left(\overline{t}_p,\overline{f}_p\right) + \nabla{\operatorname{f}}(\overline{t}_p,\overline{f}_p])^{\intercal}
+    \begin{bmatrix}
+        t_p - \overline{t}_p\\
+        f_p - \overline{f}_p\\
+    \end{bmatrix}
+    + \frac{1}{2}
+    \begin{bmatrix}
+        t_p - \overline{t}_p\\
+        f_p - \overline{f}_p\\
+    \end{bmatrix}^{\intercal}
+    \mathcal{H}(\overline{t}_p,\overline{f}_p)
+    \begin{bmatrix}
+        t_p - \overline{t}_p\\
+        f_p - \overline{f}_p\\
+    \end{bmatrix}\,.
+\end{equation}
+As a function of random variables $\TP_\p$ and $\FP_\n$, $\operatorname{g}\!\left(\TP_\p,\FP_\n\right)$ is a random variable. Since $\Expect{\TP_\p - \overline{t}_p} = 0$ and $\Expect{\FP_\p - \overline{f}_p} = 0$, we immediately simplify the expectation of $\operatorname{g}$ to
+\begin{equation}
+\label{eq:proof_hess1}
+    \Expect{\operatorname{g}(\TP_\p,\FP_\n)} = \frac{\overline{t}_p}{\overline{t}_p+\overline{f}_p} + \frac{\Expect{A}}{(\overline{t}_p + \overline{f}_p)^3}
+\end{equation}
+where
+\begin{equation}
+    A = \frac{1}{2}
+    \begin{bmatrix}
+        \TP_\p - \overline{t}_p\\
+        \FP_\n - \overline{f}_p
+    \end{bmatrix}^{\intercal}
+    \begin{bmatrix}
+        -2 \overline{f}_p & \overline{t}_p-\overline{f}_p\\
+        \overline{t}_p-\overline{f}_p & 2 \overline{t}_p
+    \end{bmatrix}
+    \begin{bmatrix}
+        \TP_\p - \overline{t}_p\\
+        \FP_\n - \overline{f}_p
+    \end{bmatrix}\,.
+\end{equation}
+Multiplying the right column matrix by the Hessian matrix in $A$ results in
+\begin{equation}
+    A = \frac{1}{2}
+    \begin{bmatrix}
+        \TP_\p - \overline{t}_p\\
+        \FP_\n - \overline{f}_p
+    \end{bmatrix}^{\intercal}
+    \begin{bmatrix}
+        -2 \overline{f} \left(\TP_\p - \overline{t}_p\right) + \left(\overline{t}_p-\overline{f}_p\right)\left(\FP_\n - \overline{f}_p\right)\\
+        \left(\overline{t}_p-\overline{f}_p\right)\left(\TP_\p - \overline{t}_p\right) + 2 \overline{t}_p\left(\FP_\n - \overline{f}_p\right)
+    \end{bmatrix}
+\end{equation}
+Multiplying the left column matrix by the right column matrix in $A$ results in
+\begin{equation}
+    A = -\overline{f}_p \left(\TP_\p - \overline{t}_p\right)^2 + 
+    \left(\overline{t}_p-\overline{f}_p\right)\left(\TP_\p - 
+    \overline{t}_p\right)\left(\FP_\n - \overline{f}_p\right) + 
+    \overline{t}_p\left(\FP_\n - \overline{f}_p\right)^2\,.
+\end{equation}
+As a linear operator, the expectation of $A$ is equivalent to
+\begin{equation}
+\label{eq:proof_of_exp_precision_approx_1}
+    \Expect{A} = -\overline{f}_p \Expect{\TP_\p - \overline{t}_p}^2 + \left(\overline{t}-\overline{f}_p\right)\Expect{\left(\FP_\n - \overline{f}_p\right)\left(\TP_\p - \overline{t}_p\right)} + \overline{t}_p\Expect{\FP_\n - \overline{f}_p}^2\,.
+\end{equation}
+By definition, $\Expect{\TP_\p - \overline{t}_p}^2$ is the variance of $\TP_\p$, $\Expect{\FP_\n - \overline{f}_p}^2$ is the variance of $\FP_\n$, and $\Expect{\left(\FP_\n - \overline{f}_p\right)\left(\TP_\p - \overline{t}_p\right)}$ is the covariance of $\TP_\p$ and $\FP_\n$, which is $0$ since they are independent.
+Making these substitutions results in
+\begin{equation}
+    \Expect{A} = \overline{t}_p\Var{\FP_\n} - \overline{f}_p \Var{\TP_\p}\,.
+\end{equation}
+Substituting this result into \cref{eq:proof_hess1} yields
+\begin{equation}
+\label{eq:proof_hess2}
+    \Expect{\operatorname{g}(\TP_\p,\FP_\n)} = 
+    \frac{\overline{t}_p}{\overline{t}_p+\overline{f}_p} + 
+    \frac{-\overline{f}_p \Var{\TP_\p} + 
+    \overline{t}_p\Var{\FP_\n}}{(\overline{t}_p + \overline{f}_p)^3}
+\end{equation}
+By \cref{thm:fpbinom}, $\FP_\n$ is binomially distributed with a mean $\n \fprate$ and a variance $\n \fprate \tnrate$ and by \cref{cor:tpbinom}, $\TP_\p$ is binomailly distributed with a mean $\p \tprate$ and a variance $\p \fnrate \tprate$.
+\end{proof}
+
+\section{Proof of theorem~\ref{thm:union_fn_rate}}
+\label{sec:union_fn_rate}
+Given $\ASet{A}(\fprate_1,\fnrate)$ and $\ASet{B}(\fprate_2,\fnrate_2)$, their union is an \emph{approximate set} with a false negative rate given by
+\begin{equation*}
+\begin{split}
+    \fnrate &=
+        \alpha_1 \fnrate_1(1 - \fprate_2) + \alpha_2 \fnrate_2(1 - \fprate_1)\\
+        &\qquad+ (1 - \alpha_1 - \alpha_2) \fnrate_1 \fnrate_2\,,
+\end{split}
+\tag{\ref{eq:union_fn_rate} revisited}
+\end{equation*}
+where
+\begin{equation*}
+\tag{\ref{eq:union_fn_rate_alpha} revisited}
+\begin{split}
+   0 &\leq \alpha_1 = \frac{\Card{\SetDiff[\Set{S}[1]][\Set{S}[2]]}}{\Card{\SetUnion[\Set{S}[1]][\Set{S}[2]]}}\,,\\
+   0 &\leq \alpha_2 = \frac{\Card{\SetDiff[\Set{S}[2]][\Set{S}[1]]}}{\Card{\SetUnion[\Set{S}[1]][\Set{S}[2]]}}\,,\\
+   \alpha_1 + \alpha_2 &\leq 1\,.
+\end{split}
+\end{equation*}
+\begin{proof}
+Suppose we have two sets $\Set{S}[1]$ and $\Set{S}[2]$. The false negative rate $\fnrate$ is a probability conditioned on a positive in the union of sets $\Set{S}[1]$ and $\Set{S}[2]$ being a negative in the union of approximate sets $\ASet{S}[1]$ and $\ASet{S}[2]$.
+
+The set of \emph{possible} false negatives is the set of positives, $\Set{S}[1] \! \cup \Set{S}[2]$, which is equivalent to the union of the disjoint sets
+$\SetIntersection[\Set{S}[1]][\Set{S}[2]]$, $\SetDiff[\Set{S}[1]][\Set{S}[2]]$ and $\SetDiff[\Set{S}[2]][\Set{S}[1]]$.
+
+The false negative rate is equivalent to ratio of the \emph{expected} number of false negatives to the maximum possible false negatives $\Card{\SetUnion[\Set{S}[1]][\Set{S}[2]]}$. Since they are disjoint, we may consider each independently to calculate the expected total number of false negatives.
+
+Let $A_1$ denote the event $\RV{X} \in \ASet{S}[1]$, $A_2$ denote $\RV{X} \in \ASet{S}[2]$, $B_1$ denote $\RV{X} \in \Set{S}[1]$, and $B_2$ denote $\RV{X} \in \Set{S}[2]$. Suppose we randomly select an element from $\Set{S}[1] \! \cap \Set{S}[2]$. The probability that $\RV{X}$ is a negative in $\ASet{S}[1] \cup \ASet{S}[2]$ given that it is positive in $\Set{S}[1] \cap \Set{S}[2]$ is given by
+\begin{equation}
+    \fnrate_{1 \! \cap 2} = \Prob{(A_1 \! \cup A_2)' \Given B_1 \! \cap B_2}\,.
+\end{equation}
+By De Morgan's law, $(A_1 \! \cup A_2)' \equiv \SetIntersection[A_1'][A_2']$. Making this substitution results in
+\begin{equation}
+    \fnrate_{1 \! \cap 2} = \Prob{\SetIntersection[A_1'][A_2'] \Given B_1 \! \cap B_2}\,.
+\end{equation}
+Since $A_1$ and $A_2$ are independent events, by the rules of probability \begin{equation}
+    \fnrate_{\SetIntersection[1][2]} = \Prob{A_1' \Given \SetIntersection[B_1][B_2]} \Prob{A_2' \Given \SetIntersection[B_1][B_2]}\,.
+\end{equation}
+Since $A_1$ is independent of $B_2$ and $A_2$ is independent of $B_1$, by the rules of probability
+\begin{equation}
+    \fnrate_{1 \! \cap 2} = \Prob{A_1' \Given B_1} \Prob{A_2' \Given B_2}\,.
+\end{equation}
+By definition, $\Prob{A_j' \Given B_j}$ is the false negative rate $\fnrate_j$. Making this substitution yields
+\begin{equation}
+    \fnrate_{1 \! \cap 2} = \fnrate_1 \fnrate_2\,.
+\end{equation}
+There are $\Card{\SetIntersection[\Set{S}[1]][\Set{S}[2]]}$ elements in $\SetIntersection[\Set{S}[1]][\Set{S}[2]]$, where each is an independent Bernoulli trial. Thus, there are expected to be
+\begin{equation}
+\label{eq:proof_union_fn_1}
+    \Card{\Set{S}[1] \! \cap \Set{S}[2]} \fnrate_{1 \! \cap 2} = \Card{\Set{S}[1] \! \cap \Set{S}[2]} \fnrate_1 \fnrate_2
+\end{equation}
+false negatives in $\SetIntersection[\Set{S}[1]][\Set{S}[2]]$.
+
+Suppose we randomly select an element from $\SetDiff[\Set{S}[1]][\Set{S}[2]]$. The probability that $\RV{X}$ is a negative in $\SetUnion[\ASet{S}[1]][\ASet{S}[2]]$ given that it is a positive in $\SetDiff[\Set{S}[1]][\Set{S}[2]]$ is given by
+\begin{equation}
+    \fnrate_{\SetIntersection[1][\SetComplement[2]]} = \Prob{\SetIntersection[A_1'][A_2'] \Given \SetIntersection[B_1][B_2']}\,.
+\end{equation}
+Since $A_1$ and $A_2$ are independent events, this may be rewritten as
+\begin{equation}
+    \fnrate_{\SetIntersection[1][\SetComplement[2]]} = \Prob{A_1' \Given B_1 \! \cap B_2'} \Prob{A_2' \Given B_1 \cap B_2'}\,.
+\end{equation}
+Since $A_1$ is independent of $B_2$ and $A_2$ is independent of $B_1$, this may be rewritten as
+\begin{equation}
+    \fnrate_{\SetIntersection[1][\SetComplement[2]]} = \Prob{A_1' \Given B_1} \Prob{A_2' \Given B_2'}\,.
+\end{equation}
+By definition, $\Prob{A_1' \Given B_1}$ is the false negative rate $\fnrate_1$ and $\Prob{A_2 \Given B_2'}$ is the false positive rate $\fprate_2$. Thus,
+\begin{equation}
+    \fnrate_{\SetIntersection[1][\SetComplement[2]]} = \fnrate_1 (1 - \fprate_2)\,.
+\end{equation}
+There are $\Card{\SetDiff[\Set{S}[1]][\Set{S}[2]]}$ elements in $\SetDiff[\Set{S}[1]][\Set{S}[2]]$, where each is an independent Bernoulli trial. Thus, there are expected to be
+\begin{equation}
+\label{eq:proof_union_fn_2}
+    \Card{\SetDiff[\Set{S}[1]][\Set{S}[2]]} \fnrate_{\SetIntersection[1][\SetComplement[2]]} = \Card{\SetDiff[\Set{S}[1]][\Set{S}[2]]} \fnrate_1 (1 - \fprate_2)
+\end{equation}
+false negatives in $\SetDiff[\Set{S}[1]][\Set{S}[2]]$. A similar argument follows for $\SetDiff[\Set{S}[2]][\Set{S}[1]]$ where there are expected to be
+\begin{equation}
+\label{eq:proof_union_fn_3}
+    \Card{\SetDiff[\Set{S}[2]][\Set{S}[1]]} \fnrate_2(1 - \fprate_2)
+\end{equation}
+false negatives.
+
+The false negative rate is given by the ratio of the total expected number of false negatives given by \cref{eq:proof_union_fn_1,eq:proof_union_fn_2,eq:proof_union_fn_3} to the total number of possible false negatives $\Card{\Set{S}[1] \! \cup \Set{S}[2]}$, which is given by
+\begin{equation}
+\label{eq:proof_union_fn_4}
+\begin{split}
+    \fnrate =
+        &\frac{\Card{\Set{S}[1] \! \setminus \Set{S}[2]}}{\Card{\Set{S}[1] \! \cup \Set{S}[2]}} \fnrate_1(1 - \fprate_2) + \frac{\Card{\Set{S}[2] \! \setminus \Set{S}[1]}}{\Card{\Set{S}[1] \! \cup \Set{S}[2]}} \fnrate_2(1 - \fprate_1) + \frac{\Card{\Set{S}[1] \! \cap \Set{S}[2]}}{\Card{\Set{S}[1] \! \cup \Set{S}[2]}} \fnrate_1 \fnrate_2\,.
+\end{split}
+\end{equation}
+If we let
+\begin{align}
+    \alpha_1 = \frac{\Card{\Set{S}[1] \! \setminus \Set{S}[2]}}{\Card{\Set{S}[1] \! \cup \Set{S}[2]}}\; \text{and} \;
+    \alpha_2 = \frac{\Card{\Set{S}[2] \! \setminus \Set{S}[1]}}{\Card{\Set{S}[1] \! \cup \Set{S}[2]}}\,,
+\end{align}
+then
+\begin{equation}
+    1 - \alpha_1 - \alpha_2 = \frac{\Card{\Set{S}[1] \! \cap \Set{S}[2]}}{\Card{\Set{S}[1] \! \cup \Set{S}[2]}}\,.
+\end{equation}
+Making these substitutions into \cref{eq:proof_union_fn_4} yields the result
+\begin{equation}
+\begin{split}
+    \fnrate &= \alpha_1 \fnrate_1(1-\fprate_2) + \alpha_1 \fnrate_2(1-\fprate_1) +\\
+         &\qquad (1 - \alpha_1 - \alpha_2) \fnrate_1 \fnrate_2\,.
+\end{split}
+\end{equation}
+\end{proof}
+
+\section{Sampling distribution of arbitrary functions}
+\label{app:samp}
+TODO: add generative model as an algorithm for approximate sets? Add C++ implementation of the model? Do some simulations to see how rapidly it converges to the normal?
+TODO: feed in something like ppv function and see how well it matches the solution given in that one section. etc.
+
+Suppose we have an objective function $\operatorname{f} \colon \PS{\Set{X}[1]} \times \cdots \times \PS{\Set{X}[q]} \mapsto \Set{Y}$, and we are interested in evaluating the loss when we replace one or more of the objective input sets with particular corresponding random approximate sets.
+The result of this substitution, as previously described, is a probability distribution over $\Set{Y}$.
+
+The probability distribution of random approximate sets are precisely given; therefore, we may estimate the distribution of any function of random approximate sets by generating the random approximate sets and applying the function of interest.
+
+Consider the $m$-by-$q$ matrix where the $(i,j)$-th element is the random approximate set $\ASet{A}[i,j](\tprate_j,\fprate_j)$ such that they are all independely distributed and $\ASet{A}[i,j]$ for $i=1,\ldots, m$ are also identically distributed.
+If we apply $\operatorname{g}$ to each row of the matrix,
+\begin{equation}
+\RV{Y_i} = \operatorname{g}\left(\ASet{A}[i,1],\ldots,\ASet{A}[i,q]\right)
+\end{equation}
+for $i=1,\ldots,m$, we generate $m$ i.i.d. random elements $\RV{Y_1},\ldots,\RV{Y_m}$.
+
+If $\Set{Y}$ is a measure space (discrete or continuous), consider the random variable
+\begin{equation}
+\RV{\overline{Y}_m} = \frac{1}{m} \sum_{i=1}^{m} \RV{Y_i}\,.
+\end{equation}
+If $\RV{Y_1}$ has a well-defined mean and variance, then by the central limit theorem
+\begin{equation}
+\lim_{m \to \infty} \RV{\overline{Y}_m}
+\end{equation}
+converges in distribution to a normal with a mean $\Expect{\RV{Y_1}}$ and a variance $\Var{\RV{Y_1}} / m$.
+
+A general approach to estimating $\RV{\overline{Y}_m}$ is given by generating a large sample of matrices and applying the function $\operatorname{g}$ to each to generate a large sample from $\RV{Y_1}$.
+
+We provide an implementation of the generative model and a tool set that permits one to analyze various properties of the distribution of the function of interest.
+}
+\end{document}

@@ -1,0 +1,76 @@
+/*************************************************************************************
+ * This maxima package defines several functions relating to random approximate sets *
+ *************************************************************************************/
+
+/************************************************
+ * Random variables for random approximate sets *
+ ************************************************/
+
+/**
+ * the probability mass function of the uncertain number of true positives given
+ * pos positives and true positive rate tpr, denoted by TP(pos,tpr).
+ */
+pdf_tp(tp,pos,tpr) := binomial(pos,tp)*(tpr)^(tp)*(1-tpr)^(pos-tp);
+
+/**
+ * the probability mass function of the uncertain number of false positives given
+ * neg negatives and false positive rate fpr, denoted by FP(neg,fpr).
+ */
+pdf_fp(fp,neg,fpr) := binomial(neg,fp)*(fpr)^(fp)*(1-fpr)^(neg-fp);
+
+/**
+ * computes the expectation of g(TP(pos,tpr)).
+ * if g is the identity, then computes E[TP(pos,tpr)] = pos * tpr.
+ */
+expect_tp(g,pos,tpr) := sum(g(tp)*pdf_tp(tp,pos,tpr),tp,0,pos);
+
+/**
+ * computes the expectation of g(FP(neg,fpr)).
+ * if g is the identity, then computes E[FP(neg,fpr)] = neg * fpr.
+ */
+expect_fp(g,neg,fpr) := sum(g(fp)*pdf_fp(fp,neg,fpr),fp,0,neg);
+
+/*****************************************
+ * Power sets of random approximate sets *
+ *****************************************/
+
+/**
+ * ps_neg computes the number of negative elements in a power set
+ * with respect to an objective set with pos positives and neg negatives.
+ */
+ps_neg(pos,neg) := 2^pos*(2^neg-1);
+
+
+f(x):=
+    block(
+        if x=0 then 0
+        else 2^x
+    );
+
+approx_ps_fp(p,t,n,e):=
+    block(
+        (2^(p*t)+(log(2))^2/2*p*t*(1-t))*(2^(n*e)+(log(2))^2/2*n*e*(1-e)-1)
+    );
+
+ps_fp(p,t,n,e):=
+    block(
+        tp(f,p,t)*(fp(f,n,e)-1)
+    );
+
+ps_fp(p,t,n,e):=
+    block(
+        binomial(n,x)
+    );
+
+
+
+approx_ps_fpr(p,t,n,e):=
+    block(
+        approx_ps_fp(p,t,n,e)/ps_neg(p,n)
+    );
+
+ps_fpr(p,t,n,e):=
+    block(
+        ps_fp(p,t,n,e)/ps_neg(p,n)
+    );
+

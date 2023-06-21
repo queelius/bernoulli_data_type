@@ -1,0 +1,45 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+\section{Random approximate Boolean algebra}
+A general purpose The primitive operations in the Boolean algebra, \AndFn,\OrFn, and \NegateFn, 
+
+The approximate value type $\AT{\Bool}$ discussed in \cref{sec:} can be composed with algebraic types like the product type to construct any other value type.
+
+We consider a generalization of this Boolean algebra given by six-tuple
+\begin{equation}
+	\left(\,\ATL{\BitSet^n},\AT{\AndFn},\AT{\OrFn},\AT{\NegateFn},\ATL{1^n},\ATL{0^n}\,\right)\,,
+\end{equation}
+where the operators are \emph{bit-wise} operators.
+
+The values of $n$ bits are \emph{isomorphic} to any value type that has a cardinality of $2^n$ and as a Boolean algebra.
+For instance, we could implement approximate sets with a complete implementation of set-theoretic operations on them over any universe of $n$ elements.
+	
+An exponential type $X \mapsto Y$ is the set of functions from domain $X$ to codomain $Y$. If we replace $X$ and $Y$ by $\AT{X}$ and $\AT{Y}$, we have an approximate exponential type $\AT{X} \mapsto \AT{Y}$, e.g., if $\Fun{f} \colon X \mapsto Y$, then an approximate representation of $\Fun{f}$ is $\APFun{f} \colon \AT{X} \mapsto \AT{Y}$.
+
+TODO: make an approximate value monad! Carry the approximation error information, make it a simple wrapper with some additional info.
+	
+If it is not important that $X$ or $Y$ be themselves oblivious types, then we have the \emph{represntation} of the functions as oblivious, but the inputs and outputs can be \emph{plain}.
+	
+NOTE: this is the case for many things not just exponential types. Still need to grapple with this, maybe still dealing with the approximation over elements rather than the approximation of universe thing.
+	
+	
+	
+	Maps, also known as \emph{partial functions}, are \emph{rules} that map inputs to outputs.
+	Let $\PFun{f} \colon \Set{X} \mapsto \Set{Y}$ be a partial function that maps inputs from the domain $\Set{X}$ to outputs from the codomain $\Set{Y}$.
+	
+	There are three \emph{orthogonal} ways in which $\PFun{f}$ may leak information.
+	
+	Let the \emph{computational basis} (a minimal set of functions) for values of type $\Set{X}$ be denoted by the overload set $\Set{F}$, where \emph{any} other function that depends on $\Set{X}$ is some composition of the elements of $\Set{F}$ and elements from other dependent computational bases.
+	
+	As a function of $\Set{X}$, $\PFun{f}$ depends on a subset $\Set{L}$ of $\Set{F}$.
+	If we \emph{substitute} $\Set{X}$ by some object type that \emph{models} $\Set{X}$, to be compatible with $\PFun{f}$, at minimum it must overload the set of functions in $\Set{L}$.
+	
+
+Consider a partial function $\PFun{f} \colon X_1 \times X_2 \cdots \times X_n \mapsto Y_1 \times \cdots \times Y_m$ and suppose we replace $X_1$ by $\AT{X}_1$, an approximate value type.
+Then, we denote this function by $\APFun{f} \colon \AT{X_1} \times X_2 \cdots \times X_n \mapsto \AT{Y_1} \times \cdots \times \AT{Y_m}$.
+	
+There are two approaches to this.
+
+	
+\end{document}

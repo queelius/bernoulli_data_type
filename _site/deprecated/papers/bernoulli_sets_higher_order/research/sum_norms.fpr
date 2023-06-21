@@ -1,0 +1,70 @@
+/**
+ * This maxima batch file defines several functions relating to the power set of a random approximate set.
+ */
+
+
+/**
+ * computes the expectation of f(TPp), i.e., E[f(TPp)].
+ * if f is the identity, then computes E[TPp]=pt where t
+ * is the true positive rate and p is the number of positives
+ * with respect to the objective set being approximated.
+ */
+tp(ff,p,t):=
+    block(
+        sum(ff(x)*binomial(p,x)*t^x*(1-t)^(p-x),x,0,p)
+    );
+
+/**
+ * computes the expectation of f(FPp), i.e., E[f(FPp)].
+ * if f is the identity, then computes E[FPp]=ne where e
+ * is the false positive rate and n is the number of negatives
+ * with respect to the objective set being approximated.
+ */
+fp(ff,n,e):=
+    block(
+        sum(ff(x)*binomial(n,x)*e^x*(1-e)^(n-x),x,1,n)
+    );
+
+/**
+ * ps_neg computes the number of negative elements with
+ * respect to an objective set with p positives and n negatives.
+ */
+ps_neg(p,n):=
+    block(
+        2^p*(2^n-1)
+    );
+
+
+f(x):=
+    block(
+        if x=0 then 0
+        else 2^x
+    );
+
+approx_ps_fp(p,t,n,e):=
+    block(
+        (2^(p*t)+(log(2))^2/2*p*t*(1-t))*(2^(n*e)+(log(2))^2/2*n*e*(1-e)-1)
+    );
+
+ps_fp(p,t,n,e):=
+    block(
+        tp(f,p,t)*(fp(f,n,e)-1)
+    );
+
+ps_fp(p,t,n,e):=
+    block(
+        binomial(n,x)
+    );
+
+
+
+approx_ps_fpr(p,t,n,e):=
+    block(
+        approx_ps_fp(p,t,n,e)/ps_neg(p,n)
+    );
+
+ps_fpr(p,t,n,e):=
+    block(
+        ps_fp(p,t,n,e)/ps_neg(p,n)
+    );
+

@@ -1,0 +1,2 @@
+#!/bin/sh
+g++ -std=c++20 -O3 -o test_hash_set test_hash_set.cpp -I ~/sources/bernoulli_data_type/include -I ~/sources/algebraic_hash_functions/include -pthread

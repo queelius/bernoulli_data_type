@@ -1,0 +1,197 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+%\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\tsr}{\tprate_{\ASet{X} \subseteq \ASet{Y}}}
+
+\begin{document}	
+%\appendixpage
+\appendices
+{
+%\section{Additional proofs}
+%In what follows, we show additional or more rigorous proofs that are not necessarily central to the paper but warrant mention.
+
+\section{Proof of corollary~\ref{cor:fpr_as_vareps}}
+\label{app:cor_fpr_as_vareps}
+To say that the sequence $\FPR_1,\FPR_2,\ldots$ converges almost surely to $\fprate$ means that
+\begin{equation}
+\Prob{\lim _{n \to \infty} \FPR_n = \fprate} = 1\,.
+\end{equation}
+
+By \cref{cor:fpr_as_vareps}, given \emph{countably infinite} negatives, a random approximate set with a false positive rate $\fprate$ is \emph{certain} to obtain $\fprate$.
+\begin{proof}
+Hoeffding's inequality\cite{hoeffding} provides that $\FP_n$ is concentrated around its mean $n \fprate$ as given by
+\begin{equation}
+\Prob{(\fprate -\epsilon) n \leq \FP_n \leq (\fprate + \epsilon )n}
+\geq 1 - 2 \exp\!\left(-2\epsilon ^{2} n\right)\,,
+\end{equation}
+where $\epsilon > 0$.
+We are interested in the limiting probability
+\begin{equation}
+\begin{split}
+\lim_{n \to \infty} \Pr\!\left[(\fprate -\epsilon) n \leq 
+\FP_n \leq (\fprate + \epsilon)n\right] =\\
+\lim_{n \to \infty} \left\{ 1 - 
+2 \exp\!\left(-2\epsilon ^{2} n\right) \right\} = 1\,.
+\end{split}
+\end{equation}
+As $\epsilon$ goes to $0$, $\lim_{n \to \infty} \FP_n$ converges almost surely to $\fprate n$ and therefore $\lim_{n \to \infty} \FP_n / n$ converges almost surely to $\fprate$.
+\end{proof}
+
+\section{Proof of theorem~\ref{thm:approx_expected_precision}}
+\label{sec:proof_approx_expected_precision}
+Given $p$ positives and $n$ negatives, by \cref{cor:approx_expected_precision} an approximate set with a false positive rate $\fprate$ and a false negative rate $\fnrate$ has an \emph{expected} precision given \emph{approximately} by
+\begin{equation*}
+    \ppv(\fnrate, \fprate ; n, p) \approx \frac{\overline{t}}{\overline{t} + \overline{f}} +
+    \frac{\overline{t} \sigma_{\!f}^2 - \overline{f}_p \sigma_{\!t}^2}{\left(\overline{t} + \overline{f}\right)^3}\,,
+    \tag{\ref{eq:cor_approx_expected_precision} revisited}
+\end{equation*}
+where $\overline{t} = p \tprate$ is the \emph{expected} number of \emph{true positives}, $\overline{f} =  n \fprate$ is the \emph{expected} number of \emph{false positives}, $\sigma_{\!t}^2 = p \fnrate \tprate$ is the variance of the number of \emph{true positives}, and $\sigma_{\!f}^2 = n \fprate \fnrate$ is the variance of the number of \emph{false positives}.
+\begin{proof}
+The positive predictive value is a random variable given by
+\begin{equation}
+    \frac{\TP_p}{\TP_p + \FP_n}\,.
+\end{equation}
+We are interested in the \emph{expected} positive predictive value,
+\begin{equation}
+    \ppv(\fprate,\tprate) = \Expect{\frac{\TP_p}{\TP_p + \FP_n}}\,.
+\end{equation}
+This expectation is of a non-linear function of random variables, which is problematic so we choose to approximate the expectation.
+
+Let the \emph{positive predictive value} function be denoted by
+\begin{equation}
+    \Fun{f}(t, f) = \frac{t}{t + f}\,,
+\end{equation}
+where $t$ is the number of true positives and $f$ is the number of false positives.
+We approximate this function with a second-order Taylor series.
+The gradient of $\Fun{f}$ is given by
+\begin{equation}
+    \nabla{\Fun{f}}(t,f) =
+    \frac{1}{(t + f)^2}
+    \begin{bmatrix}
+        f\\
+        -t\\
+    \end{bmatrix}
+\end{equation}
+and the Hessian of $\Fun{f}$ is given by
+\begin{equation}
+    \mathcal{H}(t,f) =
+    \frac{1}{(t + f)^3}
+    \begin{bmatrix}
+        -2 f & t-f\\
+        t-f & 2 t \\
+    \end{bmatrix}\,.
+\end{equation}
+
+A linear approximation $\Fun{g}$ of $\Fun{f}$ that is reasonably accurate near the expected value of $\TP_p$, denoted by $\overline{t}$, and the expected value of $\FP_n$, denoted by $\overline{f}$, is given by
+\begin{equation}
+    \Fun{g}(t,f) =
+    \Fun{f}\left(\overline{t},\overline{f}\right) + \nabla{\Fun{f}}(\overline{t},\overline{f}])^{\intercal}
+    \begin{bmatrix}
+        t - \overline{t}\\
+        f - \overline{f}\\
+    \end{bmatrix}
+    + \frac{1}{2}
+    \begin{bmatrix}
+        t - \overline{t}\\
+        f - \overline{f}\\
+    \end{bmatrix}^{\intercal}
+    \mathcal{H}(\overline{t},\overline{f})
+    \begin{bmatrix}
+        t - \overline{t}\\
+        f - \overline{f}\\
+    \end{bmatrix}\,.
+\end{equation}
+As a function of random variables $\TP_p$ and $\FP_n$, $\Fun{g}\!\left(\TP_p,\FP_n\right)$ is a random variable.
+Since $\Expect{\TP_p - \overline{t}} = 0$ and $\Expect{\FP_p - \overline{f}} = 0$, we immediately simplify the expectation of $\Fun{g}$ to
+\begin{equation}
+\label{eq:proof_hess1}
+    \Expect{\Fun{g}(\TP_p,\FP_n)} = \frac{\overline{t}}{\overline{t}+\overline{f}} + \frac{\Expect{A}}{(\overline{t} + \overline{f})^3}
+\end{equation}
+where
+\begin{equation}
+    A = \frac{1}{2}
+    \begin{bmatrix}
+        \TP_p - \overline{t}\\
+        \FP_n - \overline{f}
+    \end{bmatrix}^{\intercal}
+    \begin{bmatrix}
+        -2 \overline{f} & \overline{t}-\overline{f}\\
+        \overline{t}-\overline{f} & 2 \overline{t}
+    \end{bmatrix}
+    \begin{bmatrix}
+        \TP_p - \overline{t}\\
+        \FP_n - \overline{f}
+    \end{bmatrix}\,.
+\end{equation}
+Multiplying the right column matrix by the Hessian matrix in $A$ results in
+\begin{equation}
+    A = \frac{1}{2}
+    \begin{bmatrix}
+        \TP_p - \overline{t}\\
+        \FP_n - \overline{f}
+    \end{bmatrix}^{\intercal}
+    \begin{bmatrix}
+        -2 \overline{f} \left(\TP_p - \overline{t}\right) + \left(\overline{t}-\overline{f}\right)\left(\FP_n - \overline{f}\right)\\
+        \left(\overline{t}-\overline{f}\right)\left(\TP_p - \overline{t}\right) + 2 \overline{t}\left(\FP_n - \overline{f}\right)
+    \end{bmatrix}
+\end{equation}
+Multiplying the left column matrix by the right column matrix in $A$ results in
+\begin{equation}
+    A = -\overline{f} \left(\TP_p - \overline{t}\right)^2 + 
+    \left(\overline{t}-\overline{f}\right)\left(\TP_p - 
+    \overline{t}\right)\left(\FP_n - \overline{f}\right) + 
+    \overline{t}\left(\FP_n - \overline{f}\right)^2\,.
+\end{equation}
+As a linear operator, the expectation of $A$ is equivalent to
+\begin{equation}
+\label{eq:proof_of_exp_precision_approx_1}
+    \Expect{A} = -\overline{f} \Expect{\TP_p - \overline{t}}^2 + \left(\overline{t}-\overline{f}\right)\Expect{\left(\FP_n - \overline{f}\right)\left(\TP_p - \overline{t}\right)} + \overline{t}\Expect{\FP_n - \overline{f}}^2\,.
+\end{equation}
+By definition, $\Expect{\TP_p - \overline{t}}^2$ is the variance of $\TP_p$, $\Expect{\FP_n - \overline{f}}^2$ is the variance of $\FP_n$, and $\Expect{\left(\FP_n - \overline{f}\right)\left(\TP_p - \overline{t}\right)}$ is the covariance of $\TP_p$ and $\FP_n$, which is $0$ since they are independent.
+Making these substitutions results in
+\begin{equation}
+    \Expect{A} = \overline{t} \Var{\FP_n} - \overline{f} \Var{\TP_p}\,.
+\end{equation}
+Substituting this result into \cref{eq:proof_hess1} yields
+\begin{equation}
+\label{eq:proof_hess2}
+    \Expect{\Fun{g}(\TP_p,\FP_n)} = 
+    \frac{\overline{t}}{\overline{t}+\overline{f}} + 
+    \frac{-\overline{f} \Var{\TP_p} + 
+    \overline{t}\Var{\FP_n}}{(\overline{t} + \overline{f})^3}
+\end{equation}
+By \cref{thm:fpbinom}, $\FP_n$ is binomially distributed with a mean $n \fprate$ and a variance $n \fprate \tnrate$ and by \cref{cor:tpbinom}, $\TP_p$ is binomailly distributed with a mean $p \tprate$ and a variance $p \fnrate \tprate$.
+\end{proof}
+
+\section{Sampling distribution of arbitrary functions}
+\label{app:samp}
+TODO: add generative model as an algorithm for approximate sets? Add C++ implementation of the model? Do some simulations to see how rapidly it converges to the normal?
+TODO: feed in something like ppv function and see how well it matches the solution given in that one section. etc.
+
+Suppose we have a function $\Fun{f} \colon \PS{\Set{X}[1]} \times \cdots \times \PS{\Set{X}[q]} \mapsto \Set{Y}$, and we are interested in evaluating the loss when we replace one or more of the objective input sets with particular corresponding random approximate sets.
+The result of this substitution, as previously described, is a probability distribution over $\Set{Y}$.
+
+The probability distribution of random approximate sets are precisely given; therefore, we may estimate the distribution of any function of random approximate sets by generating the random approximate sets and applying the function of interest.
+
+Consider the $m$-by-$q$ matrix where the $(i,j)$-th element is the random approximate set $\ASet{A}_{i\,j}$ such that each random element of the matrix is independently and each column is identically distributed.
+If we apply $\Fun{g}$ to each row of the matrix,
+\begin{equation}
+\RV{Y}_i = \Fun{g}\left(\ASet{A}_{i\,1},\ldots,\ASet{A}_{i\,q}\right)
+\end{equation}
+for $i=1,\ldots,m$, we generate $m$ i.i.d. random elements $\RV{Y_1},\ldots,\RV{Y_m}$.
+
+If $\Set{Y}$ is a measure space (discrete or continuous), consider the random variable
+\begin{equation}
+\RV{\overline{Y}_m} = \frac{1}{m} \sum_{i=1}^{m} \RV{Y_i}\,.
+\end{equation}
+If $\RV{Y_1}$ has a well-defined mean and variance, then by the central limit theorem
+\begin{equation}
+\lim_{m \to \infty} \RV{\overline{Y}_m}
+\end{equation}
+converges in distribution to a normal with a mean $\Expect{\RV{Y_1}}$ and a variance $\Var{\RV{Y_1}} / m$.
+
+A general approach to estimating $\RV{\overline{Y}_m}$ is given by generating a large sample of matrices and applying the function $\\Fun{g}$ to each to generate a large sample from $\RV{Y_1}$.
+
+We provide an implementation of the generative model and a tool set that permits one to analyze various properties of the distribution of the function of interest.
+}
+\end{document}

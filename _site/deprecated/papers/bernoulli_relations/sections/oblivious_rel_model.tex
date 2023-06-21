@@ -1,0 +1,135 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+\section{Application: oblivious relational model}
+The relational model manages data using a structure and language consistent with first-order predicate logic\cite{} where data is represented in terms of tuples grouped into relations. A database organized according to the relational model is a relational database.
+
+Relations in mathematics as previously defined is a powerful abstraction with wide applicability. However, there are a few key differences between relations in mathematics and relations in the relational model. In the \emph{relational model}, we replace \emph{tuples} with sets of \emph{named} attributes and provide, limit the value types (corresponding to each attribute) to \emph{fundamental value types} like \emph{integers} or \emph{strings}, and provide an interface for \emph{modifying} attributes values and \emph{adding} or \emph{removing} attributes. Some of the key differences are summarized by \cref{table:mathrel_vsrelmodel}.
+\begin{table}
+    \label{tab:mathrel_vsrelmodel}
+    \centering
+    \caption{Relations in mathematics versus relations in the relational model}
+    \begin{tabular}{l l}
+        \toprule
+        mathematics & relational model\\
+        \midrule
+        unconstrained value types               & fundamental value types\\
+        columns identified by order (position)  & columns identified by names\\
+        immutable                               & mutable\\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+The purpose of the relational model is to provide a declarative method for specifying data and queries: users directly state what information the database contains and what information they want from it, and the implementation takes care of describing data structures for storing the data and retrieval procedures for answering queries.
+
+Most relational databases use the SQL data definition and query language; these systems implement what can be regarded as an engineering approximation to the relational model. A table in an SQL database schema corresponds to a predicate variable; the contents of a table to a relation; key constraints, other constraints, and SQL queries correspond to predicates. However, SQL databases deviate from the relational model in many details, and Codd fiercely argued against deviations that compromise the original principles.
+
+The golden rule is ``every non-key attribute must provide a fact about the key, the whole key, and nothing but the key.''
+
+NOTE: Also cannot do any sort of computations on entire columns, or subsets of columns, unless the corresponding keys are also known.
+
+NOTE: Mention how this is an especially appropriate choice of a relational data structure in the case of Encrypted Search, since it allows \emph{oblivious} relations.
+
+If a key needs to map to a variable-sized \emph{array} of elements, that constitutes \emph{multiple} facts about the key. In this case, it is probably better to use a key-value map, where the \emph{value} is an array. An array does too much. It has multiple facts and it stores the order (which is not related to the relation itself). And the performance is poor (see above).
+
+\Cref{tbl:relation} depicts a \emph{relation} where the \emph{key} column consists of unique identifiers and the \emph{values} column must consist of (possibly repeated) elements from $\mathbb{Z}$.
+\begin{table}[h]
+\centering
+\caption{A table representing a relation of $p$ tuples each with $n$ attributes about each key}
+\label{tbl:relation}
+\begin{tabular}{|c c c c|} 
+\hline
+key & attribute$_1$ & $\cdots$ & attribute$_n$\\
+\hline
+    $k_1$ & $a_{1 1}$ & $\cdots$ & $a_{1 n}$\\
+    $k_2$ & $a_{2 1}$ & $\cdots$ & $a_{2 n}$\\
+    $\vdots$ & $\vdots$& $\vdots$ & $\vdots$\\
+    $k_p$ & $a_{p 1}$ & $\cdots$ & $a_{p n}$\\
+\hline
+\end{tabular}
+\end{table}
+
+
+TODO: Add (relation, foreign key), give name. Now, another function on a table (relation). get attribute(relation, key)
+
+TODO: The add linked attribute by key is a special linking feature. Since the \emph{key} is not necessarily stored anywhere in the table, but is only used at \emph{query} time to map to the correct row (with a false positive / false negative rate), the add link by key feature allows the key used at query time to be used at query time. Maybe operator overload this, i.e., a general attribute (that no other attribute may be named), say ``key'', that may be used in many of those functions.
+%%%%%%%%%%%%%%%%%%%%%%
+
+If a key needs to map to a variable-sized \emph{array} of elements, that constitutes \emph{multiple} facts about the key. In this case, it is probably better to use a key-value map, where the \emph{value} is an array. An array does too much. It has multiple facts and it stores the order (which is not related to the relation itself). And the performance is poor (see above).
+
+
+TODO: separately, what about an OBLIVIOUS TYPE? In an approximate set, the elements are instances of an OBLIVIOUS TYPE because:
+(1) You don't know the element x is in the set until you specifically ask if x is in the set. That is, you can't iterate over the set, that is, just by looking at the collection of bits that make up the set, you can't infer what the elements are. You actually have to ask for x specifically, and only then is it revealed to be a member or not. The less you can tell about the elements of the set by looking at the collection of bits that make up the set, the better. In a Perfect Hash Filter, we can know some things... like we can know that there are N or fewer elements if the perfect hash function is 1,...,N. The load factor may not be known, though (although a low load factor makes the distribution of bit lengths assign greater probability to smaller values), so we can only say with certainty that there are N or fewer. Another thing we know is that each actual element of the set
+
+The relational model manages data using a structure and language consistent with first-order predicate logic\cite{} where data is represented in terms of tuples grouped into relations. A database organized according to the relational model is a relational database.
+
+In the relational model, related records are linked together with a \emph{key}. The purpose of the relational model is to provide a declarative method for specifying data and queries: users directly state what information the database contains and what information they want from it, and let the implementation ake care of describing data structures for storing the data and retrieval procedures for answering queries.
+
+Most relational databases use the SQL data definition and query language; these systems implement what can be regarded as an engineering approximation to the relational model. A table in an SQL database schema corresponds to a predicate variable; the contents of a table to a relation; key constraints, other constraints, and SQL queries correspond to predicates. However, SQL databases deviate from the relational model in many details, and Codd fiercely argued against deviations that compromise the original principles.[4]
+
+The golden rule is ``every non-key attribute must provide a fact about the key, the whole key, and nothing but the key.''
+
+
+NOTE: Also cannot do any sort of computations on entire columns, or subsets of columns, unless the corresponding keys are also known.
+
+NOTE: Mention how this is an especially appropriate choice of a relational data structure in the case of Encrypted Search, since it allows \emph{oblivious} relations.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+
+
+%The \HasKey function tests whether a particular \emph{key} is in the relation, i.e., \HasKey{$\ASet{R}$,$x$}, $x \in \Set{X}$, returns \True if $x \in \Keys(\ASet{R})$ and otherwise returns \False.
+%The \GetAttributes function retrieves the \emph{attributes}, a set of iterable key-value pairs, where the key is the \emph{name} of the attribute, about a particular \emph{key}. If a key has no associated attributes, \Null is returned.
+
+
+\subsection{Derived attributes}
+Oblivious partial functions may be constructed for primary or composite keys, or mapped-values that are revealed.
+
+\subsection{Attribute comparisons}
+Oblivious relations may be constructed for the \emph{oblivious} primary or composite keys. (They may also be constructed for the mapped-to values that are revealed (some columns may be chosen to be revealed for various reasons), but still choose to make the relational operators oblivious.) So, relations all the way down?
+
+
+
+
+
+
+TODO: Add (relation, foreign key), give name. Now, another function on a table (relation). get attribute(relation, key)
+
+TODO: The add linked attribute by key is a special linking feature. Since the \emph{key} is not necessarily stored anywhere in the table, but is only used at \emph{query} time to map to the correct row (with a false positive / false negative rate), the add link by key feature allows the key used at query time to be used at query time. Maybe operator overload this, i.e., a general attribute (that no other attribute may be named), say ``key'', that may be used in many of those functions.
+
+The latter approach that uses multiple maps all indexed by the same key can more fully implement the relational logic. Moreover, if each approximate map has some false positive rate less than $1$, say a false positive rate that is independently useful, then there are fewer restrictions on how the approximate maps may be combined to generate new table views, joins, or compositions.
+
+However, note that since we have the restriction that we may only index based off of a single key, we cannot do certain types of joins.
+
+
+\begin{table}[h]
+\centering
+\caption{A derived \emph{attribute} based on the \emph{composition} $\operatorname{g}(\text{attribute$_2$})$.}
+\label{tbl:relation_derived}
+\begin{tabular}{|c c|} 
+\hline
+key & derived attribute\\
+\hline
+    $k_1$ & $\operatorname{g} \circ \ExactMap{2}(a_{1 2})$\\
+    $k_2$ & $\operatorname{g} \circ \ExactMap{2}(a_{2 2})$\\
+    $\vdots$ & $\vdots$\\
+    $k_p$ & $\operatorname{g} \circ \ExactMap{2}(a_{p 2})$\\
+\hline
+\end{tabular}
+\begin{tabular}{l l} 
+\toprule
+key & $\operatorname{g}(\text{key})$\\
+\midrule
+    $k_1$ & $v_1$\\
+    $k_2$ & $v_2$\\
+    $\vdots$ & $\vdots$\\
+    $k_t$ & $v_t$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\end{document}

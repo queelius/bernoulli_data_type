@@ -1,0 +1,136 @@
+approximate prolog
+cipher prolog
+
+hard to do, unification requires being able to do, say, a depth first search
+
+suppose we have db:
+---
+male(tom).
+parent(tom,bob).
+parent(tom,kim).
+
+male(bob).
+parent(bob,tim).
+
+female(april).
+parent(april,bob).
+
+father(X,Y) :- parent(X,Y), male(X).
+
+is_father(X) :- father(X,_).
+---
+
+father(X,Y).
+    X=tom,Y=bob
+    X=tom,Y=kim
+    X=bob,Y=tim
+
+suppose parent and male are cipher relations.
+
+% model male(tom): n
+male(tom1').
+male(tom2').
+male(tom3').
+
+% model parent(tom,bob): n*n terms, n=3
+parent(tom1',bob1').
+parent(tom1',bob2').
+parent(tom1',bob3').
+
+parent(tom2',bob1').
+parent(tom2',bob2').
+parent(tom2',bob3').
+
+parent(tom3',bob1').
+parent(tom3',bob2').
+parent(tom3',bob3').
+% end parent(tom,bob)
+
+% model parent(tom,kim): n*n terms, n=3 ; original relation had one entry for this
+parent(tom1',kim1').
+parent(tom1',kim2').
+parent(tom1',kim3').
+
+parent(tom2',kim1').
+parent(tom2',kim2').
+parent(tom2',kim3').
+
+parent(tom3',kim1').
+parent(tom3',kim2').
+parent(tom3',kim3').
+% end parent(tom,kim)
+
+% model male(bob)
+male(bob1').
+male(bob2').
+male(bob3').
+
+% model parent(bob,tim)
+parent(bob1',tim1').
+parent(bob1',tim2').
+parent(bob1',tim3').
+
+parent(bob2',tim1').
+parent(bob2',tim2').
+parent(bob2',tim3').
+
+parent(bob3',tim1').
+parent(bob3',tim2').
+parent(bob3',tim3').
+% end parent(bob,tim)
+
+% model male(bob)
+female(april1').
+female(april2').
+female(april3').
+
+% model parent(april,bob)
+parent(april1',bob1').
+parent(april1',bob2').
+parent(april1',bob3').
+
+parent(april2',bob1').
+parent(april2',bob2').
+parent(april2',bob3').
+
+parent(april3',bob1').
+parent(april3',bob2').
+parent(april3',bob3').
+
+
+father(X,Y) :- parent(X,Y), male(X).
+
+is_father(X) :- father(X,_).
+
+father(X,Y) =>
+    X=tom1',Y=bob1'
+    X=tom1',Y=bob2'
+    X=tom1',Y=bob3'
+    X=tom2',Y=bob1'
+    X=tom2',Y=bob2'
+    X=tom2',Y=bob3'
+    X=tom3',Y=bob1'
+    X=tom3',Y=bob2'
+    X=tom3',Y=bob3'
+
+    X=tom1',Y=kim1'
+    X=tom1',Y=kim2'
+    X=tom1',Y=kim3'
+    X=tom2',Y=kim1'
+    X=tom2',Y=kim2'
+    X=tom2',Y=kim3'
+    X=tom3',Y=kim1'
+    X=tom3',Y=kim2'
+    X=tom3',Y=kim3'
+
+    X=bob1',Y=tim1'
+    X=bob1',Y=tim2'
+    X=bob1',Y=tim3'
+    X=bob2',Y=tim1'
+    X=bob2',Y=tim2'
+    X=bob2',Y=tim3'
+    X=bob3',Y=tim1'
+    X=bob3',Y=tim2'
+    X=bob3',Y=tim3'
+
+is this useful?

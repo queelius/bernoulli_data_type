@@ -1,0 +1,33 @@
+#!/bin/bash
+
+BACKUP_DIR_BASE="backup"
+BACKUP_DIR=${BACKUP_DIR_BASE}
+
+counter=0
+while [ -d ${BACKUP_DIR} ]
+do
+    ((counter++))
+    echo "${counter}"
+    BACKUP_DIR=${BACKUP_DIR_BASE}_${counter}
+done
+
+mkdir -p ${BACKUP_DIR}
+
+for f in *.tex
+do
+    SAMPLE=`basename ${f}`
+    if [ ! -f ${BACKUP_DIR}/${SAMPLE} ]
+    then
+        echo "processing ${SAMPLE}"
+        echo "copying ${f} to ${BACKUP_DIR}/${f}"
+        cp ${f} ${BACKUP_DIR}/${f}
+        
+        TEMP="${f%%.*}.tmp"
+       
+        echo "applying $1 to ${TEMP}"
+        sh $1 ${f} > ${TEMP}
+        
+        echo "moving ${TEMP} back onto ${f}"
+        mv ${TEMP} ${f}        
+    fi
+done 

@@ -1,0 +1,2 @@
+#!/bin/sh
+g++ -std=c++20 -o test_hash_map test_hash_map.cpp -I ~/sources/bernoulli_data_type/include -I ~/sources/algebraic_hash_functions/include
