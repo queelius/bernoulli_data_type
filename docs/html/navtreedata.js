@@ -50,19 +50,19 @@ var NAVTREE =
       [ "Regular types", "md_BERNOULLI_MAP.html#autotoc_md18", null ]
     ] ],
     [ "Bernoulli set", "md_BERNOULLI_SET.html", null ],
-    [ "Concept: Codec", "codec.html", [
-      [ "Codecs", "codec.html#autotoc_md19", null ]
+    [ "Concept: Codec", "md_CODEC.html", [
+      [ "Codecs", "md_CODEC.html#autotoc_md19", null ]
     ] ],
     [ "README", "md_README.html", null ],
-    [ "Concept: RegularType", "regular_type.html", [
-      [ "C++ regular types", "regular_type.html#autotoc_md20", null ]
+    [ "Concept: Regular Type", "md_REGULAR_TYPE_CONCEPT.html", [
+      [ "C++ regular types", "md_REGULAR_TYPE_CONCEPT.html#autotoc_md20", null ]
     ] ]
   ] ]
 ];
 
 var NAVTREEINDEX =
 [
-"codec.html"
+"index.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
