@@ -3,24 +3,15 @@
 
 
 The Boolean type, represented as `bool` in C++, models the set of values
-given by `{true,false}`. This document entertains the replacement of `bool` with a
-type `bernoulli<bool>`, which represents a sort of *noisy* Boolean. In general, we
-can have a Bernoulli type for any type `T`, denoed by `bernoulli<T>`.
+given by `{true,false}`. This document entertains the replacement of `bool` with a type `bernoulli<bool>`, which represents a sort of *noisy* Boolean. In general, we can have a Bernoulli type for any type `T`, denoed by `bernoulli<T>`.
 
 Each Bernoulli Model also has an *order*, an integer greater than 1, and 
-it essentially describes the number of independent ways in which the process that
-generated the Bernoulli approximation can produce errors. We denote that a Bernoulli
-Model has order `K` with `bernoulli<T,K>`. Unless it is useful, we drop the order
-information and simply write `bernoulli<T>`.
+it essentially describes the number of independent ways in which the process that generated the Bernoulli approximation can produce errors. We denote that a Bernoulli Model has order `K` with `bernoulli<T,K>`. Unless it is useful, we drop the order information and simply write `bernoulli<T>`.
 
 > As special case, data structures like Bloom filters can be thought of as a
 > Bernoulli data structure.
 
-In the Bernoulli Boolean model, a `bool` is wrapped inside of a Bernoulli type
-`bernoulli<bool>`. We use the notation `bernoulli<bool>{x}` to denote that
-it is modeling some *latent* variable `x` (unobservable). We can think of
-`bernoulli<bool>{x}` as a measurement of `x`, or a noisy version of the original
-`x`, and it may or may not equal `x`.
+In the Bernoulli Boolean model, a `bool` is wrapped inside of a Bernoulli type `bernoulli<bool>`. We use the notation `bernoulli<bool>{x}` to denote that it is modeling some *latent* variable `x` (unobservable). We can think of `bernoulli<bool>{x}` as a measurement of `x`, or a noisy version of the original `x`, and it may or may not equal `x`.
 
 The Bernoulli model introduces a notion of uncertainty or error. Specifically, a
 `bernoulli<bool>{x}` is a *random Bernoulli variable* such that
