@@ -1,0 +1,162 @@
+%
+%
+%
+\NeedsTeXFormat{LaTeX2e}[1994/06/01]
+\ProvidesPackage{relationnotation}[2018/01/01 alex towell's set notation (style) for his various papers]
+
+\RequirePackage{xparse}
+\RequirePackage{bm}
+\RequirePackage{bbm}
+\RequirePackage{amssymb}
+\RequirePackage{mathtools}
+\RequirePackage{algorithm2e}
+
+\newcommand{\blackboardrelationstyle}[1]{\mathbbm{#1}}
+\newcommand{\blackboardrelationsubstyle}[1]{\pmb{#1}}
+\newcommand{\blackboardrelationsupstyle}[1]{\pmb{#1}}
+
+\newcommand{\boldrelationstyle}[1]{\pmb{\mathsf{#1}}}
+\newcommand{\boldrelationsubstyle}[1]{\pmb{#1}}
+\newcommand{\boldrelationsupstyle}[1]{\pmb{#1}}
+
+\newcommand{\fancyrelationstyle}[1]{\mathcal{#1}}
+\newcommand{\fancyrelationsubstyle}[1]{#1}
+\newcommand{\fancyrelationsupstyle}[1]{#1}
+
+\newcommand{\plainrelationstyle}[1]{\mathsf{#1}}
+\newcommand{\plainrelationsubstyle}[1]{\mathsf{#1}}
+\newcommand{\plainrelationsupstyle}[1]{\mathsf{#1}}
+
+\newcommand{\relationstyle}[1]{\plainrelationstyle{#1}}
+\newcommand{\relationsubstyle}[1]{\plainrelationsubstyle{#1}}
+\newcommand{\relationsupstyle}[1]{\plainrelationsupstyle{#1}}
+
+\DeclareOption{blackboard}
+{
+    \renewcommand{\relationstyle}[1]{\blackboardrelationstyle{#1}}
+    \renewcommand{\relationsubstyle}[1]{\blackboardrelationsubstyle{#1}}
+    \renewcommand{\relationsupstyle}[1]{\blackboardrelationsupstyle{#1}}
+}
+\DeclareOption{bold}
+{
+    \renewcommand{\relationstyle}[1]{\boldrelationstyle{#1}}
+    \renewcommand{\relationsubstyle}[1]{\boldrelationsubstyle{#1}}
+    \renewcommand{\relationsupstyle}[1]{\boldrelationsupstyle{#1}}
+}
+\DeclareOption{fancy}
+{
+    \renewcommand{\relationstyle}[1]{\fancyrelationstyle{#1}}
+    \renewcommand{\relationsubstyle}[1]{\fancyrelationsubstyle{#1}}
+    \renewcommand{\relationsupstyle}[1]{\fancyrelationsupstyle{#1}}
+}
+\DeclareOption{plain}
+{
+    \renewcommand{\relationstyle}[1]{\plainrelationstyle{#1}}
+    \renewcommand{\relationsubstyle}[1]{\plainrelationsubstyle{#1}}
+    \renewcommand{\relationsupstyle}[1]{\plainrelationsupstyle{#1}}
+}
+
+\ExecuteOptions{plain}
+\ProcessOptions\relax
+
+\NewDocumentCommand{\Relation}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {\relationstyle{#1}}
+            {\relationstyle{#1}_{\setsubstyle{#2}}}
+    }
+    {\relationstyle{#1}_{\setsubstyle{#2}}^{\setsupstyle{#3}}}
+}
+
+\NewDocumentCommand{\FancyRelation}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {\fancyrelationstyle{#1}}
+            {\fancyrelationstyle{#1}_{\fancysetsubstyle{#2}}}
+    }
+    {\fancyrelationstyle{#1}_{\fancysetsubstyle{#2}}^{\fancysetsupstyle{#3}}}
+}
+
+\NewDocumentCommand{\BlackboardRelation}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {\blackboardrelationstyle{#1}}
+            {\blackboardrelationstyle{#1}_{\blackboardrelationsubstyle{#2}}}
+    }
+    {\blackboardrelationstyle{#1}_{\blackboardrelationsubstyle{#2}}^{\blackboardrelationsupstyle{#3}}}
+}
+
+\NewDocumentCommand{\PlainRelation}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {\plainrelationstyle{#1}}
+            {\plainrelationstyle{#1}_{\plainrelationsubstyle{#2}}}
+    }
+    {\plainrelationstyle{#1}_{\plainrelationsubstyle{#2}}^{\plainrelationsupstyle{#3}}}
+}
+
+\NewDocumentCommand{\BoldRelation}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {\boldrelationstyle{#1}}
+            {\boldrelationstyle{#1}_{\boldrelationsubstyle{#2}}}
+    }
+    {\boldrelationstyle{#1}_{\boldrelationsubstyle{#2}}^{\boldrelationsupstyle{#3}}}
+}
+
+
+\newcommand{\partialfunstyle}[1]{\operatorname{#1}}
+\newcommand{\partialfunsubstyle}[1]{#1}
+\newcommand{\partialfunsupstyle}[1]{#1}
+
+\newcommand{\funstyle}[1]{\operatorname{#1}}
+\newcommand{\funsubstyle}[1]{#1}
+\newcommand{\funsupstyle}[1]{#1}
+
+
+\NewDocumentCommand{\Fun}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {\funstyle{#1}}
+            {\funstyle{#1}_{\funsubstyle{#2}}}
+    }
+    {\funstyle{#1}_{\funsubstyle{#2}}^{\funsupstyle{#3}}}
+}
+
+
+\NewDocumentCommand{\PFun}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {\partialfunstyle{#1}}
+            {\partialfunstyle{#1}_{\partialfunsubstyle{#2}}}
+    }
+    {\partialfunstyle{#1}_{\partialfunsubstyle{#2}}^{\partialfunsupstyle{#3}}}
+}
+
+
+%\DeclarePairedDelimiterX\Pair[2]{\langle}{\rangle}{#1\,,#2}
+\DeclarePairedDelimiterX\Tuple[1]{\langle}{\rangle}{#1}
+
+%\newcommand{\Join}{\bowtie}
+\newcommand{\Proj}{\Pi}
+\newcommand{\Selection}{\sigma}
+
+%\SetKwFunction{Proj}{proj}
+\SetKwFunction{Dom}{dom}
+\SetKwFunction{Codom}{codom}
+\SetKwFunction{Dod}{def}
+\SetKwFunction{Image}{image}
+\SetKwFunction{Preimage}{preimage}
+\SetKwFunction{Range}{range}
+\SetKwFunction{Related}{related}
+
+\newcommand\pfun{\mathrel{\ooalign{\hfil$\mapstochar$\hfil\cr$\to$\cr}}}
+
+\endinput

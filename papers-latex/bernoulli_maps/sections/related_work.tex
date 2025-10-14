@@ -1,0 +1,90 @@
+\providecommand{\mainx}{..}
+\section{Related Work}
+\label{sec:related}
+
+Our work builds upon and unifies several research areas spanning theoretical computer science, information theory, and systems design.
+
+\subsection{Probabilistic Data Structures}
+
+The study of space-efficient probabilistic data structures began with Bloom filters~\cite{bloom1970}, which represent sets with one-sided error.
+Numerous variants have been proposed to address specific limitations:
+\begin{itemize}
+    \item \textbf{Counting Bloom filters}~\cite{fan2000} support deletion at increased space cost
+    \item \textbf{Cuckoo filters}~\cite{fan2014} achieve better space efficiency and support deletion
+    \item \textbf{Quotient filters}~\cite{bender2012} provide cache-friendly implementations
+\end{itemize}
+
+For frequency estimation, the Count-Min sketch~\cite{cormode2005} and Count sketch~\cite{charikar2002} provide probabilistic guarantees on query accuracy.
+The AMS sketch~\cite{alon1996} estimates second moments in data streams.
+These structures exemplify the space-accuracy tradeoffs our framework formalizes.
+
+\subsection{Locality-Sensitive Hashing}
+
+Indyk and Motwani~\cite{indyk1998} introduced locality-sensitive hashing (LSH) for approximate nearest neighbor search.
+Subsequent work developed LSH families for various distance metrics:
+\begin{itemize}
+    \item Hamming distance~\cite{gionis1999}
+    \item Jaccard similarity~\cite{broder1997}
+    \item Cosine similarity~\cite{charikar2002similarity}
+\end{itemize}
+
+Our framework views LSH as approximate maps from points to hash buckets, where collision probabilities encode similarity.
+This perspective enables unified analysis of different LSH schemes.
+
+\subsection{Information Theory and Rate-Distortion}
+
+Shannon's rate-distortion theory~\cite{shannon1959} provides fundamental limits on lossy compression.
+Cover and Thomas~\cite{cover2006} present comprehensive treatment of these concepts.
+Our work adapts rate-distortion principles to discrete functions rather than continuous signals.
+
+The connection between data structures and information theory has been explored by:
+\begin{itemize}
+    \item Mitzenmacher and Upfal~\cite{mitzenmacher2005} analyze Bloom filters using information-theoretic arguments
+    \item Carter et al.~\cite{carter1978} establish lower bounds for approximate membership queries
+    \item Pagh et al.~\cite{pagh2005} prove optimality of certain hashing schemes
+\end{itemize}
+
+\subsection{Approximate Computing}
+
+The broader field of approximate computing trades accuracy for efficiency across the computing stack:
+\begin{itemize}
+    \item \textbf{Hardware}: Approximate arithmetic circuits~\cite{han2013}
+    \item \textbf{Algorithms}: Randomized approximation algorithms~\cite{motwani1995}
+    \item \textbf{Systems}: Approximate query processing~\cite{hellerstein1997}
+\end{itemize}
+
+Our framework provides theoretical foundations specifically for data structure approximations.
+
+\subsection{Algebraic Approaches}
+
+Algebraic methods in computer science have been studied extensively:
+\begin{itemize}
+    \item \textbf{Abstract data types}: Goguen et al.~\cite{goguen1977} formalized ADTs algebraically
+    \item \textbf{Monoids and sketches}: The monoid structure of sketches enables parallel and distributed computation~\cite{boykin2013}
+    \item \textbf{Category theory}: Categorical approaches to data structures provide compositional semantics~\cite{bird1997}
+\end{itemize}
+
+Our contribution extends these algebraic approaches to probabilistic settings, defining operations that preserve approximation guarantees.
+
+\subsection{Encrypted Search and Privacy}
+
+Approximate data structures play crucial roles in privacy-preserving systems:
+\begin{itemize}
+    \item \textbf{Private set intersection}: Bloom filters enable efficient PSI protocols~\cite{dong2013}
+    \item \textbf{Searchable encryption}: Approximate structures hide access patterns~\cite{cash2014}
+    \item \textbf{Differential privacy}: Sketches provide privacy through approximation~\cite{dwork2006}
+\end{itemize}
+
+Our framework's emphasis on oblivious computation aligns with these privacy requirements.
+
+\subsection{Distinction from Prior Work}
+
+While previous work studied specific probabilistic data structures or general approximation concepts, our contribution is a unified algebraic framework that:
+\begin{enumerate}
+    \item Formalizes the relationship between maps, sets, and relations through approximation
+    \item Provides compositional semantics for complex approximate operations
+    \item Establishes hierarchy of approximation orders with precise error characterization
+    \item Connects practical data structures to fundamental information-theoretic limits
+\end{enumerate}
+
+This systematic approach enables both theoretical analysis and practical design of novel probabilistic data structures.

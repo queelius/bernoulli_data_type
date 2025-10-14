@@ -1,0 +1,115 @@
+%
+%
+%
+%
+%   \BitString      B^* denotes arbitrary length bit strings
+%   \BitString[n]   B^n denotes bit strings of size n
+%   \BitSet         set B denotes {0,1}
+%
+%
+
+
+\NeedsTeXFormat{LaTeX2e}[1994/06/01]
+\ProvidesPackage{obliviousnotation}[2018/01/01 alex towell's oblivious set notation for his various papers]
+
+\RequirePackage{setnotation}
+\RequirePackage{approxsetnotation}
+\RequirePackage{algorithm2e}
+%\RequirePackage{accents}
+\RequirePackage{txfonts}
+
+%\SetKwFunction{Obfuscate}{o}
+\newcommand{\LongOT}[1]{$\textrm{cipher}(#1)$}
+
+%\NewDocumentCommand{\LongOT}{mo}{%
+%    \IfNoValueTF{#2}
+%        {\Obfuscate\!\left(#1\right)}
+%        {\Obfuscate^{#2}\!\left(#1\right)}
+%}
+
+%\setlength{\dashlength}{1pt}%     % length of dash + gap
+%\setlength{\dashdash}{1pt}%     % length of dash
+%\setlength{\fboxrule}{1pt}%     % width of line
+%\setlength{\fboxsep}{.5pt}%        % separation between box and inner content
+
+
+
+%\makeatletter
+%\renewcommand{\boxed}[1]{\text{\fboxsep=.2em\fbox{\m@th$\displaystyle#1$}}}
+%\makeatother
+
+\setlength{\fboxsep}{1.6pt}
+\newcommand{\OTL}[1]{\boxed{#1}}
+
+%\newcommand{\OMap}{\raisebox{1.4pt}{\boxed{\mapsto}}}
+\newcommand{\POMap}{\raisebox{1.4pt}{\boxed{\pfun}}}
+
+%\newcommand{\OMap}{
+%$\;$
+%\begin{tikzpicture}[scale=.15]
+%  \draw[|->] (-3,0) -- (-2.5,0) -- (-2.25,.25) -- (-2,-.25) -- (-1.75,0) -- (-.75,0);
+%\end{tikzpicture}
+%$\;$}
+
+\newcommand{\OMap}{\boxright}
+ 
+
+\newcommand{\OT}[1]{\breve{#1}}
+
+
+\SetKwFunction{Repr}{repr}
+%\DeclareMathOperator{\Repr}{repr}
+
+\SetKwFunction{Signal}{signal}
+
+%\newcommand{\Poison}[1]{\breve{#1}}
+%\DeclareMathOperator{\Poi}{poi}
+
+\SetKwFunction{Poison}{noise}
+
+%\newcommand{\Poi}[1]{\underset{\frown}{#1}}
+%\newcommand{\Poi}[1]{{}^{\varsigma\!}#1}
+
+
+\def\presuper#1#2%
+  {\mathop{}%
+   \mathopen{\vphantom{#2}}^{#1}%
+   \kern-\scriptspace%
+   #2}
+
+   \newcommand{\Poi}[1]{\presuper{*}{#1}}
+
+  %\overset{\smile}{\underset{\frown}{t t t t}}$
+
+
+%\newcommand{\Poison}[1]{\Poi{#1}}
+
+
+%\newcommand{\OT}[1]{\accentset{\tilde}{a}}
+
+%\NewDocumentCommand{\OSet}{mo}{%
+%    \IfNoValueTF{#2}
+%        {\Set{\OT{#1}}}
+%        {\Set{\OT{#1}}[#2]}
+%}
+
+%\SetKwData{Obfuscated}{obfuscated}
+
+%\NewDocumentCommand{\OASet}{mo}{%
+%    \IfNoValueTF{#2}
+%        {\ASet{\OT{#1}}[]}
+%        {\ASet{\OT{#1}}[#2]}
+%}
+
+%\NewDocumentCommand{\OPASet}{mo}{%
+%    \IfNoValueTF{#2}
+%        {\PASet{\check{#1}}[]}
+%        {\PASet{\check{#1}}[#2]}
+%}
+
+%\NewDocumentCommand{\ONASet}{mo}{%
+%    \IfNoValueTF{#2}
+%        {\PASet{\check{#1}}[]}
+%        {\PASet{\check{#1}}[#2]}
+%}
+

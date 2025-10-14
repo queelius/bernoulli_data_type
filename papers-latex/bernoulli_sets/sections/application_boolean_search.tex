@@ -1,0 +1,123 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+
+\SetKwFunction{MakeIndex}{index}
+\SetKwFunction{MakeApproxIndex}{index$^\sigma$}
+\SetKwFunction{OrOp}{or}
+\SetKwFunction{NotOp}{not}
+\SetKwFunction{AndOp}{and}
+
+\begin{document}
+\section{Application: Boolean search with Bernoulli sets}
+\label{sec:bool_search}
+
+Information retrieval systems must balance query accuracy against computational and space efficiency. We demonstrate how Bernoulli sets provide a principled framework for approximate Boolean search with quantifiable error bounds.
+
+\subsection{Boolean search model}
+
+\begin{definition}[Boolean Search]
+A document collection $\mathcal{D} \subseteq \Set{D}$ is queried using Boolean expressions over a keyword space $\Set{K}$. A document $d \in \mathcal{D}$ is relevant to query $q$ if it satisfies the Boolean predicate defined by $q$.
+\end{definition}
+
+The search system operates on three Boolean algebras:
+\begin{itemize}
+\item Query algebra: $Q = (\mathcal{P}(\Set{K}), \land, \lor, \neg, \epsilon, \Set{K})$
+\item Index algebra: $S = (\mathcal{P}(\Set{K}), \cap, \cup, \overline{\phantom{x}}, \emptyset, \Set{K})$
+\item Result algebra: $R = (\mathcal{P}(\Set{D}), \cap, \cup, \overline{\phantom{x}}, \emptyset, \Set{D})$
+\end{itemize}
+
+The indexing function $\texttt{index}: \Set{D} \to \mathcal{P}(\Set{K})$ maps each document to its set of keywords:
+\begin{equation}
+\texttt{index}(d) = \{k \in \Set{K} : \text{keyword } k \text{ appears in document } d\}
+\end{equation}
+
+\subsection{Approximate Boolean search with Bernoulli sets}
+
+When exact indexes are replaced with Bernoulli approximations, the indexing function becomes $\texttt{index}^\sigma: \Set{D} \to \text{Bernoulli}(\mathcal{P}(\Set{K}))$.
+
+\begin{theorem}[Approximate Search Correctness]
+\label{thm:approx_search}
+For any Boolean query $q$ and document collection $\mathcal{D}$, if each document index has false positive rate $\fprate$ and false negative rate $\fnrate$, then the approximate result set $\mathcal{R}^\sigma$ is a Bernoulli approximation of the exact result set $\mathcal{R}$ with error rates determined by the query structure.
+\end{theorem}
+
+\begin{proof}
+We proceed by structural induction on the query $q$:
+
+\textbf{Base case:} For a single keyword $k$, a document $d$ appears in $\mathcal{R}^\sigma$ if $k \in \texttt{index}^\sigma(d)$. This occurs with:
+\begin{itemize}
+\item Probability $1-\fnrate$ if $k \in \texttt{index}(d)$ (true positive)
+\item Probability $\fprate$ if $k \notin \texttt{index}(d)$ (false positive)
+\end{itemize}
+
+\textbf{Inductive step:} For compound queries:
+\begin{itemize}
+\item $q_1 \land q_2$: Error rates follow intersection composition (Theorem~\ref{thm:union_error})
+\item $q_1 \lor q_2$: Error rates follow union composition
+\item $\neg q$: Error rates invert per Theorem~\ref{thm:complement_error}
+\end{itemize}
+\end{proof}
+
+\subsection{Query-specific error analysis}
+
+Different query types exhibit distinct error propagation patterns:
+
+\begin{theorem}[Conjunctive Query Error]
+For a conjunctive query $q = k_1 \land k_2 \land \cdots \land k_n$ over $n$ keywords, the false positive rate decreases exponentially:
+\begin{equation}
+\fprate_q = \fprate^n
+\end{equation}
+while the false negative rate increases:
+\begin{equation}
+\fnrate_q = 1 - (1-\fnrate)^n
+\end{equation}
+\end{theorem}
+
+\begin{theorem}[Disjunctive Query Error]
+For a disjunctive query $q = k_1 \lor k_2 \lor \cdots \lor k_n$, the error rates exhibit dual behavior:
+\begin{equation}
+\fprate_q = 1 - (1-\fprate)^n, \quad \fnrate_q = \fnrate^n
+\end{equation}
+\end{theorem}
+
+\subsection{Bloom filter indexes}
+
+A common implementation uses Bloom filters as Bernoulli set approximations with $\fnrate = 0$.
+
+\begin{example}[Web Search Cache]
+Consider a search engine indexing $|\mathcal{D}| = 10^9$ documents with $|\Set{K}| = 10^6$ unique keywords. Using exact indexes requires $O(|\mathcal{D}| \cdot |\Set{K}|)$ bits. With Bloom filters at $\fprate = 0.01$:
+\begin{itemize}
+\item Space: $\approx 10$ bits per keyword per document
+\item Conjunctive query (3 terms): $\fprate_q \approx 10^{-6}$
+\item Disjunctive query (3 terms): $\fprate_q \approx 0.03$
+\end{itemize}
+This achieves 100× space reduction with acceptable accuracy for most queries.
+\end{example}
+
+\subsection{Privacy-preserving search}
+
+Bernoulli approximations provide natural privacy guarantees through plausible deniability.
+
+\begin{theorem}[Differential Privacy via Bernoulli Sets]
+A Bernoulli set with false positive rate $\fprate$ provides $\epsilon$-differential privacy where:
+\begin{equation}
+\epsilon = \ln\left(\frac{1-\fnrate}{\fprate}\right)
+\end{equation}
+for membership queries on the underlying set.
+\end{theorem}
+
+This connection enables encrypted search systems where the index structure itself provides privacy guarantees without additional cryptographic overhead.
+
+\subsection{Optimizing for query workloads}
+
+Given a query workload distribution, we can optimize the Bernoulli approximation parameters:
+
+\begin{optimization}
+\text{minimize} \quad \mathbb{E}_{q \sim \mathcal{Q}}[\text{error}(q)] \\
+\text{subject to} \quad \text{space}(\fprate, \fnrate) \leq B
+\end{optimization}
+
+where $\mathcal{Q}$ is the query distribution and $B$ is the space budget.
+
+For workloads dominated by conjunctive queries, optimizing for low false positive rates is crucial. For disjunctive-heavy workloads, balanced error rates often perform better.
+
+\end{document}

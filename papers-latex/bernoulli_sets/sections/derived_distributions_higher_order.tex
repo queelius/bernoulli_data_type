@@ -1,0 +1,78 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+\section{Higher-order compositions and Boolean algebra operations}
+\label{sec:higher_order_compositions}
+
+The composition of Bernoulli sets through Boolean algebra operations produces higher-order approximations with derived error distributions. This section characterizes these compositions and their resulting error structures.
+
+\subsection{Union of Bernoulli sets}
+
+The union of two first-order Bernoulli sets produces a higher-order approximation with compound error rates.
+
+\begin{theorem}[Union Error Propagation]
+\label{thm:union_error}
+Given two Bernoulli sets $\ASetFO{A}[\epsilon_1]$ and $\ASetFO{B}[\epsilon_2]$ approximating sets $\Set{A}$ and $\Set{B}$, their union $\ASetFO{A} \cup \ASetFO{B}$ has:
+\begin{itemize}
+\item False negative rate: $\fnrate = \epsilon_1 \epsilon_2$
+\item False positive rate: $\fprate = 1 - (1-\epsilon_1)(1-\epsilon_2)$
+\item Expected error rate: $\epsilon = \alpha_1(1-\epsilon_1)\epsilon_2 + \alpha_2(1-\epsilon_2)\epsilon_1 + (1-\alpha_1-\alpha_2-\alpha_3)\epsilon_1\epsilon_2$
+\end{itemize}
+where $\alpha_1 = \frac{|\Set{A} \setminus \Set{B}|}{|\Set{U}|}$, $\alpha_2 = \frac{|\Set{B} \setminus \Set{A}|}{|\Set{U}|}$, and $\alpha_3 = \frac{|\Set{A} \cap \Set{B}|}{|\Set{U}|}$.
+\end{theorem}
+
+\begin{proof}
+For the false positive rate, consider an element $x \notin \Set{A} \cup \Set{B}$. A false positive occurs when $x \in \ASetFO{A} \cup \ASetFO{B}$, which happens when $x \in \ASetFO{A}$ or $x \in \ASetFO{B}$. Since $x \notin \Set{A}$ and $x \notin \Set{B}$:
+\begin{align}
+\Prob{x \in \ASetFO{A} \cup \ASetFO{B} \mid x \notin \Set{A} \cup \Set{B}} &= 1 - \Prob{x \notin \ASetFO{A} \land x \notin \ASetFO{B}}\\
+&= 1 - (1-\epsilon_1)(1-\epsilon_2)
+\end{align}
+
+For the false negative rate, consider $x \in \Set{A} \cup \Set{B}$. A false negative occurs when $x \notin \ASetFO{A} \cup \ASetFO{B}$, requiring both $x \notin \ASetFO{A}$ and $x \notin \ASetFO{B}$. This happens with probability $\epsilon_1 \epsilon_2$ when $x \in \Set{A} \cap \Set{B}$.
+\end{proof}
+
+\subsection{Complement of Bernoulli sets}
+
+The complement operation on Bernoulli sets swaps the roles of false positives and false negatives.
+
+\begin{theorem}[Complement Error Inversion]
+\label{thm:complement_error}
+For a Bernoulli set $\ASet{A}$ with false positive rate $\fprate$ and false negative rate $\fnrate$, the complement $\overline{\ASet{A}}$ has:
+\begin{itemize}
+\item False positive rate: $\fprate' = \fnrate$
+\item False negative rate: $\fnrate' = \fprate$
+\end{itemize}
+\end{theorem}
+
+\begin{proof}
+An element $x \in \Set{U} \setminus \Set{A}$ yields a false positive in $\overline{\ASet{A}}$ when $x \notin \ASet{A}$ (correctly), resulting in $x \in \overline{\ASet{A}}$ when it should be $x \notin \overline{\Set{A}}$. This occurs precisely when $\ASet{A}$ has a false negative for elements in $\Set{A}$.
+\end{proof}
+
+\subsection{Complete basis and derived operations}
+
+Since union and complement form a complete basis for Boolean algebras, all other operations can be expressed through their composition.
+
+\begin{corollary}[Set Difference]
+The set difference $\ASet{A} \setminus \ASet{B} = \ASet{A} \cap \overline{\ASet{B}}$ has error rates derived from the intersection of $\ASet{A}$ with the complement of $\ASet{B}$.
+\end{corollary}
+
+\begin{corollary}[Symmetric Difference]
+The symmetric difference $\ASet{A} \triangle \ASet{B} = (\ASet{A} \setminus \ASet{B}) \cup (\ASet{B} \setminus \ASet{A})$ compounds errors from both difference operations and their union.
+\end{corollary}
+
+\subsection{Iterated compositions and convergence}
+
+When Boolean operations are applied iteratively to Bernoulli sets, the error structure evolves predictably.
+
+\begin{theorem}[Iterated Union Convergence]
+\label{thm:iterated_union}
+For a Bernoulli set $\ASet{A}$ with false positive rate $\fprate < 1$, the sequence $\{\ASet{A}^{(n)}\}$ where $\ASet{A}^{(n+1)} = \ASet{A}^{(n)} \cup \ASet{A}$ converges to the universal set $\Set{U}$ as $n \to \infty$.
+\end{theorem}
+
+\begin{theorem}[Iterated Intersection Convergence]
+For a Bernoulli set $\ASet{A}$ with false negative rate $\fnrate < 1$, the sequence $\{\ASet{A}^{(n)}\}$ where $\ASet{A}^{(n+1)} = \ASet{A}^{(n)} \cap \ASet{A}$ converges to the approximation's fixed point, which depends on the initial error structure.
+\end{theorem}
+
+These results demonstrate that higher-order compositions of Bernoulli sets maintain predictable error propagation patterns, enabling the construction of complex probabilistic data structures with quantifiable accuracy guarantees.
+
+\end{document}

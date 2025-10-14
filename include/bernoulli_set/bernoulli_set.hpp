@@ -1,114 +1,95 @@
 #pragma once
 
 /**
- * @file bernoulli_set.hpp Type-erased set open over types and closed over
- * some specified set of operators.
+ * @file observed_set.hpp Type-erased observed set implementation.
  * 
- * bernoulli_set<X,N> models the concept of a Nth order Bernoulli set with
- * elements of type X by wrapping some type that models the concept and then
- * subsequently erases the specific type. This is known as type-erasure, and
- * allows, for instance, one to store Bernoulli sets that vary over types into
- * a container of bernoulli_set<X,N> elements.
+ * observed_set<X> models the concept of an observed set ~S where S is the
+ * latent/true set. The observed set may have false positives and false
+ * negatives when testing membership.
  * 
- * As a model of a set type, set<T> provides a predicate
- *     contains : (set<T>, T) -> bool
- * to answer queries about set membership.
+ * This implementation uses type-erasure to allow storing different concrete
+ * observed set implementations in the same container.
  * 
- * There are many ways to represent a set, both mathematically and
- * representationally in computer memory. Depending upon the particulars of the
- * implementation, there may be functions, like union, that have more efficient
- * algorithms than the general case.
+ * As a model of a set type, observed_set<T> provides a predicate
+ *     contains : (observed_set<T>, T) -> bool
+ * to answer queries about set membership (with possible errors).
+ * 
+ * The latent/observed framework:
+ * - S represents the true/latent set
+ * - ~S represents the observed/approximate set
+ * - Membership queries to ~S may return incorrect results with rates α (FPR) and β (FNR)
  */
 
 #include <memory>
+#include "bernoulli_bool/bernoulli_boolean.hpp"
+#include "rate_span.hpp"
+
+// Forward declaration for expression templates
+namespace algebra {
+    template <typename Derived>
+    class bernoulli_set_expr;
+}
 
 /**
- * Models `bernoulli<set<X>,N>`.
+ * Models an observed set ~S with elements of type X.
  *
- * Example: `bernoulli_set<X,1>` models the concept of a binary symmetric
- *          channel.
+ * The observed set represents a latent set S through noisy observations.
+ * Membership queries have:
+ * - False positive rate α: P(x ∈ ~S | x ∉ S)
+ * - False negative rate β: P(x ∉ ~S | x ∈ S)
  *
- * As a degenerate case, `bernoulli_set<X,0>` models the concept of a `set<X>`.
- * Note that `set<X>` is not `std::set<X>`, but another type that models the
- * concept of a set over `X`.
+ * Note that observed_set<X> is *non-iterable*, even though concrete 
+ * implementations may support iteration.
  *
- * Note that `bernoulli_set<X,N>` is *non-iterable*, even though
- * concrete types that model Bernoulli sets may be iterable.
- *
- * `bernoulli_set<X,N>` is not a regular type since for simplicity we decided
- * not to implement the equality predicate (which in turn may also return a
- * Bernoulli Boolean).
- *
- * If we wished to implement equality, we might take the following approach.
- * Given two Bernoulli sets over `X`, consider the following two facts:
- *
- * (1) The probability that they are equal goes to zero as
- *     |X| goes to infinity.
- *
- * (2) Representational equality implies equality.
- * 
- * For a finite univeral set, exact equality can be implemented, but as an
- * approximation, two Bernoulli sets are equal iff they have the same
- * representation. We can store a hash of the representation to compute
- * equality in `O(1)` time, i.e., `hash(rep(s1)) == hash(rep(s2))`.
- * It is interesting to point out that even if representational equality
- * implied equality and equality implied representational equality, then
- * hashing the representations would generate an equality
- * predicate of type
- * ```
- *     == : (bernoulli_set<X,N>,bernoulli_set<X,N>) -> bernoulli<1,bool,eq>
- * ```
- * such that the false positive and false negative rates would both be given by
- * `2^(-k)` where `k` is the number of bits `hash` generates, assuming `hash`
- * models a crypographic hash function.
- *
- * In this case, we see that the Bernoulli set models
- * a Bernoulli type whose equality predicate is given by
- * ```
- *     == : (bernoulli_set<X,N>,bernoulli_set<X,N>) -> bernoulli<bool,1>
- * ```
- * and whose membership predicate is given by
- * ```
- *     is_member : (X,bernoulli_set<X,N>) -> bernoulli<bool,2>
- * ```
- *
- * Of course, we can generate higher-order Bernoulli types by replacing `X`
- * with `bernoulli<X,K>
+ * observed_set<X> is not a regular type since equality would itself
+ * return an uncertain result (observed bool).
  */
-
 template <typename X>
-class bernoulli_set: public algebra::bernoulli_set_expr<bernoulli_set<X>>
+class observed_set : public algebra::bernoulli_set_expr<observed_set<X>>
+{
 public:
-    
     using value_type = X;
 
     template <typename B>
-    bernoulli_set(B const & s)
-        : s_(std::make_shared<model<B> const>(s)) {};
+    observed_set(B const & s)
+        : s_(std::make_shared<model_<B> const>(s)) {}
 
-    bernoulli_set(bernoulli_set const & s) : s_(s._s) {};
+    observed_set(observed_set const & s) : s_(s.s_) {}
 
+    /**
+     * Test if x is in the observed set ~S.
+     * May return incorrect results with rates α and β.
+     */
     auto contains(X const & x) const { return s_->contains(x); }
     auto operator()(X const & x) const { return contains(x); }
+    
+    /**
+     * Get the false positive rate α = P(x ∈ ~S | x ∉ S)
+     */
     auto false_positive_rate() const { return s_->fpr(); }
+    
+    /**
+     * Get the false negative rate β = P(x ∉ ~S | x ∈ S)
+     */
     auto false_negative_rate() const { return s_->fnr(); }
 
 private:
     struct concept_
     {
-        virtual bernoulli_bool contains(X const &) const = 0;
-        virtual interval<double> fpr() const = 0;
-        virtual interval<double> fnr() const = 0;
+        virtual ~concept_() = default;
+        virtual bool contains(X const &) const = 0;
+        virtual rate_span fpr() const = 0;
+        virtual rate_span fnr() const = 0;
     };
 
     template <typename B>
     struct model_ final : concept_
     {
-        model(B s) : s_(s) {}
+        model_(B s) : s_(s) {}
 
-        bernoulli_bool contains(T const & x) const { return s_->contains(x); }
-        interval<double> fpr() const { return s_->false_positive_rate(); }
-        interval<double> fnr() const { return s_->false_negative_rate(); }
+        bool contains(X const & x) const override { return s_.contains(x); }
+        rate_span fpr() const override { return s_.false_positive_rate(); }
+        rate_span fnr() const override { return s_.false_negative_rate(); }
 
         B s_;
     };
@@ -116,4 +97,6 @@ private:
     std::shared_ptr<concept_ const> s_;
 };
 
-
+// Type alias for backward compatibility
+template <typename X>
+using bernoulli_set = observed_set<X>;

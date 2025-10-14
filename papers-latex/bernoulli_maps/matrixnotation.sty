@@ -1,0 +1,30 @@
+%
+% Matrix notation for Alex Towell.
+%
+\NeedsTeXFormat{LaTeX2e}[1994/06/01]
+\ProvidesPackage{matrixnotation}[2018/01/01 alex towell's matrix notation (style) for his various papers]
+
+\RequirePackage{amsmath}
+
+\renewcommand{\vec}[1]{\boldsymbol{\mathbf{#1}}}
+\newcommand{\matrx}[1]{\boldsymbol{#1}}
+\newcommand{\Transpose}{\mathsf{T}}
+
+\DeclareMathOperator{\trace}{tr}
+
+\newcount\colveccount
+\newcommand*\colvec[1]{
+        \global\colveccount#1
+        \begin{pmatrix}
+        \colvecnext
+}
+\def\colvecnext#1{
+        #1
+        \global\advance\colveccount-1
+        \ifnum\colveccount>0
+                \\
+                \expandafter\colvecnext
+        \else
+                \end{pmatrix}
+        \fi
+}

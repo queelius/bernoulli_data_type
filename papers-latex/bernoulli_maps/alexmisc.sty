@@ -1,0 +1,61 @@
+%
+%
+%
+%
+%   \BitString      B^* denotes arbitrary length bit strings
+%   \BitString[n]   B^n denotes bit strings of size n
+%   \BitSet         set B denotes {0,1}
+%
+%
+\NeedsTeXFormat{LaTeX2e}[1994/06/01]
+\ProvidesPackage{alexmisc}[2018/01/01 alex towell's misc stuff]
+
+\RequirePackage{xparse}
+\RequirePackage{bm}
+\RequirePackage{bbm}
+\RequirePackage{amssymb}
+\RequirePackage{mathtools}
+\RequirePackage{pgfplots}
+
+%\PassOptionsToPackage{unicode}{hyperref}
+%\PassOptionsToPackage{naturalnames}{hyperref}
+
+\definecolor{ltgray}{rgb}{0.7,0.7,0.7}
+\newcommand{\ith}{$i^{\text{th }}$}
+
+% for nice tables
+\renewcommand{\arraystretch}{1.3}
+%\bibliographystyle{plainnat}
+
+\usetikzlibrary{arrows,shapes,positioning}
+\usetikzlibrary{calc,decorations.markings}
+\usetikzlibrary{plotmarks}
+
+%\usepgfplotslibrary{patchplots} % THIS MAY BE WHY THAT ONE FIG NOT WORKING!
+\pgfplotsset{compat=newest}
+
+\newcommand{\COMMENT}[1]{}
+
+%\providecommand{\Given}{\vert}
+
+\DeclarePairedDelimiterX\FuncArgs[1]{(}{)}{\renewcommand\Given{\nonscript\:\delimsize\vert\nonscript\:\mathopen{}}#1}
+
+\DeclarePairedDelimiterX\FuncArgsB[1]{[}{]}{\renewcommand\Given{\nonscript\:\delimsize\vert\nonscript\:\mathopen{}}#1}
+
+\NewDocumentCommand{\FunctionFamily}{mmo}{%
+    \IfNoValueTF{#3}
+        {\operatorname{#1}\FuncArgs*{#2}}
+        {\operatorname{#1}_{#3}\mkern-1mu\FuncArgs*{#2}}
+}
+
+\NewDocumentCommand{\Bracket}{mmo}{%
+    \IfNoValueTF{#3}
+        {\operatorname{#1}\FuncArgsB*{#2}}
+        {\operatorname{#1}_{#3}\FuncArgsB*{#2}}
+}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\SetKwFunction{Loss}{loss}
+
+\endinput

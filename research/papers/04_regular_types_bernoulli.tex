@@ -1,0 +1,556 @@
+\documentclass[11pt,final,hidelinks]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage[activate={true,nocompatibility},final,tracking=true,kerning=true,spacing=true,factor=1100,stretch=10,shrink=10]{microtype}
+\usepackage{mathtools}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+% \usepackage{minted} % Disabled - using verbatim instead
+\usepackage{hyperref}
+\usepackage[square,numbers]{natbib}
+\bibliographystyle{plainnat}
+\usepackage{cleveref}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes}
+
+% Theorem environments
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+
+% Unified notation for latent/observed framework
+\newcommand{\obs}[1]{\widetilde{#1}}  % Universal observation operator
+\newcommand{\latent}[1]{#1}           % Explicit latent marker (optional)
+\newcommand{\observed}[1]{\widetilde{#1}}  % Explicit observed marker
+
+% Type and code notation
+\newcommand{\Type}[1]{\mathtt{#1}}
+\newcommand{\Bool}{\Type{Bool}}
+\newcommand{\True}{\mathtt{true}}
+\newcommand{\False}{\mathtt{false}}
+\newcommand{\bernoulli}[2]{\mathcal{B}\langle #1, #2 \rangle}
+\newcommand{\Prob}[1]{\mathbb{P}\left[#1\right]}
+\newcommand{\ProbCond}[2]{\mathbb{P}\left[#1 \mid #2\right]}
+\newcommand{\equals}{==}
+\newcommand{\notequals}{!=}
+\newcommand{\assign}{=}
+\newcommand{\code}[1]{\texttt{#1}}
+
+\title{Regular Types in the Bernoulli Model: When Equality Isn't Equal}
+\author{
+    Alexander Towell\\
+    \texttt{atowell@siue.edu}
+}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We explore the fundamental tension between regular types—which assume perfect observation of equality—and Bernoulli types, where we can only observe latent equality through a noisy channel. Regular types require that equality be reflexive, symmetric, and transitive, but these axioms assume we can perfectly observe whether two values are equal. In reality, equality comparison is itself a computation that observes the latent mathematical fact of equality. Bernoulli types make this explicit: when we write \code{a == b}, we are not accessing the latent truth but rather observing it through potentially faulty comparison operations. This shift from assuming perfect equality to observing approximate equality enables new programming paradigms for distributed systems (where different nodes may observe different equalities), privacy-preserving computation (where equality is deliberately obscured), and fault-tolerant algorithms (where hardware errors affect observations). We present a type system that distinguishes latent equality from observed equality, enabling safe integration of Bernoulli types with traditional programming.
+\end{abstract}
+
+\section{Introduction}
+
+Alexander Stepanov's concept of regular types forms the foundation of generic programming \cite{stepanov2014}. A regular type supports:
+\begin{itemize}
+    \item \textbf{Copy construction}: \code{T a(b);} creates \code{a} as a copy of \code{b}
+    \item \textbf{Assignment}: \code{a = b;} makes \code{a} equal to \code{b}
+    \item \textbf{Equality}: \code{a == b} returns \code{true} iff \code{a} and \code{b} are equal
+    \item \textbf{Destruction}: Objects can be destroyed
+\end{itemize}
+
+These operations must satisfy semantic constraints. Most critically, equality must be:
+\begin{itemize}
+    \item \textbf{Reflexive}: \code{a == a}
+    \item \textbf{Symmetric}: \code{a == b} implies \code{b == a}
+    \item \textbf{Transitive}: \code{a == b} and \code{b == c} implies \code{a == c}
+\end{itemize}
+
+Bernoulli types reveal that these constraints assume perfect observation of equality. In reality:
+\begin{itemize}
+    \item \textbf{Latent}: Two values are either mathematically equal or not
+    \item \textbf{Observed}: We can only observe this equality through computation
+\end{itemize}
+
+When \code{operator==} returns \code{bernoulli<bool>}, it acknowledges this fundamental gap:
+\begin{verbatim}
+bernoulli<int> a(42);
+assert(a == a);  // Observing latent equality; observation might be incorrect!
+\end{verbatim}
+
+This paper argues that recognizing the latent/observed distinction in equality is not a deficiency but a more honest model of computation.
+
+\section{Background: Regular Types}
+
+\subsection{The Regular Type Concept}
+
+Stepanov defines regular types as those that behave like built-in types:
+
+\begin{definition}[Regular Type]
+A type \code{T} is regular if it supports:
+\begin{enumerate}
+    \item Default construction: \code{T a;}
+    \item Copy construction: \code{T a(b);}
+    \item Move construction: \code{T a(std::move(b));}
+    \item Copy assignment: \code{a = b;}
+    \item Move assignment: \code{a = std::move(b);}
+    \item Equality: \code{a == b;}
+    \item Inequality: \code{a != b;}
+\end{enumerate}
+with natural semantics.
+\end{definition}
+
+\subsection{Why Regularity Matters}
+
+Regular types enable generic programming:
+
+\begin{verbatim}
+template<typename T>
+void sort(std::vector<T>& v) {
+    // Requires T to be regular
+    // Uses copy, assignment, and comparison
+}
+\end{verbatim}
+
+The STL assumes regularity for types stored in containers. This assumption enables efficient algorithms and predictable behavior.
+
+\subsection{The Equality Problem}
+
+Equality is fundamental to regularity. It enables:
+\begin{itemize}
+    \item Container lookups: \code{std::find}, \code{std::map}
+    \item Algorithm correctness: \code{std::unique}, \code{std::set}
+    \item Reasoning about code: Equational reasoning
+\end{itemize}
+
+But what if equality itself is uncertain?
+
+\section{Bernoulli Types and Regularity}
+
+\subsection{Probabilistic Equality}
+
+For Bernoulli types, equality returns a Bernoulli boolean:
+
+\begin{verbatim}
+template<typename T>
+class bernoulli {
+    T value;
+    double error_rate;
+public:
+    bernoulli<bool> operator==(const bernoulli<T>& other) const {
+        // Returns true with probability related to actual equality
+        return sample_bernoulli_bool(compute_equality_probability(value, other.value));
+    }
+};
+\end{verbatim}
+
+\subsection{The Latent/Observed Gap in Equality Axioms}
+
+\subsubsection{Reflexivity: Observing Self-Equality}
+
+Latent reflexivity always holds: a value is mathematically equal to itself. But observation introduces error:
+
+\begin{verbatim}
+bernoulli<int> x(42, 0.1);  // 10% error rate
+auto result = (x == x);      // Observing latent self-equality
+\end{verbatim}
+
+The gap between latent and observed arises from:
+\begin{itemize}
+    \item \textbf{Measurement uncertainty}: Physical sensors observing the same value twice
+    \item \textbf{Transmission errors}: Network corrupting equality checks
+    \item \textbf{Privacy mechanisms}: Deliberately noisy observations for security
+    \item \textbf{Hardware faults}: Bit flips during comparison
+\end{itemize}
+
+Mathematically:
+\begin{equation}
+\ProbCond{\obs{(x = x)} = \True}{\text{latent } x = x} = 1 - \epsilon
+\end{equation}
+
+\subsubsection{Symmetry: Independent Observations}
+
+Latent symmetry holds: if $a = b$ then $b = a$. However, each observation is independent:
+
+\begin{equation}
+\ProbCond{\obs{(a = b)}}{\text{latent } a = b} = \ProbCond{\obs{(b = a)}}{\text{latent } b = a}
+\end{equation}
+
+But individual observations may differ:
+\begin{verbatim}
+if (a == b) {      // First observation of latent equality
+    assert(b == a);  // Second independent observation - might differ!
+}
+\end{verbatim}
+
+This reflects reality: asking "is A equal to B?" twice may yield different answers due to measurement noise, timing, or observer differences.
+
+\subsubsection{Transitivity: Compounding Observation Errors}
+
+Transitivity suffers most severely. Even when latent transitivity holds ($a = b \land b = c \implies a = c$), observations compound errors:
+
+\begin{verbatim}
+bernoulli<int> a(1), b(1), c(1);  // Latently all equal
+if (a == b && b == c) {            // Two successful observations
+    assert(a == c);  // Third independent observation - often fails!
+}
+\end{verbatim}
+
+For error rate $\epsilon$, the probability of observing transitivity when it latently holds:
+\begin{equation}
+\ProbCond{\obs{(a = c)} \mid \obs{(a = b)} \land \obs{(b = c)} \land \text{latent } a = b = c} = 1 - \epsilon
+\end{equation}
+
+The key insight: we're not observing "transitivity" but rather three independent observations of latent equalities.
+
+\subsection{Cascading Effects}
+
+The probabilistic nature of equality affects all derived operations:
+
+\begin{itemize}
+    \item \textbf{Containers}: \code{std::set<bernoulli<T>>} may contain "duplicates"
+    \item \textbf{Algorithms}: \code{std::sort} may not produce a total order
+    \item \textbf{Invariants}: Class invariants become probabilistic
+\end{itemize}
+
+\section{New Programming Paradigms}
+
+\subsection{Probabilistic Contracts}
+
+Traditional contracts assume deterministic predicates:
+\begin{verbatim}
+void insert(std::set<T>& s, const T& value) {
+    // Postcondition: s.count(value) == 1
+}
+\end{verbatim}
+
+With Bernoulli types, contracts become probabilistic:
+\begin{verbatim}
+void insert(bernoulli_set<T>& s, const T& value) {
+    // Postcondition: P[value in s] >= 1 - epsilon
+}
+\end{verbatim}
+
+\subsection{Eventually-Consistent Data Structures}
+
+Bernoulli types naturally model eventually-consistent systems:
+
+\begin{example}[Distributed Set]
+In a distributed system with network partitions:
+\begin{verbatim}
+class distributed_set {
+    bernoulli_set<T> local_view;
+    
+    bernoulli<bool> contains(const T& value) {
+        // Returns probabilistic result based on:
+        // - Local information
+        // - Network reliability
+        // - Synchronization lag
+    }
+};
+\end{verbatim}
+\end{example}
+
+\subsection{Byzantine Fault Tolerance}
+
+Bernoulli types can model Byzantine failures:
+
+\begin{verbatim}
+template<typename T>
+class byzantine_value {
+    std::vector<bernoulli<T>> replicas;
+    
+    bernoulli<T> read() {
+        // Majority voting with probabilistic agreement
+        return majority_vote(replicas);
+    }
+};
+\end{verbatim}
+
+\section{Practical Considerations}
+
+\subsection{When to Use Bernoulli Types}
+
+Bernoulli types are appropriate when:
+\begin{itemize}
+    \item \textbf{Uncertainty is inherent}: Sensor data, network communication
+    \item \textbf{Approximation is acceptable}: Large-scale analytics, caching
+    \item \textbf{Privacy is required}: Differential privacy, secure computation
+    \item \textbf{Fault tolerance is critical}: Distributed systems, blockchain
+\end{itemize}
+
+\subsection{Mixing Deterministic and Probabilistic Code}
+
+Safe integration requires careful boundaries:
+
+\begin{verbatim}
+// Convert Bernoulli to deterministic with threshold
+template<typename T>
+std::optional<T> to_deterministic(const bernoulli<T>& b, double confidence) {
+    if (b.confidence() >= confidence) {
+        return b.expected_value();
+    }
+    return std::nullopt;
+}
+
+// Lift deterministic to Bernoulli
+template<typename T>
+bernoulli<T> to_bernoulli(const T& value) {
+    return bernoulli<T>(value, 0.0);  // Zero error rate
+}
+\end{verbatim}
+
+\subsection{Type System Extensions}
+
+We propose type system extensions for safety:
+
+\begin{verbatim}
+// Type-level error bounds
+template<typename T, double MaxError>
+class bounded_bernoulli {
+    static_assert(MaxError >= 0.0 && MaxError <= 1.0);
+    // ...
+};
+
+// Concepts for Bernoulli-aware algorithms
+template<typename T>
+concept BernoulliComparable = requires(T a, T b) {
+    { a == b } -> std::convertible_to<bernoulli<bool>>;
+};
+\end{verbatim}
+
+\section{Case Studies}
+
+\subsection{Distributed Consensus}
+
+Traditional consensus algorithms assume reliable equality checks. With Bernoulli types, we model realistic networks:
+
+\begin{example}[Probabilistic Paxos]
+\begin{verbatim}
+class probabilistic_paxos {
+    struct proposal {
+        int ballot;
+        bernoulli<value_type> value;
+    };
+    
+    bernoulli<bool> is_majority(const std::vector<vote>& votes) {
+        // Account for probabilistic equality in vote counting
+        int agrees = 0, total = 0;
+        for (const auto& v : votes) {
+            auto match = (v.value == proposed_value);
+            agrees += match.probability_true();
+            total++;
+        }
+        return bernoulli<bool>(agrees > total/2.0);
+    }
+};
+\end{verbatim}
+\end{example}
+
+\subsection{Privacy-Preserving Equality}
+
+Differential privacy requires adding noise to queries:
+
+\begin{example}[Private Database]
+\begin{verbatim}
+class private_database {
+    double epsilon;  // Privacy parameter
+    
+    bernoulli<bool> equals(const record& a, const record& b) {
+        bool actual = (a.id == b.id);
+        // Add Laplace noise for differential privacy
+        double noise = laplace_noise(1.0 / epsilon);
+        double probability = sigmoid(actual ? 1.0 + noise : noise);
+        return bernoulli<bool>::from_probability(probability);
+    }
+};
+\end{verbatim}
+\end{example}
+
+\subsection{Approximate Deduplication}
+
+Large-scale systems often need approximate deduplication:
+
+\begin{example}[Content-Addressable Storage]
+\begin{verbatim}
+class approximate_cas {
+    struct hash_result {
+        bernoulli<hash_type> hash;
+        double collision_probability;
+    };
+    
+    void store(const data& content) {
+        auto h = hash(content);
+        if (probably_unique(h)) {
+            backing_store[h.expected()] = content;
+        } else {
+            // Handle probable duplicate
+            merge_or_create_new(h, content);
+        }
+    }
+};
+\end{verbatim}
+\end{example}
+
+\section{Implementation Strategies}
+
+\subsection{Efficient Bernoulli Booleans}
+
+\begin{verbatim}
+class bernoulli_bool {
+    bool value;
+    float confidence;  // Stored as fixed-point for efficiency
+    
+public:
+    bernoulli_bool operator&&(const bernoulli_bool& other) const {
+        // Fuzzy logic operations
+        return bernoulli_bool{
+            value && other.value,
+            confidence * other.confidence
+        };
+    }
+    
+    explicit operator bool() const {
+        // Threshold conversion for legacy code
+        return confidence > 0.5 ? value : sample_bernoulli(confidence);
+    }
+};
+\end{verbatim}
+
+\subsection{Container Adaptations}
+
+Standard containers need adaptation for Bernoulli types:
+
+\begin{verbatim}
+template<typename T>
+class bernoulli_set {
+    using comparator = std::function<bernoulli<bool>(const T&, const T&)>;
+    
+    struct node {
+        T value;
+        double insertion_confidence;
+        std::vector<std::pair<T, double>> possible_duplicates;
+    };
+    
+    void insert(const T& value) {
+        // Probabilistic insertion with duplicate tracking
+        for (auto& n : nodes) {
+            auto eq = compare(value, n.value);
+            if (eq.probability_true() > duplicate_threshold) {
+                n.possible_duplicates.push_back({value, eq.probability_true()});
+                return;
+            }
+        }
+        nodes.push_back({value, 1.0, {}});
+    }
+};
+\end{verbatim}
+
+\section{Related Work}
+
+\subsection{Probabilistic Programming}
+
+Languages like Church \cite{goodman2008} and Stan \cite{carpenter2017} support probabilistic computation but don't address the regular type concept directly.
+
+\subsection{Fuzzy Logic and Computing}
+
+Fuzzy set theory \cite{zadeh1965} provides mathematical foundations for approximate membership, which Bernoulli types extend to general computation.
+
+\subsection{Eventual Consistency}
+
+CRDTs \cite{shapiro2011} achieve eventual consistency through commutative operations, while Bernoulli types model the uncertainty during convergence.
+
+\subsection{Approximate Computing}
+
+Work on approximate hardware \cite{han2013} and quality-of-service programming \cite{hoffmann2011} shares goals but focuses on different abstraction levels.
+
+\section{Future Directions}
+
+\subsection{Language Integration}
+
+Future programming languages could provide first-class support:
+
+\begin{verbatim}
+// Hypothetical syntax
+probable<int> x = 42 +/- 0.1;  // Value with uncertainty
+if probably (x == 42) {       // Probabilistic branching
+    // Execute with high probability
+} else maybe {               // Lower probability branch
+    // Handle uncertainty
+}
+\end{verbatim}
+
+\subsection{Verification Tools}
+
+Static analysis for probabilistic properties:
+\begin{itemize}
+    \item Probability of invariant violations
+    \item Error propagation analysis
+    \item Convergence guarantees
+\end{itemize}
+
+\subsection{Hardware Support}
+
+Probabilistic computing primitives in hardware:
+\begin{itemize}
+    \item Native Bernoulli boolean operations
+    \item Approximate equality instructions
+    \item Stochastic arithmetic units
+\end{itemize}
+
+\section{Philosophical Implications}
+
+\subsection{The Nature of Computational Truth}
+
+Bernoulli types reveal that computation doesn't access truth directly—it observes it. The latent/observed distinction is not a limitation but a fundamental aspect of physical computation. Even "deterministic" systems are simply those where observation error is negligible.
+
+\subsection{Identity Through Observation}
+
+The apparent violation of reflexivity ($x == x$ may be false) doesn't mean identity is broken—it means we can only observe identity, not access it directly. Consider:
+\begin{itemize}
+    \item \textbf{Latent}: A value is always identical to itself
+    \item \textbf{Observed}: Each observation of self-identity may differ
+    \item \textbf{Reality}: Different parts of a distributed system may observe different identities
+\end{itemize}
+
+\subsection{From Determinism to Observation}
+
+Traditional programming assumes perfect observation—that our code directly manipulates latent mathematical objects. Bernoulli types acknowledge that all computation is mediated by observation:
+\begin{itemize}
+    \item Physical hardware observes mathematical operations
+    \item Networks observe messages through noisy channels  
+    \item Sensors observe the physical world imperfectly
+    \item Even "pure" functions observe their inputs through the lens of representation
+\end{itemize}
+
+This isn't the end of determinism but its proper contextualization: determinism is the special case where observation is perfect.
+
+\section{Conclusions}
+
+Regular types assume perfect observation of equality—that when we write \code{a == b}, we access the latent mathematical truth. Bernoulli types acknowledge that equality comparison is itself an observation through a potentially noisy channel. This shift from assumed perfect observation to explicit approximate observation has profound implications:
+
+\begin{itemize}
+    \item \textbf{Honesty}: Acknowledges that all computation observes latent truth imperfectly
+    \item \textbf{Robustness}: Systems expecting observation errors handle real-world failures gracefully
+    \item \textbf{Scalability}: Accepting approximate observations enables better scaling
+    \item \textbf{Privacy}: The gap between latent and observed can protect sensitive information
+    \item \textbf{Distributed systems}: Different nodes may observe different equalities—a feature, not a bug
+\end{itemize}
+
+The apparent violation of regularity axioms reveals a deeper truth: those axioms assume we can perfectly observe mathematical relationships. In reality, every equality check, every comparison, every computation is an observation of latent mathematical truth through the lens of physical implementation.
+
+By making the latent/observed distinction explicit, Bernoulli types don't break programming—they make it more honest about the nature of computation. As systems grow in scale and complexity, embracing the fundamental gap between what is mathematically true and what we can observe becomes not just useful but necessary.
+
+\bibliography{references}
+
+\end{document}

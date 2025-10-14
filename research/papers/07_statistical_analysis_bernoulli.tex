@@ -1,0 +1,587 @@
+\documentclass[11pt,final,hidelinks]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage[activate={true,nocompatibility},final,tracking=true,kerning=true,spacing=true,factor=1100,stretch=10,shrink=10]{microtype}
+\usepackage{mathtools}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{pgfplots}
+% \usepackage{minted} % Disabled - using verbatim instead
+\usepackage{hyperref}
+\usepackage[square,numbers]{natbib}
+\bibliographystyle{plainnat}
+\usepackage{cleveref}
+
+% Theorem environments
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{axiom}{Axiom}
+
+% Unified notation for latent/observed framework
+\newcommand{\obs}[1]{\widetilde{#1}}  % Universal observation operator
+\newcommand{\latent}[1]{#1}           % Explicit latent marker (optional)
+\newcommand{\observed}[1]{\widetilde{#1}}  % Explicit observed marker
+
+% Sets
+\newcommand{\Set}[1]{#1}
+\newcommand{\ASet}[1]{\obs{#1}}  % Observed/approximate set
+\newcommand{\SetIndicator}[1]{\mathbf{1}_{#1}}
+\newcommand{\SetComplement}[1]{\overline{#1}}
+\newcommand{\SetUnion}{\cup}
+\newcommand{\SetIntersection}{\cap}
+\newcommand{\EmptySet}{\emptyset}
+\newcommand{\PS}[1]{\mathcal{P}(#1)}  % Power set
+\newcommand{\Card}[1]{\lvert#1\rvert}
+
+% Probability and statistics
+\newcommand{\Prob}[1]{\mathbb{P}\left[#1\right]}
+\newcommand{\ProbCond}[2]{\mathbb{P}\left[#1 \mid #2\right]}
+\newcommand{\Expect}[1]{\mathbb{E}\left[#1\right]}
+\newcommand{\Var}[1]{\mathrm{Var}\left[#1\right]}
+\newcommand{\PDF}[2]{p_{#1}\left(#2\right)}
+\newcommand{\CDF}[2]{F_{#1}\left(#2\right)}
+
+% Random variables
+\newcommand{\RV}[1]{\mathbf{#1}}
+\newcommand{\FP}{\mathsf{FP}}  % False positives
+\newcommand{\FN}{\mathsf{FN}}  % False negatives
+\newcommand{\TP}{\mathsf{TP}}  % True positives
+\newcommand{\TN}{\mathsf{TN}}  % True negatives
+\newcommand{\FPR}{\mathsf{FPR}}  % False positive rate
+\newcommand{\FNR}{\mathsf{FNR}}  % False negative rate
+\newcommand{\TPR}{\mathsf{TPR}}  % True positive rate
+\newcommand{\TNR}{\mathsf{TNR}}  % True negative rate
+\newcommand{\PPV}{\mathsf{PPV}}  % Positive predictive value
+\newcommand{\NPV}{\mathsf{NPV}}  % Negative predictive value
+
+% Error rates
+\newcommand{\fprate}{\alpha}
+\newcommand{\fnrate}{\beta}
+\newcommand{\tprate}{\tau}
+\newcommand{\tnrate}{\nu}
+
+% Distributions
+\newcommand{\Binomial}[2]{\mathrm{Binomial}(#1, #2)}
+\newcommand{\Normal}[2]{\mathcal{N}(#1, #2)}
+
+% Intervals
+\newcommand{\Interval}[2]{[#1, #2]}
+
+% Types
+\newcommand{\Type}[1]{\mathtt{#1}}
+\newcommand{\Bool}{\Type{Bool}}
+
+\title{Statistical Analysis of Bernoulli Sets: Distributions, Confidence Intervals, and Performance Measures}
+\author{
+    Alexander Towell\\
+    \texttt{atowell@siue.edu}
+}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+While the latent/observed framework provides conceptual clarity for Bernoulli types, practical applications require understanding the statistical properties of these observations. We present a comprehensive analysis of the distributions that arise when observing latent sets through noisy channels. For finite sets, the number of false positives and false negatives follow binomial distributions, leading to beta-distributed error rates. We derive asymptotic normal approximations, confidence intervals, and the distributions of key performance measures including positive predictive value (precision). Additionally, we develop interval arithmetic methods for propagating uncertainty when error rates themselves are uncertain. These results enable practitioners to quantify uncertainty, design systems with statistical guarantees, and analyze the performance of probabilistic data structures in real-world applications.
+\end{abstract}
+
+\section{Introduction}
+
+The Bernoulli framework distinguishes between latent mathematical objects and their computational observations. While this provides theoretical elegance, practical applications demand answers to statistical questions:
+\begin{itemize}
+    \item If we observe a set with nominal false positive rate $\fprate = 0.01$, what is the actual false positive rate likely to be?
+    \item How many false positives should we expect when querying 1 million elements?
+    \item What confidence intervals can we place on precision and recall?
+    \item How do we handle uncertainty in the error rates themselves?
+\end{itemize}
+
+This paper provides rigorous statistical analysis of Bernoulli sets, focusing on finite-sample distributions and practical tools for uncertainty quantification.
+
+\section{Fundamental Distributions}
+
+\subsection{The Statistical Model}
+
+We model the observation of a latent set $S \subseteq U$ through a noisy channel that produces an observed set $\obs{S}$. The key insight is that for finite sets, the observation errors follow well-understood probability distributions.
+
+\begin{axiom}[Independence of Errors]
+Each element's observation error is independent:
+\begin{equation}
+\ProbCond{\SetIndicator{\obs{S}}(x) \neq \SetIndicator{S}(x)}{\SetIndicator{\obs{S}}(y) \neq \SetIndicator{S}(y)} = 
+\Prob{\SetIndicator{\obs{S}}(x) \neq \SetIndicator{S}(x)}
+\end{equation}
+for all distinct $x, y \in U$.
+\end{axiom}
+
+This independence assumption, while idealized, holds for many practical implementations including Bloom filters and hash-based data structures.
+
+\subsection{Distribution of False Positives}
+
+\begin{theorem}[False Positive Distribution]
+\label{thm:fp-dist}
+Given a latent set $S$ with $n = \Card{\SetComplement{S}}$ negative elements (elements not in $S$), the number of false positives when observing through a channel with false positive rate $\fprate$ follows:
+\begin{equation}
+\FP_n \sim \Binomial{n}{\fprate}
+\end{equation}
+with expectation $\Expect{\FP_n} = n\fprate$ and variance $\Var{\FP_n} = n\fprate(1-\fprate)$.
+\end{theorem}
+
+\begin{proof}
+Each of the $n$ elements in $\SetComplement{S}$ has probability $\fprate$ of being incorrectly observed as belonging to $\obs{S}$. By the independence axiom, these are $n$ independent Bernoulli trials.
+\end{proof}
+
+\begin{corollary}[Observed False Positive Rate]
+The observed false positive rate $\FPR_n = \FP_n/n$ has:
+\begin{itemize}
+    \item Expectation: $\Expect{\FPR_n} = \fprate$
+    \item Variance: $\Var{\FPR_n} = \fprate(1-\fprate)/n$
+    \item Distribution: Scaled binomial on support $\{0, 1/n, 2/n, \ldots, 1\}$
+\end{itemize}
+\end{corollary}
+
+\subsection{Distribution of False Negatives}
+
+By symmetry, false negatives follow an analogous distribution:
+
+\begin{theorem}[False Negative Distribution]
+Given a latent set $S$ with $p = \Card{S}$ positive elements, the number of false negatives follows:
+\begin{equation}
+\FN_p \sim \Binomial{p}{\fnrate}
+\end{equation}
+\end{theorem}
+
+\subsection{Joint Distribution of Classification Outcomes}
+
+For a complete statistical picture, we need the joint distribution of all classification outcomes:
+
+\begin{theorem}[Joint Distribution]
+Given $p$ positive and $n$ negative elements in the latent set, the joint distribution of classification outcomes is:
+\begin{align}
+(\TP_p, \FN_p, \FP_n, \TN_n) &\sim \text{Product of Independent Binomials} \\
+\TP_p &\sim \Binomial{p}{1-\fnrate} \\
+\FN_p &\sim \Binomial{p}{\fnrate} \\
+\FP_n &\sim \Binomial{n}{\fprate} \\
+\TN_n &\sim \Binomial{n}{1-\fprate}
+\end{align}
+\end{theorem}
+
+\section{Asymptotic Approximations}
+
+For large sets, normal approximations provide computational efficiency and theoretical insight.
+
+\subsection{Central Limit Theorem for Error Rates}
+
+\begin{theorem}[Asymptotic Normality]
+As $n \to \infty$, the observed false positive rate converges in distribution:
+\begin{equation}
+\sqrt{n}(\FPR_n - \fprate) \xrightarrow{d} \Normal{0}{\fprate(1-\fprate)}
+\end{equation}
+Equivalently:
+\begin{equation}
+\FPR_n \approx \Normal{\fprate}{\frac{\fprate(1-\fprate)}{n}}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+By the Central Limit Theorem applied to the mean of $n$ independent Bernoulli($\fprate$) random variables.
+\end{proof}
+
+\subsection{Confidence Intervals}
+
+\begin{corollary}[Asymptotic Confidence Intervals]
+A $(1-\alpha)$ confidence interval for the observed false positive rate is:
+\begin{equation}
+\fprate \pm z_{\alpha/2}\sqrt{\frac{\fprate(1-\fprate)}{n}}
+\end{equation}
+where $z_{\alpha/2}$ is the $(1-\alpha/2)$ quantile of the standard normal distribution.
+\end{corollary}
+
+\begin{example}[Bloom Filter Confidence]
+A Bloom filter with design false positive rate $\fprate = 0.01$ and $n = 10^6$ negative elements has 95\% confidence interval:
+\begin{equation}
+0.01 \pm 1.96\sqrt{\frac{0.01 \times 0.99}{10^6}} = [0.0098, 0.0102]
+\end{equation}
+The observed rate will be within 2\% of the nominal rate with high probability.
+\end{example}
+
+\section{Bayesian Inference from Observations}
+
+\subsection{Predicting Latent from Observed}
+
+A fundamental question in the Bernoulli framework is: given an observation, what can we infer about the latent value?
+
+\begin{theorem}[Posterior Probability of Membership]
+Given observation $x \in \obs{S}$ and prior probability $\Prob{x \in S} = \pi$:
+\begin{equation}
+\ProbCond{x \in S}{x \in \obs{S}} = \frac{\pi(1-\fnrate)}{\pi(1-\fnrate) + (1-\pi)\fprate}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+By Bayes' theorem:
+\begin{align}
+\ProbCond{x \in S}{x \in \obs{S}} &= \frac{\ProbCond{x \in \obs{S}}{x \in S} \cdot \Prob{x \in S}}{\Prob{x \in \obs{S}}} \\
+&= \frac{(1-\fnrate) \cdot \pi}{(1-\fnrate)\pi + \fprate(1-\pi)}
+\end{align}
+where the denominator follows from the law of total probability.
+\end{proof}
+
+\begin{example}[Maximum Entropy Prior]
+With uniform prior $\pi = 0.5$ (maximum entropy):
+\begin{equation}
+\ProbCond{x \in S}{x \in \obs{S}} = \frac{1-\fnrate}{1-\fnrate + \fprate}
+\end{equation}
+For a typical Bloom filter with $\fnrate = 0$ and $\fprate = 0.01$:
+\begin{equation}
+\ProbCond{x \in S}{x \in \obs{S}} = \frac{1}{1.01} \approx 0.99
+\end{equation}
+\end{example}
+
+\subsection{Multiple Independent Observations}
+
+When we have multiple independent observations of the same latent set, we can improve our inference:
+
+\begin{theorem}[Majority Vote for Set Membership]
+Given $k$ independent observations $\obs{S}_1, \ldots, \obs{S}_k$ of latent set $S$, each with error rates $(\fprate, \fnrate)$, define the majority vote:
+\begin{equation}
+x \in \obs{S}_{\text{maj}} \iff \sum_{i=1}^k \mathbf{1}_{x \in \obs{S}_i} > k/2
+\end{equation}
+Then:
+\begin{align}
+\ProbCond{x \in \obs{S}_{\text{maj}}}{x \in S} &= \sum_{j > k/2}^k \binom{k}{j} (1-\fnrate)^j \fnrate^{k-j} \\
+\ProbCond{x \in \obs{S}_{\text{maj}}}{x \notin S} &= \sum_{j > k/2}^k \binom{k}{j} \fprate^j (1-\fprate)^{k-j}
+\end{align}
+\end{theorem}
+
+\begin{corollary}[Asymptotic Perfection]
+If $\fprate, \fnrate < 0.5$, then as $k \to \infty$:
+\begin{equation}
+\ProbCond{x \in \obs{S}_{\text{maj}}}{x \in S} \to 1 \quad \text{and} \quad \ProbCond{x \in \obs{S}_{\text{maj}}}{x \notin S} \to 0
+\end{equation}
+exponentially fast in $k$.
+\end{corollary}
+
+\subsection{Learning Error Rates from Data}
+
+Often the true error rates are unknown and must be estimated from observations:
+
+\begin{theorem}[Bayesian Error Rate Estimation]
+Given $n$ known negative elements with $k$ false positives observed, the posterior distribution for $\fprate$ with uniform prior is:
+\begin{equation}
+\fprate | (k \text{ false positives in } n \text{ trials}) \sim \text{Beta}(k+1, n-k+1)
+\end{equation}
+with posterior mean:
+\begin{equation}
+\Expect{\fprate | \text{data}} = \frac{k+1}{n+2}
+\end{equation}
+\end{theorem}
+
+\begin{remark}[Regularization Effect]
+The posterior mean $(k+1)/(n+2)$ differs from the maximum likelihood estimate $k/n$ by adding one "pseudo-observation" of each type. This Laplace smoothing prevents extreme estimates when $n$ is small.
+\end{remark}
+
+\subsection{Information-Theoretic View}
+
+The observation process can be quantified using mutual information:
+
+\begin{theorem}[Information Content of Observations]
+The mutual information between latent membership and observation is:
+\begin{equation}
+I(X \in S; X \in \obs{S}) = H(\pi) - \pi H(\fnrate) - (1-\pi)H(\fprate)
+\end{equation}
+where $H$ is the binary entropy function and $\pi = \Prob{X \in S}$.
+\end{theorem}
+
+\begin{example}[Perfect vs. Noisy Observation]
+\begin{itemize}
+    \item Perfect observation ($\fprate = \fnrate = 0$): $I = H(\pi) = $ full information
+    \item Random observation ($\fprate = 1-\fnrate = 0.5$): $I = 0 = $ no information
+    \item Bloom filter ($\fnrate = 0, \fprate = 0.01$): $I \approx H(\pi) - 0.08(1-\pi)$ bits
+\end{itemize}
+\end{example}
+
+\section{Performance Measure Distributions}
+
+\subsection{Positive Predictive Value (Precision)}
+
+The positive predictive value is the probability that an element observed in $\obs{S}$ is actually in the latent set $S$.
+
+\begin{definition}[PPV as Random Variable]
+Given $p$ positives and $n$ negatives:
+\begin{equation}
+\PPV = \frac{\TP_p}{\TP_p + \FP_n}
+\end{equation}
+where $\TP_p$ and $\FP_n$ are independent binomial random variables.
+\end{definition}
+
+\begin{theorem}[Expected PPV]
+\label{thm:expected-ppv}
+The expected positive predictive value is approximately:
+\begin{equation}
+\Expect{\PPV} \approx \frac{\bar{t}_p}{\bar{t}_p + \bar{f}_p} + \frac{\bar{t}_p \sigma_{f_p}^2 - \bar{f}_p \sigma_{t_p}^2}{(\bar{t}_p + \bar{f}_p)^3}
+\end{equation}
+where:
+\begin{align}
+\bar{t}_p &= p(1-\fnrate) \quad \text{(expected true positives)} \\
+\bar{f}_p &= n\fprate \quad \text{(expected false positives)} \\
+\sigma_{t_p}^2 &= p\fnrate(1-\fnrate) \quad \text{(variance of true positives)} \\
+\sigma_{f_p}^2 &= n\fprate(1-\fprate) \quad \text{(variance of false positives)}
+\end{align}
+\end{theorem}
+
+\begin{proof}[Proof Sketch]
+Using the delta method for the ratio of random variables, we expand $g(X,Y) = X/(X+Y)$ around $(\Expect{X}, \Expect{Y})$ to second order.
+\end{proof}
+
+\begin{remark}[Interpretation]
+The first term is the naive expectation treating denominators as fixed. The correction term accounts for the variance in both true and false positives, showing that higher variance in false positives improves expected precision while higher variance in true positives degrades it.
+\end{remark}
+
+\subsection{Distribution Shape of PPV}
+
+While the exact distribution of PPV is complex, we can characterize its behavior:
+
+\begin{proposition}[PPV Concentration]
+In the high-precision regime where $\bar{f}_p \ll \bar{t}_p$:
+\begin{equation}
+\Var{\PPV} \approx \frac{\sigma_{f_p}^2}{\bar{t}_p^2} = \frac{n\fprate(1-\fprate)}{[p(1-\fnrate)]^2}
+\end{equation}
+The variance is dominated by fluctuations in false positives.
+\end{proposition}
+
+\section{Uncertain Error Rates}
+
+In practice, we often have uncertainty about the error rates themselves. This section develops interval arithmetic methods for propagating this uncertainty.
+
+\subsection{Interval Representations}
+
+\begin{definition}[Interval Error Rates]
+When error rates are uncertain, we represent them as intervals:
+\begin{align}
+[\fprate] &= \Interval{\underline{\fprate}}{\overline{\fprate}} \\
+[\fnrate] &= \Interval{\underline{\fnrate}}{\overline{\fnrate}}
+\end{align}
+where $\underline{\fprate}$ and $\overline{\fprate}$ are lower and upper bounds respectively.
+\end{definition}
+
+\subsection{Performance Measures with Interval Arithmetic}
+
+\begin{theorem}[Interval Accuracy]
+Given interval error rates and proportion of positives $\lambda \in [\underline{\lambda}, \overline{\lambda}]$, the accuracy lies in:
+\begin{equation}
+\text{Accuracy} \in \left[\min_{\substack{\fprate \in [\fprate] \\ \fnrate \in [\fnrate] \\ \lambda \in [\lambda]}} \text{Acc}(\fprate, \fnrate, \lambda), \max_{\substack{\fprate \in [\fprate] \\ \fnrate \in [\fnrate] \\ \lambda \in [\lambda]}} \text{Acc}(\fprate, \fnrate, \lambda)\right]
+\end{equation}
+\end{theorem}
+
+\begin{example}[Worst-Case Analysis]
+With complete uncertainty about the proportion of positives ($[\lambda] = [0,1]$) and known false positive rate $\fprate$:
+\begin{equation}
+\text{Accuracy} \in [1-\fprate, 1]
+\end{equation}
+The worst case occurs when all elements are negative and we have maximum false positives.
+\end{example}
+
+\subsection{Confidence Intervals vs. Interval Arithmetic}
+
+It's crucial to distinguish two types of intervals:
+
+\begin{itemize}
+    \item \textbf{Confidence intervals}: Probabilistic statements about where a random quantity likely falls
+    \item \textbf{Interval arithmetic}: Deterministic bounds when parameters are known to lie in ranges
+\end{itemize}
+
+These can be combined:
+
+\begin{proposition}[Combined Uncertainty]
+If the true false positive rate lies in $[\fprate] = [0.01, 0.02]$ and we have $n = 10^6$ negatives, then with 95\% confidence, the observed false positive count lies in:
+\begin{equation}
+\FP_n \in [9,800 \pm 196, 20,000 \pm 280] = [9,604, 20,280]
+\end{equation}
+\end{proposition}
+
+\section{Applications}
+
+\subsection{Bloom Filter Analysis}
+
+\begin{example}[Bloom Filter Precision]
+A Bloom filter with $m$ bits, $k$ hash functions, and $n$ stored elements has:
+\begin{itemize}
+    \item Expected FPR: $\fprate = (1 - e^{-kn/m})^k$
+    \item For a query workload with proportion $\lambda$ of positive queries:
+    \begin{equation}
+    \Expect{\PPV} \approx \frac{\lambda}{\lambda + (1-\lambda)\fprate}
+    \end{equation}
+    \item With $n_q$ queries, the observed PPV has approximate variance:
+    \begin{equation}
+    \Var{\PPV} \approx \frac{\lambda(1-\lambda)\fprate(1-\fprate)}{n_q[\lambda + (1-\lambda)\fprate]^2}
+    \end{equation}
+\end{itemize}
+\end{example}
+
+\subsection{Distributed Set Operations}
+
+\begin{example}[Union with Uncertain Sources]
+When computing $\obs{A} \cup \obs{B}$ where sets come from different sources with error rates in intervals:
+\begin{itemize}
+    \item $A$ observed with $\fprate_A \in [0.01, 0.02]$
+    \item $B$ observed with $\fprate_B \in [0.005, 0.015]$
+    \item Union false positive rate: $\fprate_{A \cup B} \in [0.01495, 0.0347]$
+\end{itemize}
+The interval widens due to uncertainty composition.
+\end{example}
+
+\subsection{Privacy-Preserving Queries}
+
+\begin{example}[Differential Privacy via Bernoulli Noise]
+Adding Bernoulli noise for privacy:
+\begin{itemize}
+    \item True answer: Set $S$ with $\Card{S} = 1000$
+    \item Add false positives with rate $\fprate = 0.1$
+    \item Remove true positives with rate $\fnrate = 0.1$
+    \item Expected observed size: $900 + 0.1 \times \Card{\SetComplement{S}}$
+    \item Privacy parameter: $\epsilon = \log(0.9/0.1) = 2.2$
+\end{itemize}
+\end{example}
+
+\section{Advanced Topics}
+
+\subsection{Higher-Order Moments}
+
+Beyond expectation and variance, higher moments provide additional insight:
+
+\begin{proposition}[Skewness of FPR]
+The observed false positive rate has skewness:
+\begin{equation}
+\text{Skew}(\FPR_n) = \frac{1-2\fprate}{\sqrt{n\fprate(1-\fprate)}}
+\end{equation}
+For small $\fprate$, the distribution is right-skewed, with occasional large deviations above the mean.
+\end{proposition}
+
+\subsection{Multivariate Analysis}
+
+When analyzing multiple sets simultaneously:
+
+\begin{theorem}[Joint Distribution of Multiple Sets]
+For $k$ independent observed sets of the same latent set $S$:
+\begin{equation}
+(\FPR_1, \ldots, \FPR_k) \approx \text{Multivariate Normal}(\fprate \mathbf{1}, \frac{\fprate(1-\fprate)}{n}\mathbf{I})
+\end{equation}
+\end{theorem}
+
+\subsection{Sequential Testing}
+
+When observations arrive sequentially:
+
+\begin{proposition}[Sequential Confidence Intervals]
+After observing $t$ elements with $f_t$ false positives, a Bayesian credible interval for $\fprate$ using a uniform prior is:
+\begin{equation}
+\fprate \in \left[\frac{f_t + 1}{t + 2}, \frac{f_t + 1}{t + 2}\right]_{95\%}
+\end{equation}
+based on the Beta$(f_t + 1, t - f_t + 1)$ posterior.
+\end{proposition}
+
+\section{Practical Guidelines}
+
+\subsection{Sample Size Requirements}
+
+To achieve relative error $\epsilon$ in estimating false positive rate with confidence $1-\alpha$:
+\begin{equation}
+n \geq \frac{z_{\alpha/2}^2(1-\fprate)}{\epsilon^2 \fprate}
+\end{equation}
+
+\begin{example}
+To estimate $\fprate = 0.01$ within 10\% relative error with 95\% confidence:
+\begin{equation}
+n \geq \frac{1.96^2 \times 0.99}{0.1^2 \times 0.01} = 38,032
+\end{equation}
+\end{example}
+
+\subsection{Choosing Between Models}
+
+\begin{itemize}
+    \item \textbf{Use exact binomial}: When $n < 1000$ or $n\fprate < 10$
+    \item \textbf{Use normal approximation}: When $n\fprate > 10$ and $n(1-\fprate) > 10$
+    \item \textbf{Use Poisson approximation}: When $\fprate < 0.01$ and $n\fprate < 20$
+\end{itemize}
+
+\subsection{Cardinality Estimation}
+
+In many applications, we need to estimate the cardinality of the latent set $S$ given only observations of $\obs{S}$:
+
+\begin{theorem}[Method of Moments Estimator]
+For finite universe $U$ with $|U| = u$, given $\obs{S}$ with error rates $\fprate$ and $\fnrate$:
+\begin{equation}
+\hat{|S|} = \frac{|\obs{S}| - \fprate u}{(1-\fnrate) - \fprate}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+The expected size of $\obs{S}$ is:
+\begin{equation}
+\Expect{|\obs{S}|} = |S|(1-\fnrate) + (u-|S|)\fprate
+\end{equation}
+Solving for $|S|$ yields the estimator.
+\end{proof}
+
+For data structures with known space complexity:
+
+\begin{proposition}[Space-Based Estimator]
+If a data structure uses $b$ expected bits per element, then:
+\begin{equation}
+\hat{|S|} = \frac{\text{BitLength}(\obs{S})}{b}
+\end{equation}
+For optimal structures, $b = -\log_2 \fprate$ bits per element.
+\end{proposition}
+
+\begin{example}[Bloom Filter Cardinality]
+A Bloom filter with $m$ bits and $k$ hash functions storing approximately $n$ elements has:
+\begin{equation}
+\hat{n} = -\frac{m}{k} \ln\left(1 - \frac{\text{bits set}}{m}\right)
+\end{equation}
+\end{example}
+
+\section{Related Work}
+
+This statistical analysis builds on:
+\begin{itemize}
+    \item Classical work on Bloom filter analysis \cite{bloom1970,mitzenmacher2002}
+    \item Probabilistic data structure theory \cite{broder2004}
+    \item Interval arithmetic methods \cite{moore1966}
+    \item Statistical analysis of streaming algorithms \cite{cormode2005}
+\end{itemize}
+
+\section{Conclusions}
+
+While the latent/observed framework provides conceptual elegance, practical applications demand rigorous statistical analysis. We have shown that:
+
+\begin{itemize}
+    \item Observation errors in finite sets follow binomial distributions
+    \item Asymptotic normality enables efficient confidence interval computation
+    \item Performance measures like PPV have complex but analyzable distributions
+    \item Interval arithmetic provides tools for worst-case analysis
+    \item Combined probabilistic and interval methods handle multiple uncertainty sources
+\end{itemize}
+
+These results enable practitioners to:
+\begin{itemize}
+    \item Design systems with statistical guarantees
+    \item Quantify uncertainty in probabilistic data structures
+    \item Make informed space-accuracy trade-offs
+    \item Validate implementations against theoretical predictions
+\end{itemize}
+
+The statistical view complements the algebraic view of Bernoulli types, providing the quantitative tools necessary for real-world deployment.
+
+\bibliography{references}
+
+\end{document}

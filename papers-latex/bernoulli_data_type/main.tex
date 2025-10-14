@@ -1,0 +1,681 @@
+\documentclass[11pt,final,hidelinks]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage[activate={true,nocompatibility},final,tracking=true,kerning=true,spacing=true,factor=1100,stretch=10,shrink=10]{microtype}
+\microtypecontext{spacing=nonfrench}
+\usepackage[noend]{algorithm2e}
+\usepackage{caption}
+\usepackage{mathtools}
+\usepackage{commath}
+\usepackage{listings}
+\lstset{
+  language=C++,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\bfseries,
+  commentstyle=\itshape,
+  stringstyle=\ttfamily,
+  showstringspaces=false,
+  breaklines=true
+}
+\usepackage{enumerate}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{pgfplots}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usepackage{tikzscale}
+\usepackage[square,numbers]{natbib}
+\bibliographystyle{plainnat}
+\usepackage{cleveref}
+\usepackage[super]{nth}
+\usepackage{siunitx}
+\usepackage[section]{placeins}
+\usepackage{subcaption}
+\usepackage{xparse}
+\usepackage{bm}
+\usepackage{bbm}
+\usepackage{etoolbox}
+
+% ===== SIMPLIFIED MATHEMATICAL NOTATION =====
+
+% Standard mathematical sets
+\newcommand{\R}{\mathbb{R}}        % Real numbers
+\newcommand{\N}{\mathbb{N}}        % Natural numbers
+\newcommand{\Z}{\mathbb{Z}}        % Integers
+\newcommand{\Q}{\mathbb{Q}}        % Rationals
+\newcommand{\C}{\mathbb{C}}        % Complex numbers
+
+% Standard set operations
+\newcommand{\powerset}{\mathcal{P}}  % Power set
+\DeclarePairedDelimiter\card{\lvert}{\rvert}  % Cardinality
+\DeclarePairedDelimiter\pair{\langle}{\rangle}  % Ordered pair
+
+% Standard probability notation
+\renewcommand{\P}{\mathbb{P}}      % Probability measure
+\newcommand{\E}{\mathbb{E}}        % Expectation
+\newcommand{\Var}{\mathrm{Var}}    % Variance
+\newcommand{\Cov}{\mathrm{Cov}}    % Covariance
+
+% Error rates using conventional ML/statistics notation
+\newcommand{\FPR}{\alpha}          % False positive rate (Type I error)
+\newcommand{\FNR}{\beta}           % False negative rate (Type II error)
+\newcommand{\TPR}{\tau}            % True positive rate (sensitivity)
+\newcommand{\TNR}{\sigma}          % True negative rate (specificity)
+
+% Confusion matrix elements using standard notation
+\newcommand{\TP}{\mathrm{TP}}      % True positive
+\newcommand{\FP}{\mathrm{FP}}      % False positive
+\newcommand{\FN}{\mathrm{FN}}      % False negative
+\newcommand{\TN}{\mathrm{TN}}      % True negative
+
+% Performance metrics
+\newcommand{\PPV}{\mathrm{PPV}}    % Positive predictive value (precision)
+\newcommand{\NPV}{\mathrm{NPV}}    % Negative predictive value
+\newcommand{\ACC}{\mathrm{ACC}}    % Accuracy
+\newcommand{\F}{\mathrm{F}}        % F-score
+
+% Type theory notation
+\newcommand{\Void}{\mathbf{0}}     % Empty type
+\newcommand{\Unit}{\mathbf{1}}     % Unit type
+\newcommand{\Bool}{\mathbb{B}}     % Boolean type
+
+% Function notation
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newcommand{\dom}{\mathrm{dom}}    % Domain
+\newcommand{\cod}{\mathrm{cod}}    % Codomain
+\newcommand{\img}{\mathrm{im}}     % Image
+\newcommand{\id}{\mathrm{id}}      % Identity function
+
+% Bernoulli type notation (simplified)
+\newcommand{\Ber}[1]{\mathcal{B}(#1)}  % Bernoulli type
+\newcommand{\BerSet}[1]{\mathcal{B}(\powerset(#1))}  % Bernoulli set
+\newcommand{\BerMap}[2]{\mathcal{B}(#1 \to #2)}  % Bernoulli map
+
+% Algorithm commands (simplified)
+\RestyleAlgo{ruled}
+\LinesNumbered
+\SetKw{True}{true}
+\SetKw{False}{false}
+\SetKwData{Null}{null}
+\SetKwData{Nothing}{nothing}
+\SetKwInOut{Params}{params}
+\SetKwInOut{KwIn}{input}
+\SetKwInOut{KwOut}{output}
+
+% Theorem environments
+\theoremstyle{plain}
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{definition}{Definition}[section]
+\newtheorem{postulate}{Postulate}[section]
+\newtheorem{conjecture}{Conjecture}[section]
+\newtheorem{assumption}{Assumption}
+\newtheorem{axiom}{Axiom}
+
+% Example environment
+\newcounter{examplecounter}
+\newenvironment{example}
+{
+    \refstepcounter{examplecounter}%
+    \par\vspace{\baselineskip}\noindent
+    \textbf{Example \theexamplecounter}%
+    \begin{itshape}
+    \quad
+}
+{
+    \end{itshape}
+    \par\vspace{\baselineskip}%
+    \noindent\ignorespacesafterend
+}
+
+% Remark environment
+\newtheorem*{remarkx}{Remark}
+\newenvironment{remark}
+  {\pushQED{\qed}\renewcommand{\qedsymbol}{$\triangle$}\remarkx}
+  {\popQED\endremarkx}
+
+\newtheorem*{notation}{Notation}
+
+% ===== END SIMPLIFIED NOTATION =====
+
+\hypersetup{
+    pdftitle={Random approximate values over algebraic types},
+    pdfauthor={Alexander Towell},
+    pdfsubject={computer science},
+    pdfkeywords={
+        probabilistic data structure,
+        partial function,
+        random approximate set,
+        random approximate data type,
+        random approximate relation,
+        random approximate map,
+        random approximate Boolean,
+        random approximate unit,
+        random approximate sum type,
+        random approximate product type,
+        random approximate exponential type,
+        random approximate void type,
+        relation,
+        set
+	},
+    colorlinks=false,
+    citecolor=green,
+    filecolor=magenta,
+    urlcolor=green
+}
+
+\title
+{
+    Bernoulli Data Types: A unified theory of probabilistic approximations\\
+    \large From primitive types to algebraic constructions
+}
+\author
+{
+    Alexander Towell\\
+    \texttt{atowell@siue.edu}
+}
+\date{}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+We present a comprehensive theory of Bernoulli data types---a systematic framework for data types with controlled probabilistic errors.
+Starting from primitive types (Void, Unit, Boolean), we show how standard algebraic type constructors (products, sums, exponentials) preserve and compose approximation structure.
+We analyze the confusion matrices that govern these approximations, revealing fundamental connections to information theory, rank structure, and inferability.
+Our framework unifies probabilistic data structures (Bloom filters, sketch algorithms), noisy channels, lossy compression, and oblivious computation within a single algebraic foundation.
+We provide exact characterizations of error propagation, establish impossibility results for certain parameter regimes, and demonstrate practical applications including space-efficient data structures and privacy-preserving systems.
+The theory extends classical type theory to the probabilistic domain while maintaining compositionality and algebraic reasoning.
+\end{abstract}
+
+\tableofcontents
+
+\section{Introduction}
+\label{sec:introduction}
+
+Classical data types model exact values with perfect equality and deterministic operations. This paper introduces \emph{Bernoulli data types}---a systematic framework for data types with controlled probabilistic errors. These types arise naturally in diverse contexts: probabilistic data structures that trade space for accuracy, noisy communication channels, lossy compression algorithms, and privacy-preserving computations.
+
+\subsection{Motivation and applications}
+
+The Bernoulli framework unifies several important computer science concepts:
+
+\paragraph{Space-efficient data structures.} Bloom filters exemplify Bernoulli sets---approximations of set membership with false positive rates. By generalizing this principle, we obtain Bernoulli maps (approximating arbitrary functions), Bernoulli relations (approximating binary relations), and higher-order compositions.
+
+\paragraph{Noisy computation.} When computations operate on uncertain inputs or use randomized algorithms, the results become Bernoulli approximations. The Miller-Rabin primality test, for instance, implements a Bernoulli Boolean predicate with quantifiable error rates.
+
+\paragraph{Oblivious data structures.} Bernoulli types enable oblivious implementations where the data structure reveals minimal information about its contents. The controlled error rates provide plausible deniability while maintaining utility.
+
+\paragraph{Information-theoretic foundations.} The confusion matrix structure of Bernoulli types determines fundamental limits on inference and recovery, connecting to rate-distortion theory and channel capacity.
+
+\subsection{The Bernoulli hierarchy}
+
+We develop a hierarchy of Bernoulli types, starting from primitive types and building through algebraic composition:
+
+\begin{enumerate}
+\item \textbf{Bernoulli Booleans} ($\Ber{\Bool}$): The simplest non-trivial case, modeling binary values with symmetric or asymmetric error rates. Despite their simplicity, they exhibit rich structure through confusion matrix rank analysis.
+
+\item \textbf{Bernoulli Sets} ($\Ber{\powerset(X)}$): Approximate set membership with false positive rate $\FPR$ and false negative rate $\FNR$. Boolean algebra operations on Bernoulli sets produce higher-order approximations with predictable error propagation.
+
+\item \textbf{Bernoulli Maps} ($\Ber{X \to Y}$): The most general case, approximating arbitrary functions. The confusion matrix has dimension $|Y|^{|X|} \times |Y|^{|X|}$, capturing all possible function approximations.
+
+\item \textbf{Algebraic compositions}: Product types, sum types, and exponential types built from Bernoulli primitives inherit probabilistic structure. For instance, $\Ber{\Bool} \times \Ber{\Bool}$ forms an approximate Boolean algebra.
+\end{enumerate}
+
+\subsection{Key insights}
+
+Our analysis reveals several counterintuitive results:
+
+\paragraph{Rank enhances inferability.} Bloom filters, despite introducing errors, actually \emph{increase} the confusion matrix rank compared to random approximations. This enhanced structure improves Bayesian inference about the latent set.
+
+\paragraph{Composition complexity.} The composition of first-order Bernoulli approximations yields higher-order approximations. For Boolean operations, we derive exact formulas for error propagation through union, intersection, and complement.
+
+\paragraph{Latent-observed duality.} Every Bernoulli type exhibits a fundamental duality between latent (true) values and observed (approximate) values. The confusion matrix mediates between these perspectives, determining what can be inferred about latent values from observations.
+
+\subsection{Contributions}
+
+This paper makes the following contributions:
+
+\begin{itemize}
+\item A unified algebraic framework for probabilistic data types with controlled error rates
+\item Confusion matrix analysis revealing rank structure and inferability properties
+\item Exact characterization of error propagation through Boolean algebra operations
+\item Connection between Bernoulli types and information-theoretic bounds
+\item Practical constructions including singular hash maps with optimal space complexity
+\item Applications to Boolean search, privacy-preserving computation, and oblivious data structures
+\end{itemize}
+
+\subsection{Paper organization}
+
+Section~\ref{sec:primitives} introduces primitive Bernoulli types (Void, Unit, Boolean). Section~\ref{sec:algebraic} develops the algebra of type composition. Section~\ref{sec:confusion} analyzes confusion matrix structure and rank properties. Section~\ref{sec:implementation} provides C++ implementations.
+
+\section{Algebraic construction of Bernoulli types}
+\label{sec:algebraic}
+
+Bernoulli types form an algebra closed under standard type constructors. Starting from primitive types, we build complex Bernoulli structures through systematic composition.
+
+\subsection{Primitive Bernoulli types}
+
+\subsubsection{Void type}
+The empty type $\Void$ has no values, hence $\Ber{\Void} = \Void$. No approximation is possible when no values exist. This serves as the algebraic zero for sum types.
+
+\subsubsection{Unit type}
+The unit type $\Unit$ has exactly one value $()$. Since there's no ambiguity, $\Ber{\Unit} = \Unit$. The confusion matrix is $1 \times 1$ with entry $1$, representing perfect transmission.
+
+\subsubsection{Boolean type}
+The Boolean type admits non-trivial approximations. We distinguish orders by parameter count:
+
+\begin{definition}[Bernoulli Boolean Orders]
+\begin{itemize}
+\item \textbf{Zeroth-order} ($\Ber{\Bool}^{(0)}$): Perfect Boolean, no errors
+\item \textbf{First-order} ($\Ber{\Bool}^{(1)}$): Symmetric errors with rate $\epsilon$
+\item \textbf{Second-order} ($\Ber{\Bool}^{(2)}$): Asymmetric with false positive rate $\FPR$ and false negative rate $\FNR$
+\end{itemize}
+\end{definition}
+
+The confusion matrix for second-order:
+\begin{equation}
+\mathbf{C} = \begin{pmatrix}
+1-\FNR & \FNR \\
+\FPR & 1-\FPR
+\end{pmatrix}
+\end{equation}
+
+Rank analysis reveals:
+\begin{itemize}
+\item Rank 2 when $\FPR + \FNR \neq 1$ (invertible)
+\item Rank 1 when $\FPR + \FNR = 1$ (doubly stochastic, non-invertible)
+\end{itemize}
+
+\subsection{Product types}
+
+Product types compose error rates independently.
+
+\begin{theorem}[Product Type Approximation]
+For $\Ber{A} \times \Ber{B}$:
+\begin{equation}
+\P((a', b') = (a, b)) = \P(a' = a) \cdot \P(b' = b)
+\end{equation}
+where $a'$ and $b'$ are observed values, $a$ and $b$ are latent values.
+\end{theorem}
+
+\begin{example}[Approximate Boolean Pairs]
+$\Ber{\Bool}^{(\epsilon_1)} \times \Ber{\Bool}^{(\epsilon_2)}$ has confusion matrix dimension $4 \times 4$:
+\begin{equation}
+C_{(i,j),(k,\ell)} = C^{(1)}_{ik} \cdot C^{(2)}_{j\ell}
+\end{equation}
+where $C^{(1)}, C^{(2)}$ are individual Boolean confusion matrices.
+\end{example}
+
+\subsection{Sum types}
+
+Sum types (tagged unions) introduce tag approximation errors.
+
+\begin{definition}[Bernoulli Sum Type]
+For $\Ber{A + B}$:
+\begin{itemize}
+\item Tag errors: $\text{Left}(a)$ may be observed as $\text{Right}(b')$ with probability $\epsilon_{LR}$
+\item Value errors: Within correct tag, value approximation follows component type
+\end{itemize}
+\end{definition}
+
+The confusion matrix has block structure:
+\begin{equation}
+\mathbf{C} = \begin{pmatrix}
+(1-\epsilon_{LR}) \mathbf{C}_A & \epsilon_{LR} \mathbf{M}_{AB} \\
+\epsilon_{RL} \mathbf{M}_{BA} & (1-\epsilon_{RL}) \mathbf{C}_B
+\end{pmatrix}
+\end{equation}
+where $\mathbf{M}_{AB}$ represents cross-type confusion.
+
+\subsection{Exponential types (functions)}
+
+Function types $A \to B$ have the richest structure.
+
+\begin{theorem}[Function Space Confusion]
+For $\Ber{A \to B}$, the confusion matrix has:
+\begin{itemize}
+\item Dimension: $|B|^{|A|} \times |B|^{|A|}$
+\item Maximum rank: $|B|^{|A|}$
+\item Order (degrees of freedom): up to $|B|^{|A|}(|B|^{|A|} - 1)$
+\end{itemize}
+\end{theorem}
+
+Special cases yield familiar structures:
+\begin{itemize}
+\item $\Ber{X \to \Bool}$: Approximate predicates (Bloom filters)
+\item $\Ber{X \to X}$: Approximate endomorphisms (lossy compression)
+\item $\Ber{X \to Y}$: General approximate maps
+\end{itemize}
+
+\subsection{Recursive types}
+
+Lists and trees built from Bernoulli components accumulate errors.
+
+\begin{definition}[Bernoulli List]
+$\text{List}[\Ber{A}]$ where each element has independent error rate $\epsilon$.
+Expected errors in list of length $n$: $n \cdot \epsilon$.
+\end{definition}
+
+\begin{theorem}[Tree Error Propagation]
+For binary tree of height $h$ with per-node error $\epsilon$:
+\begin{itemize}
+\item Root-to-leaf path: $(1-\epsilon)^h$ probability of no errors
+\item Full tree traversal: $(1-\epsilon)^{2^h - 1}$ probability of no errors
+\end{itemize}
+\end{theorem}
+
+\subsection{Algebraic laws}
+
+Bernoulli types satisfy modified algebraic laws:
+
+\begin{theorem}[Approximate Distributivity]
+For Bernoulli types:
+\begin{equation}
+\Ber{A \times (B + C)} \approx \Ber{A \times B + A \times C}
+\end{equation}
+where $\approx$ indicates equality up to error rate composition.
+\end{theorem}
+
+\begin{theorem}[Curry-Howard for Approximate Types]
+The correspondence between types and logic extends to Bernoulli types:
+\begin{itemize}
+\item $\Ber{A \times B}$: Approximate conjunction
+\item $\Ber{A + B}$: Approximate disjunction
+\item $\Ber{A \to B}$: Approximate implication
+\end{itemize}
+with error rates determining the "strength" of logical connectives.
+\end{theorem}
+
+These algebraic constructions demonstrate that Bernoulli approximations form a closed, compositional system suitable for building complex probabilistic data structures from simple components.
+
+\section{Primitive approximate values}
+\label{sec:primitives}
+Here are a basic list of primitive algebraic data types and operations on types.
+
+These are \emph{first-order} approximate types since they directly approximate their corresponding exact types.
+
+\subsection{Void type}
+The most primitive type is the \emph{empty set} type, denoted by $\Void$.
+There are no elements in the empty set and therefore it is not possible to construct values of this type.
+There is only one function in the set $\Void \to X$, known as the \emph{absurd} function since it can never be invoked.
+Since $\Void$ has no values, $\Ber{\Void}$ is equivalent to $\Void$.
+
+$\Ber{\Void}$ is necessary to complete the algebra of algebraic data types, but serves only a theoretical purpose.
+
+\subsection{Unit type}
+The \emph{unit} type, denoted by $\Unit$, is isomorphic to any set with only a single element, i.e., any \emph{singleton set}.
+The set $\Unit \to X$ has a cardinality $|X|$ and the set $X \to \Unit$ has a cardinality $1$.
+If we are talking about \emph{partial} functions, then $X \rightharpoonup \Unit$ has cardinality $2^{|X|}$.
+
+The set $\Unit \to \Unit$ has a cardinality of $1$, which is the identity function $\id : \Unit \to \Unit$.
+
+The approximate unit type $\Ber{\Unit}$ is necessary to complete the algebra, but given a unit $\Unit$ type, similar to the $\Void$ type there is no uncertainty about its value, i.e., $\Ber{\Unit}$ is equivalent to $\Unit$.
+
+In addition, if there is some function $f : \Unit \to X$ its approximate analog is $\Ber{f} : \Unit \to X$, which models an \emph{approximate} constant.
+
+\subsection{Sum types}
+
+A sum type $X + Y$ is the disjoint union of types $X$ and $Y$.
+The \emph{first-order} approximate sum type $\Ber{X + Y}$ is an approximate of the type $X+Y$.
+
+The \emph{higher-order} sum type is different, e.g., $\Ber{X} + \Ber{Y}$ is a higher order sum type, as is $\Ber{X} + Y$ and $\Ber{\Ber{X} + \Ber{Y}}$ is even a higher order.
+
+If we replace $X$ and $Y$ by $\Ber{X}$ and $\Ber{Y}$, we have a sum type $\Ber{X} + \Ber{Y}$.
+
+Values of these types are naturally constructed from approximate maps that map to the type $X+Y$.
+
+\subsection{Product types}
+
+A product type $X \times Y$ is the Cartesian product of types $X$ and $Y$.
+If we replace $X$ and $Y$ by $\Ber{X}$ and $\Ber{Y}$, we have a product type $\Ber{X} \times \Ber{Y}$.
+
+Values of these types are naturally constructed from approximate maps that map to the type $X+Y$ and form a random approximate set over the type $X \times Y$.
+
+\subsection{Exponential types (functions)}
+
+These have already been discussed.
+Random approximate maps are the same thing as random approximate exponential types.
+
+When we generate a set of approximate value types and a set of approximate functions over those value types and compose them together to generate a \emph{program}, we may consider this composition to be an \emph{approximate} program.
+
+A \emph{partial function} is not defined on entire domain.
+We allow elements not in the preimage, i.e., not defined by the partial function, to either correctly map to \emph{nothing} or, map to some other element in the codomain.
+The \emph{false mapping rate} $\FPR_{y}$ for element $y$ may be specified explicitly, i.e.,
+\begin{equation}
+\P(f(x) = y \mid x \notin \dom(f)) = \FPR_{y},
+\end{equation}
+and the \emph{total} false mapping rate is
+\begin{equation}
+\sum_{y \in \cod(f)} \P(f(x) = y \mid x \notin \dom(f)) = \FPR,
+\end{equation}
+by the fact that each outcome is mutually exclusive (a function $f$ maps to only one element).
+Alternatively,
+\begin{equation}
+\sum_{y \in \cod(f)} \P(f(x) \neq y \mid x \notin \dom(f)) = 1-\FPR = \TNR.
+\end{equation}
+
+\begin{example}
+Suppose we have a predicate function $f : X \to \Bool$, i.e., set indicator.
+Then, we may construct a partial function from $f$ with an \emph{approximate map} over those elements that return \texttt{true}.
+If we specify a false mapping rate $\FPR_{\text{false}}$, this predicate is isomorphic to an approximate set over $X$ with a false positive rate $\FPR = \FPR_{\text{false}}$.
+
+An optimal approximate map obtains the information-theoretic lower-bound on the expected space complexity, $-1.44 \log_2 \FPR$ bits per positive element.
+
+While a random approximate set is in practice simpler to implement, theoretically an optimal approximate map is both fully generalized (for any function over any domain and codomain) and obtains the same space efficiency.
+
+The obfuscated approximate map has the same characteristics, and the optimal implementation is a black box that is able to increase obfuscation power for less space efficiency.
+\end{example}
+
+\begin{remark}
+We call a value an approximate value when it should be $x$ but there is a probability it is something else due to the approximate map or some other noisy process.
+\end{remark}
+
+Most approximate maps are black boxes.
+They introduce an approximation error, and in addition, the inputs may also have an approximation error. At that point, the values being mapped to are higher-order random approximate values.
+
+\section{Random approximate Boolean algebra}
+\label{sec:confusion}
+
+The primitive operations in the Boolean algebra, $\land$, $\lor$, and $\neg$, can be extended to approximate Boolean values.
+
+The approximate value type $\Ber{\Bool}$ discussed in Section~\ref{sec:primitives} can be composed with algebraic types like the product type to construct any other value type.
+
+We consider a generalization of this Boolean algebra given by six-tuple
+\begin{equation}
+\left(\Ber{\{0,1\}^n}, \Ber{\land}, \Ber{\lor}, \Ber{\neg}, \Ber{1^n}, \Ber{0^n}\right),
+\end{equation}
+where the operators are \emph{bit-wise} operators.
+
+The values of $n$ bits are \emph{isomorphic} to any value type that has a cardinality of $2^n$ and as a Boolean algebra.
+For instance, we could implement approximate sets with a complete implementation of set-theoretic operations on them over any universe of $n$ elements.
+
+An exponential type $X \to Y$ is the set of functions from domain $X$ to codomain $Y$. If we replace $X$ and $Y$ by $\Ber{X}$ and $\Ber{Y}$, we have an approximate exponential type $\Ber{X} \to \Ber{Y}$, e.g., if $f : X \to Y$, then an approximate representation of $f$ is $\Ber{f} : \Ber{X} \to \Ber{Y}$.
+
+If it is not important that $X$ or $Y$ be themselves oblivious types, then we have the \emph{representation} of the functions as oblivious, but the inputs and outputs can be \emph{plain}.
+
+Maps, also known as \emph{partial functions}, are \emph{rules} that map inputs to outputs.
+Let $f : X \rightharpoonup Y$ be a partial function that maps inputs from the domain $X$ to outputs from the codomain $Y$.
+
+There are three \emph{orthogonal} ways in which $f$ may leak information.
+
+Let the \emph{computational basis} (a minimal set of functions) for values of type $X$ be denoted by the overload set $F$, where \emph{any} other function that depends on $X$ is some composition of the elements of $F$ and elements from other dependent computational bases.
+
+As a function of $X$, $f$ depends on a subset $L$ of $F$.
+If we \emph{substitute} $X$ by some object type that \emph{models} $X$, to be compatible with $f$, at minimum it must overload the set of functions in $L$.
+
+Consider a partial function $f : X_1 \times X_2 \times \cdots \times X_n \rightharpoonup Y_1 \times \cdots \times Y_m$ and suppose we replace $X_1$ by $\Ber{X_1}$, an approximate value type.
+Then, we denote this function by $\Ber{f} : \Ber{X_1} \times X_2 \times \cdots \times X_n \rightharpoonup \Ber{Y_1} \times \cdots \times \Ber{Y_m}$.
+
+There are two approaches to this.
+
+\section{C++ implementation}
+\label{sec:implementation}
+
+In programming languages, \emph{composite} types are typically composed in two ways, the \emph{sum type} and the \emph{product type}.
+The product type is a Cartesian product of types (sets).
+
+For instance, a product type may the Cartesian product of integer and Boolean types, $\Z \times \{0,1\}$. In the C++ family of programming languages, this product type may be represented by \texttt{pair<int,bool>}.
+
+Since it may be inconvenient to refer to member types by their respective tuple indices, programming languages typically allow the indices to be \emph{labeled}. In C++, keywords like \texttt{struct} and \texttt{class} are commonly used to provide named product types.
+
+A data type may be thought of as a product type with \emph{invariants}, or \emph{constraints} on which values member types may be assigned. Thus, it may be thought of as a \emph{relation} or \emph{correspondence} over the product type. In many cases, this may make approximate relations unsuitable for representing data types, e.g., a tuple that violates one or more of the invariants may be generated from an objective value of the data type.
+
+However, if an approximate relation does violate the invariants, it can simply be considered invalid. In this case, we may pose questions like, what is the probability that an approximate data type generates an invalid result?
+
+Viewing a \emph{type} as a set, most programming languages have primitive types like \emph{integers}, \emph{Booleans}, and \emph{characters}.
+In C++, these are respectively denoted by \lstinline{int}, \lstinline{bool}, and \lstinline{char} with cardinalities given respectively by $2^{32}$, $2^8$, and $2^1$.
+Any type needs one or more \emph{value constructors} to construct objects that model values in that type.
+For instance, in C++ the value that denotes the Boolean value of \emph{true} is constructed with the syntax \lstinline{true}.
+
+The \emph{unit} type is special singleton set with a single value, i.e., a cardinality of $2^0$.
+In C++, the confusing notation of \lstinline{void} denotes the unit type (and the single value).
+\begin{remark}
+The \emph{absurd} type is a special type with zero values, i.e., the \emph{empty set}.
+Since there are no values in the absurd type, no values of this type can be constructed.
+There is no primitive absurd type in C++.
+\end{remark}
+
+A \emph{product type} is the $n$-fold Cartesian product of zero or more types where the zero-th product is the unit type.
+For instance, in C++, \lstinline|struct { char y, bool z }| is a \emph{named} product type and \lstinline|tuple<char,bool>|
+is the \emph{unnamed} counterpart, where both are product types \lstinline{char} $\times$ \lstinline{bool}.
+The cardinality of this product type is $2^8 \cdot 2^1 = 512$.
+One way a particular value of this product type may be constructed is \lstinline{tuple<char,bool>('a', true)}.
+
+The values of a sum type are typically grouped into several classes, called variants.
+The set of all possible values of a sum type is the disjoint union of the sets of all possible values of its variants.
+For instance, in C++, \lstinline{variant<char,bool>}
+is the sum type \lstinline{char} $+$ \lstinline{bool}, which has a cardinality of $2^8 + 2^1 = 258$.
+One way a particular value of this sum type may be constructed is \lstinline{variant<char,bool>('1', true)}.
+A particularly useful type in C++ is \lstinline{optional<X>}, which conceptually models the sum type \lstinline{X} + \lstinline{void} where \lstinline{void} denotes the variant ``not a value of type \lstinline{X}.''
+\begin{remark}
+This is not valid C++ syntax, even though the unit type value should be first-class.
+\end{remark}
+The cardinality of the \lstinline{optional<X>} is the cardinality of \lstinline{X} plus $1$.
+We label the value in this singleton \emph{nothing} and may test whether a particular value is either \emph{nothing} or alternatively a value in \lstinline{X}.
+
+Exponential types are \emph{functions}.
+In C++, \lstinline{[](tuple<char,bool>) -> bool} is the set of functions \lstinline{char} $\times$ \lstinline{bool} $\to$ \lstinline{bool}, which has a cardinality of $2^{512}$.
+Usually, a more convenient syntax is used, like \lstinline|[](char,bool) -> bool|.
+The constant \lstinline|true| function of the exponential type \lstinline|char| $\times$ \lstinline|bool| $\to$ \lstinline|bool| may be constructed with the definition \lstinline|[](char,bool) -> bool { return true; }|.
+\begin{remark}
+The exponential type \lstinline{[](X x) -> void} is of little practical value and, in C++, usually denotes a \emph{procedure} that causes \emph{side-effects} like writing to IO.
+\end{remark}
+
+Recall that any subset of a set corresponds to a \emph{relation}. Types are \emph{subsets} of the algebraic types where subsets are defined by \emph{invariants}.
+We may compose primitive types to specify a variety of \emph{compound} types.
+\begin{example}
+\emph{Rationals} may be implemented as a product type of two integers,
+\begin{lstlisting}
+using Rational = tuple<int,int>;
+\end{lstlisting}
+where the first and last elements of the tuple represent the numerator and denominator respectively.
+If the invariant is that the denominator is not $0$, then a \emph{value constructor} \lstinline{rational} $:$ \lstinline{int} $\times$ \lstinline{int} $\to$ \lstinline{optional<Rational>} that takes a numerator and denominator and outputs either a rational or, if the invariants are violated, \emph{nothing}, is given by:
+\begin{lstlisting}
+optional<Rational> rational(int num, int denom)
+{
+    if (denom == 0)
+        return {}; // Return the value that denotes Nothing.
+    return tuple<int,int>(num, denom);
+}
+\end{lstlisting}
+
+The expected operators on rationals, like addition \lstinline{operator+(Rational,Rational) -> Rational}, may be implemented so that \lstinline{Rational} models the \emph{concept} of rationals.
+
+The \lstinline{Rational} type is a subset of the product type \lstinline{tuple<int,int>} and is thus
+a \emph{binary relation} on $\Z \times \Z$.
+\begin{remark}
+We implemented \lstinline{Rational} as a product type \lstinline{tuple<int,int>} and a value constructor \lstinline{rational} for pedagogical reasons, but generally programming structures like \emph{class} are utilized since they facilitate important concepts like \emph{encapsulation}.
+\end{remark}
+\end{example}
+
+Each of these types and operators has a corresponding random approximation, e.g., the exponential type is just a random approximate map, and the \emph{relations} that define types are just random approximate relations with \emph{deterministic} properties that model the invariants.
+
+The invariants may not be easy to satisfy, and so a random approximation relation of the corresponding type may not be practical.
+However, when the invariants can be satisfied, we may implement \emph{random approximate algebraic data types} of the \emph{algebraic data types}, e.g., we can compose random approximate algebraic data types as before to construct compound random approximate data types of the corresponding compound algebraic data type.
+
+This may not seem particularly useful, but it permits space-efficient representations and, moreover, concepts like \emph{oblivious algebraic data types} may be based on it with some notion of closure.
+
+\subsection{Approximate value monad}
+
+Suppose we have a function $f : X \to Y$ and we apply $f$ to an approximate value of type $X$, denoted by $a(X)$.
+
+The approximate value parameterized by $X$, denoted by \lstinline{approx<X>}, is a monad type similar to the \emph{maybe} monad discussed previously, except significantly more complicated if \emph{fully} implemented.
+
+The general type of the approximate value monad is simply defined as
+\begin{lstlisting}
+template <typename X> struct approx<X> {}
+\end{lstlisting}
+which has a computational basis given by the following overload set.
+
+Given an approximate value of type $X$, its \emph{false positive rate} is given by
+\begin{lstlisting}
+template <typename X>
+auto fpr(approx<X> x)   { /* implementation */ }
+\end{lstlisting}
+its \emph{false negative rate} is given by
+\begin{lstlisting}
+template <typename X>
+auto fnr(approx<X> x)   { /* implementation */ }
+\end{lstlisting}
+its value is given by
+\begin{lstlisting}
+template <typename X>
+auto value(approx<X> x) { /* implementation */ }
+\end{lstlisting}
+and its conditional probability mass function is given by
+\begin{lstlisting}
+template <typename X>
+auto pmf(approx<X> x, X true_value) { /* implementation */ }
+\end{lstlisting}
+
+Note that the false positive and false negative rates are the result of using the distance function $d(a,a) = 0$ and otherwise $d(a,b) = 1$, $a \neq b$, to calculate the \emph{expected} loss given respectively the negative (where $d$ evaluates to $1$ with respect to some ground truth) and positive (where $d$ evaluates to $0$) subsets of $X$.
+
+If we give it a \emph{loss} function, we may estimate its loss.
+
+For particular value types, we specialize this template.
+\begin{lstlisting}
+template <> struct approx<bool>
+{
+    double fpr;
+    double fnr;
+    bool value;
+};
+\end{lstlisting}
+which has a computational basis given by
+\begin{lstlisting}
+auto fpr(approx<bool> x)   { return x.fpr; }
+auto fnr(approx<bool> x)   { return x.fnr; }
+auto value(approx<bool> x) { return x.value; }
+\end{lstlisting}
+
+The function \lstinline{fmap} $:$ (\lstinline{bool} $\to$ \lstinline{bool}) $\times$ \lstinline{approx<bool>} $\to$ \lstinline{approx<bool>} is defined as
+\begin{lstlisting}
+auto amap(function<bool(bool)> f, approx<bool> x)
+{
+    auto fnr = f(true);
+    auto fpr = f(false);
+
+    return approx<bool> { fpr, fnr, f(value(x)) };
+}
+\end{lstlisting}
+
+If we compose functions to construct an \emph{algorithm} (or program), then if some of the values (e.g., functions or Boolean values) are replaced by approximate values, the algorithm becomes (in general) an approximate algorithm and we may deduce its false positive and negative rates as we did previously through, say, function composition.
+
+If the algorithm includes \emph{branching}, the algorithm is still an approximate algorithm, but in order to infer the false positive and false negative rate, we must go down \emph{all} branches, which is in general not tractable.
+However, we could estimate the result using \emph{Monte Carlo} simulation.
+
+The approximate Boolean value is straightforward since Boolean types are the natural predicate return type.
+More importantly, there are only two values of this type.
+
+\subsection{Type-erasure}
+The fact that we are dealing with specific approximate types may be erased into some approximate type abstract data type that hides the concrete data type.
+It may be further erased to just a type, e.g., $\Ber{f}^{(\FPR,\FNR)}$ may be erased to $\Ber{f}$ which may be erased to $f$.
+
+\end{document}

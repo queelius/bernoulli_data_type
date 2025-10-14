@@ -1,0 +1,21 @@
+\NeedsTeXFormat{LaTeX2e}[1994/06/01]
+\ProvidesPackage{approxrelationnotation}[2018/01/01 alex towell's approximate relation notation for his various papers]
+
+\RequirePackage{relationnotation}
+\RequirePackage{approxsetnotation}
+
+\NewDocumentCommand{\ARelation}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {\Relation{#1}[][\sigma]}
+            {\Relation{#1}[#2][\sigma]}
+    }
+    {\Set{#1}[#2][#3]}
+}
+
+\NewDocumentCommand{\ARelationType}{m}{%
+    {#1}^{\sigma}
+}
+
+\endinput

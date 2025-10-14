@@ -1,0 +1,33 @@
+# Makefile for testing Bernoulli/Observed types compilation
+
+CXX = g++
+CXXFLAGS = -std=c++17 -Wall -Wextra -I.
+TARGET = test_compilation
+
+.PHONY: all clean test
+
+all: $(TARGET)
+
+$(TARGET): test_compilation.cpp
+	$(CXX) $(CXXFLAGS) -o $@ $<
+
+test: $(TARGET)
+	./$(TARGET)
+
+clean:
+	rm -f $(TARGET)
+
+# Additional targets for testing individual components
+test-bool: test_bool.cpp
+	$(CXX) $(CXXFLAGS) -o $@ $< && ./$@ && rm $@
+
+test-map: test_map.cpp
+	$(CXX) $(CXXFLAGS) -o $@ $< && ./$@ && rm $@
+
+# Check if headers are syntactically correct
+check-headers:
+	@echo "Checking header syntax..."
+	@$(CXX) $(CXXFLAGS) -fsyntax-only include/rate_span.hpp
+	@$(CXX) $(CXXFLAGS) -fsyntax-only include/bernoulli_bool/bernoulli_boolean.hpp
+	@$(CXX) $(CXXFLAGS) -fsyntax-only include/bernoulli_map/bernoulli_map.hpp
+	@echo "✓ Headers syntax check passed"

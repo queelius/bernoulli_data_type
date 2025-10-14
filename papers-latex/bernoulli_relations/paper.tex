@@ -1,0 +1,1015 @@
+%\documentclass[final,journal,compsoc,hidelinks]{article}
+\documentclass[11pt,final,hidelinks]{article}
+\usepackage{lmodern}
+\usepackage[nohints]{minitoc}
+\usepackage[margin=1in]{geometry}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage[activate={true,nocompatibility},final,tracking=true,kerning=true,spacing=true,factor=1100,stretch=10,shrink=10]{microtype}
+\microtypecontext{spacing=nonfrench}
+\usepackage[noend]{algorithm2e}
+\usepackage{caption}
+\usepackage{mathtools}
+\usepackage{commath}
+\usepackage{minted}
+\usepackage{enumerate}
+\usepackage{amsmath}
+\usepackage{subfiles}
+\usepackage{booktabs}
+\usepackage[xindy,toc,acronyms,symbols]{glossaries}
+\usepackage{latexsym}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{pgfplots}
+\usepackage{wasysym}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usepackage{tikzscale}
+\usepackage[square,numbers]{natbib}
+\bibliographystyle{plainnat}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{cleveref}
+\usepackage[super]{nth}
+\usepackage{siunitx}
+\usepackage[section]{placeins}
+\usepackage{subcaption}
+
+%\usepackage{alexmisc}
+\usepackage{functionnotation}
+\usepackage[plain]{setnotation}
+\usepackage{approxsetnotation}
+\usepackage{probabilitynotation}
+\usepackage[fancy]{relationnotation}
+\usepackage{approxrelationnotation}
+\usepackage[section]{envnotation}
+%\usepackage{algorithmnotation}
+%\usepackage{alexmisc}
+
+\hypersetup{
+    pdftitle={The random approximate relation abstract data type},
+    pdfauthor={Alexander Towell},               % author
+    pdfsubject={computer science},              % subject of the document
+    pdfkeywords={
+        probabilistic data structure,
+        partial function,
+        random approximate set,
+        random approximate data type,
+        random approximate relation,
+        random approximate map,
+        relation,
+        set        
+	},                    % keywords
+    colorlinks=false,                           % false: boxed links;
+    citecolor=green,                            % color of links to 
+    filecolor=magenta,                          % color of file links
+    urlcolor=green                              % color of external
+}
+
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{naturalnames}{hyperref}
+\pgfplotsset{compat=1.14} 
+
+\graphicspath{img}
+
+
+\title
+{
+    The abstract data type of the \emph{approximate relation}
+}
+\author
+{
+    Alexander Towell\\
+    \texttt{atowell@siue.edu}
+}
+\date{}
+
+%\include{defs}
+%\loadglsentries{gloss}
+
+\usepackage{comment}
+\begin{document}
+\maketitle
+\begin{abstract}
+We define the semantics of \emph{approximate relation}, which follows naturally from the \emph{approximate set}. It is a \emph{probabilistic} relation that \emph{approximates} another relation of objective interest with the possibility of \emph{false correspondences} and \emph{false complementary correspondences}. A special-case of the approximate relation is the approximate partial function (unary partial functions are more widely known as dictionaries). Given specified error rates of these kind, we derive the expected lower-bound on the bits per relation. Furthermore, we consider how these errors \emph{propagate} through relational operators like \emph{join} and \emph{project}, and consider the special case of partial function \emph{composition}. Following from that, we consider an implementation of the approximate relation based on approximate sets. Following from that, we consider an implemention which efficiently permits projections on the relations down to specific attributes based on perfect hash functions, denoted the \emph{perfect hash map}, which is especially useful for implementing approximate unary approximate partial functions. Finally, we demonstrate an application, \emph{oblivious databases}, which we use to implement rank-ordered Encrypted Search with extensions for the fuzzy set-theoretic model.
+\end{abstract}
+
+
+\microtypesetup{protrusion=false}
+\tableofcontents
+\microtypesetup{protrusion=true}
+
+
+\newcommand{\ExactMap}[1]{M(#1)}
+
+
+%\listoffigures
+%\listofalgorithms
+
+
+% === Content from sections/intro.tex ===
+% ===============================================================================
+% WARNING: MISSING FILE - sections/intro.tex
+% 
+% The subfile 'sections/intro.tex' was referenced in main.tex but could not be found.
+% Expected location: sections/intro.tex
+% 
+% Based on the filename, this section might have contained:
+% - Introduction or overview content
+%
+% You may need to:
+% 1. Check if the file was moved or renamed
+% 2. Create the missing file with appropriate content
+% 3. Update the \subfile{} reference in main.tex
+% ===============================================================================
+% === End of sections/intro.tex ===
+
+% === Content from sections/relations.tex ===
+\providecommand{\mainx}{..}
+\section{Relational algebra}
+\label{sec:relations}
+integrate:::
+Suppose we have a partial function $\Fun{f} \colon X_1 \times \cdots \times X_m \pfun Y_1 \times \cdots \times Y_n$.
+This is a special kind of relation where the projection $\Proj$
+Experience shows that it is awkward to deal with multi-valued functions and that it is best to treat them as relations (or to change the output domain to be a power set, which is equivalent to view the function as a relation).
+:::
+
+
+
+The concept of a \emph{relation} is dependent upon the concept of a \emph{set}.
+\begin{definition}
+A set is an unordered collection of distinct elements from a universe of elements.
+\end{definition}
+A countable set is a \emph{finite set} or a \emph{countably infinite set}. A \emph{finite set} has a finite number of elements. For example,
+\[
+    \Set{S} = \{ 1, 3, 5 \}
+\]
+is a finite set with three elements. A \emph{countably infinite set} can be put in one-to-one correspondence with the set of natural numbers.
+
+The cardinality of a set $\Set{S}$ is a measure of the number of elements in the set, denoted by
+\begin{equation}
+    \Card{\Set{S}}\,.
+\end{equation}
+The cardinality of a \emph{finite set} is a non-negative integer and counts the number of elements in the set, e.g.,
+\[
+    \Card{\left\{ 1, 3, 5\right\}} = 3\,.
+\]
+
+Given two sets $\Set{A}$ and $\Set{B}$, a basic construction in set theory is the formation of an ordered pair $\Pair{a}{b}$, where $a \in \Set{A}$ and $b \in \Set{B}$, and whose main property is that $\Pair{a}{b} = \Pair{c}{d}$ \emph{if and only if} $a = c$ and $b = d$.\footnote{This is a non-commutative property, i.e., $\Pair{a}{b}$ does not necessarily equal $\Pair{b}{a}$.} A \emph{tuple} is a generalization of pairs which can consist of an arbitrary number of elements, e.g., $\Tuple{x_1,x_2,\ldots,x_n}$.
+
+\begin{definition}[Cartesian product]
+Let $\Set{X}[1], \ldots, \Set{X}[n]$ be $n$ sets. The $n$-fold Cartesian product of $\Set{X}[1],\ldots,\Set{X}[n]$ is given by $\SetBuilder{\Tuple{x_1,\ldots,x_n}}{x_1 \in \Set{X}[1] \land \cdots \land x_n \in \Set{X}[n]}$ and is denoted by the cross product $\Set{X}[1] \times \cdots \times \Set{X}[n]$.
+\end{definition}
+
+We are now ready to define the concept of a relation.
+\begin{definition}[Relation]
+Let $\Set{X}[1],\ldots,\Set{X}[n]$ be sets. A \emph{relation} is any subset of $\Set{X}[1] \times \cdots \times \Set{X}[n]$.
+\end{definition}
+%In a relation $\Relation{R} \subseteq \Set{X}[1] \times \cdots \times \Set{X}[n]$, the domain of the relation is each $\Set{X}[j]$, $1 \leq j %\leq n$, a domain of the relation. 
+We denote that a particular tuple $\Tuple{x_1,\ldots,x_n}$ is in a relation $\Relation{R}$ using either notation $\Relation{R}(x_1,\ldots,x_n)$ or $\Tuple{x_1,\ldots,x_n} \in \Set{R}$. If the relation is \emph{binary}, then may denote that two elements $x$ and $y$ are related by $x \Relation{R} y$.
+
+The set of possible relations over $\Set{X}[1],\ldots,\Set{X}[n]$ is the \emph{power set} $\PS{\Set{X}[1] \times \cdots \times \Set{X}[n]}$, which has a cardinality of $2^{\Card{\Set{X}[1]} \cdots \Card{\Set{X}[n]}}$. As a \emph{base case}, we have \emph{unitary} relations, e.g., $\Relation{R} \subseteq \Set{X}$.
+
+Suppose we have a relation $\Relation{R} \subseteq \Set{X} \times \Set{Y} \times \Set{Z}$.
+The \emph{domain} (or type) of the relation is $\Set{X} \times \Set{Y} \times \Set{Z}$.
+We identify the component of a particular tuple in the relation by its \emph{index} position, e.g., the $\nth{2}$ component of $\Tuple{x,y,z}$ is $y$ whose \emph{domain} is $\Set{Y}$.
+
+Tables are a convenient way to represent relations. When a relation $\Relation{R}$ is viewed as a table, there are several important observations to keep in mind:
+\begin{enumerate}
+\item Each row of the table represents a tuple of $\Relation{R}$.
+\item The row order is unimportant.\footnote{That is, given a table representing $\Relation{R}$, if we exchange any two rows the table still represents $\Relation{R}$.}
+\item The multipicity of a row is unimportant.\footnote{That is, given a table representing $\Relation{R}$, if we duplicate any row the table still represents $\Relation{R}$.}
+\item The column order is important.\footnote{The set of values in the $j$-th column correspond to the set of values of the $j$-th component of each tuple.}
+\end{enumerate}
+
+\subsection{Relational operations}
+Relations are sets, therefore relations over identical domains may participate in operations on sets, like unions and differences.
+
+Moreover, due to the structure of relations as subsets of Cartesian products over domains (sets), additional operations can meaningfully be defined.
+
+First, we revisit the Cartesian product. The Cartesian product is associative and commutative \emph{up to isomorphism} only. Thus, when we take the Cartesian product of two relations, we are pairing every \emph{tuple} in one with every \emph{tuple} in the other.
+
+
+
+The \emph{join} operator\footnote{Sometimes denoted the \emph{natural join}.} in relational algebra is the counter-part to the \emph{logical-and} operator in Boolean algebra.
+\begin{definition}
+Suppose $\Relation{A} \subseteq \Set{X}[1] \times \cdots \Set{X}[n]$ and $\Relation{B} \subseteq \Set{X}[k] \times \cdots \times \Set{X}[n+p]$, where $0 < k \leq n$ and $p \geq 0$.\footnote{The order of the domains in a relation may be changed so that the common domains are in the right place.} The \emph{join} of $\Relation{A}$ and $\Relation{B}$ is the relation defined by
+\begin{equation}
+    \Relation{A} \Join \Relation{B} = \SetBuilder{ \Tuple{x_1,\ldots,x_{n+p}} }{ \Tuple{x_1,\ldots,x_n} \in \Relation{A} \land \Tuple{x_k,\ldots,x_{n+p}} \in \Relation{B}}\,.
+\end{equation}
+\end{definition}
+
+The \emph{projection} operator decreases the dimensionality of the relation, i.e., dropping columns from the relation.
+\begin{definition}
+The projection of $\Relation{R} \subseteq \Set{X}[1] \times \cdots \times \Set{X}[n]$ onto $\Set{X}[j_1] \times \cdots \times \Set{X}[j_k]$ where $j_i \leq n$ for $i=1,\ldots,k$, is defined by
+\begin{equation}
+   \Proj_{\Set{X}[j_1] \times \cdots \times \Set{X}[j_k]}\!(\Relation{R}) = \SetBuilder
+   {\Tuple{x_{j_1},\ldots,x_{j_k}}}{\Relation{R}(x_1,\ldots,x_n)}\,.
+\end{equation}
+\end{definition}
+
+The \emph{composition} operator is a function of a join and a projection.
+\begin{definition}
+The composition of $\Relation{A} \subseteq \Set{X}[1] \times \cdots \times \Set{X}[n]$ and $\Relation{B} \subseteq \Set{X}[k] \times \cdots \times \Set{X}[n+p]$ is defined by
+\begin{equation}
+    \Relation{A} \circ \Relation{B} = \Proj_{\Set{X}[1] \times \cdots \Set{X}[k-1] \times \Set{X}[n+1] \times \cdots \times \Set{X}[n+p]}\left(
+        \Relation{A} \Join \Relation{B}
+    \right)\,.
+\end{equation}
+\end{definition}
+
+We illustrate the above results with the following example.
+\begin{example}
+Consider the relations $\Relation{A}$ and $\Relation{B}$ given respectively by \cref{tbl:ex_r1,tbl:ex_r2}. The \emph{join} of relations $\Relation{A}$ and $\Relation{B}$ is given by \cref{tbl:ex_join}. The projection of $\Relation{A} \Join \Relation{B}$ onto $\Set{X}[1] \times \Set{X}[2] \times \Set{X}[5]$ is given by \cref{tbl:ex_proj}.
+
+\begin{table}[h]
+\centering
+\caption{Relations}
+\begin{subtable}[h]{.4\linewidth}
+\centering
+\begin{tabular}{llll}
+\toprule
+$\Set{X}[1]$ & $\Set{X}[2]$ & $\Set{X}[3]$ & $\Set{X}[4]$\\
+\midrule
+$a$ & $b$ & $a$ & $c$\\
+$a$ & $a$ & $a$ & $a$\\
+$a$ & $c$ & $c$ & $d$\\
+\bottomrule
+\end{tabular}
+\caption{$\Relation{A}$}
+\label{tbl:ex_r1}
+\end{subtable}
+\begin{subtable}[h]{.4\linewidth}
+\centering
+\begin{tabular}{lll} 
+\toprule
+$\Set{X}[3]$ & $\Set{X}[4]$ & $\Set{X}[5]$\\
+\midrule
+$a$ & $c$ & $a$\\
+$c$ & $d$ & $b$\\
+$e$ & $f$ & $c$\\
+$c$ & $d$ & $d$\\
+\bottomrule
+\end{tabular}
+\caption{$\Relation{B}$}
+\label{tbl:ex_r2}
+\end{subtable}\\
+\begin{subtable}[h]{.4\linewidth}
+\centering
+\begin{tabular}{lllll}
+\toprule
+$\Set{X}[1]$ & $\Set{X}[2]$ & $\Set{X}[3]$ & $\Set{X}[4]$ & $\Set{X}[5]$\\
+\midrule
+$a$ & $b$ & $a$ & $c$ & $a$\\
+$a$ & $c$ & $c$ & $d$ & $b$\\
+$a$ & $c$ & $c$ & $d$ & $d$\\
+\bottomrule
+\end{tabular}
+\caption{$\Relation{A} \Join \Relation{B}$}
+\label{tbl:ex_join}
+\end{subtable}
+\begin{subtable}[h]{.4\linewidth}
+\centering
+\begin{tabular}{lll}
+\toprule
+$\Set{X}[1]$ & $\Set{X}[2]$ & $\Set{X}[5]$\\
+\midrule
+$a$ & $b$ & $a$\\
+$a$ & $c$ & $b$\\
+$a$ & $c$ & $d$\\
+\bottomrule
+\end{tabular}
+\caption{$\Proj_{\Set{X}[1] \times \Set{X}[2] \times \Set{X}[5]}(\Relation{A} \Join \Relation{B})$.}
+\label{tbl:ex_proj}
+\end{subtable}
+\end{table}
+\end{example}
+% === End of sections/relations.tex ===
+
+% === Content from sections/approx_rel_model.tex ===
+\providecommand{\mainx}{..}
+\section{The \emph{random} approximate relation model}
+A random approximate relation $\ARelation{R}$ is a \emph{random approximate set}\cite{aset} of a relation $\Relation{R}$.
+All the results of random approximate sets apply to random approximate relations.
+
+We say that a \emph{positive} tuple is a \emph{correlation} and a \emph{negative} tuple is a \emph{complementary correlation}.
+For instance, consider the binary relation $\leq \subset \Set{X}^2$ given by $x \leq y \implies \Pair{x}{y} \in \, \leq$.
+The complement of $\leq$, denoted by $>$, is thus given by $x > y \implies \Pair{x}{y} \in >$.
+
+We use $\ARelation{R}$ to make \emph{predictions} about relations modeled by $\Relation{R}$.
+The outcome of a prediction may be classified as a \emph{true correspondence}, \emph{false correspondence}, \emph{true complementary correspondence}, and \emph{false complementary correspondence}.
+
+A \emph{type} is a set and the elements of the set are called the \emph{values} of the type.
+An \emph{abstract data type} is a type and a set of operations on values of the type.
+For example, the \emph{integer} abstract data type is defined by the set of integers and standard operations like addition and subtraction.
+A \emph{data structure} is a particular way of organizing data and may implement one or more abstract data types.
+
+The abstract data type of the approximate relation is given by the following definition.
+\begin{definition}
+\label{def:approx_rel}
+Given a relation $\Relation{R} \subseteq \Set{X}[1] \times \cdots \times 
+\Set{X}[n]$, we denote a random approximate relation of $\Relation{R}$ by $\ARelation{R}$.
+A random approximate relation $\ARelation{R}$ is a member of $\PS{\Set{X}[1] \times 
+\cdots \times \Set{X}[n]}$.
+At a minimum, the relation $\ARelation{R}$ has an \emph{is-relation} operator
+\begin{equation}
+    \ARelation{R} \colon \Set{X}[1] \times \cdots \times \Set{X}[n] \mapsto \{ 
+    0, 1 \}\,.
+\end{equation}
+
+Let a tuple that is selected uniformly at random from the universe $\Set{X}[1] 
+\times \cdots \times \Set{X}[n]$ be denoted by $\Tuple{\RV{X_1}, \ldots, 
+\RV{X_n}}$.
+The relation $\ARelation{R}[\fnrate][\fprate]$ is an approximate relation of $\Relation{R}$ 
+with a false relation rate $\fprate$ and false complementary relation rate 
+$\fnrate$ if the following conditions hold:
+\begin{enumerate}[(i)]
+    \item If $\Tuple{\RV{X_1}, \ldots, \RV{X_n}}$ is in the relation $\Relation{R}$, then it is not in the random approximate relation $\ARelation{R}[\fnrate][\fprate]$ with probability $\fnrate$,
+    \begin{equation}
+        \Prob{\AT{\SetComplement[\Relation{R}]}[\fnrate][\fprate](\RV{X_1}, \cdots, \RV{X_n}) \Given 
+        \Relation{R}(\RV{X_1}, \cdots, \RV{X_n})} = \fnrate\,.
+    \end{equation}
+    
+    \item If $\Tuple{\RV{X_1}, \ldots, \RV{X_n}}$ is in the complementary relation of $\Relation{R}$ then it is in the random approximate relation $\ARelation{R}[\fnrate][\fprate]$ with a probability $\fprate$,
+    \begin{equation}
+        \Prob{\ARelation{R}[\fnrate][\fprate](\RV{X_1}, \cdots, \RV{X_n}) \Given \SetComplement[\Relation{R}](\RV{X_1}, \cdots, \RV{X_n})} = \fprate\,.
+    \end{equation}
+\end{enumerate}
+\end{definition}
+
+\subsection{Probabilistic model}
+\label{sec:prob_model}
+Since \emph{relations} are \emph{sets} of \emph{tuples}, a random approximate relation $\ARelation{R} \subseteq \Set{X}[1] \times \cdots \times \Set{X}[n]$ is a random approximate set\cite{aset} over the universe $\Set{X}[1] \times \cdots \times \Set{X}[n]$
+
+We make the following set of assumptions.
+\begin{assumption}
+	\label{asm:ber_trial}
+	The outcome of an \emph{related} test on any tuple in the complementary set is an independent and identically distributed Bernoulli trial with a mean $\fprate$.
+	The outcome of an \emph{is-not-relation} test on any tuple in the relation is an independent and identically distributed Bernoulli trial with a mean $\fnrate$.
+\end{assumption}
+This assumption is not unrealistic as it is common for implementations of approximate sets to exhibit this assumed behavior, like Bloom filters\cite{bf} and Perfect hash filters\cite{phf}.
+
+The uncertain number of false positives is given by the following theorem.
+\begin{theorem}
+	\label{thm:fpbinom}
+	Given $\n$ negatives, the number of \emph{false positives} in an approximate set with a false positive rate $\fprate$ is a random variable denoted by $\FP_\n$ with a distribution given by
+	\begin{equation}
+		\FP_\n \sim \bindist\!\left(\n, \fprate\right)\,.
+	\end{equation}
+\end{theorem}
+\begin{proof}
+	By \cref{asm:ber_trial}, the uncertain outcome that a negative element \emph{tests} as positive is a Bernoulli trial with a mean $\fprate$. Since there are $\n$ such independent and identically distributed trials, the number of false positives is binomially distributed with a mean $\n \fprate$.
+\end{proof}
+
+The false positive rate $\fprate$ is an \emph{expectation}. However, the false positive rate of a random approximate relation $\ARelation{R}[\fnrate][\fprate]$ is \emph{uncertain}.
+\begin{theorem}
+	\label{thm:fpr}
+	The false positive rate realizes an uncertain value as given by
+	\begin{equation}
+		\FPR_\n = \frac{\FP_\n}{\n}
+	\end{equation}
+	with a support $\SetBuilder{ j / \n}{j = 0,\ldots,\n}$, an expectation $\fprate$, and a variance $\fprate(1-\fprate) / \n$. By the central limit theorem, $\FPR_\n \xrightarrow{d} \normdist\!\left(\fprate, \fprate(1-\fprate) / \n\right)$ as $\n \to \infty$.
+\end{theorem}
+\begin{proof}
+	The expected false positive rate is
+	\begin{equation}
+		\Expect{\FPR_\n} = \Expect{\frac{\FP_\n}{\n}} = \frac{1}{\n}\Expect{\FP_\n} = \fprate
+	\end{equation}
+	and the variance of the false positive rate is
+	\begin{equation}
+		\Var{\FPR_\n} = \Var{\frac{\FP_\n}{\n}} = \frac{1}{\n^2}\Var{\FP} = \frac{\fprate(1-\fprate)}{\n}\,.
+	\end{equation}
+\end{proof}
+By \cref{thm:fpr}, the more negatives there are, the lower the variance.
+% === End of sections/approx_rel_model.tex ===
+
+% === Content from sections/rel_algebra.tex ===
+% ===============================================================================
+% WARNING: MISSING FILE - sections/rel_algebra.tex
+% 
+% The subfile 'sections/rel_algebra.tex' was referenced in main.tex but could not be found.
+% Expected location: sections/rel_algebra.tex
+% 
+% Based on the filename, this section might have contained:
+% - Content related to: sections/rel algebra
+%
+% You may need to:
+% 1. Check if the file was moved or renamed
+% 2. Create the missing file with appropriate content
+% 3. Update the \subfile{} reference in main.tex
+% ===============================================================================
+% === End of sections/rel_algebra.tex ===
+
+% === Content from sections/properties.tex ===
+\providecommand{\mainx}{..}
+\section{Approximate relations with invariants}
+Sometimes, a set must satisfy certain invariants.
+We have already encountered two invariants in the form of \emph{positive} and \emph{negative} random approximate sets in which if $x \in \Set{A}$ then $x \in \PASet{A}$ and if $x \notin \Set{A}$, then $x \notin \NASet{A}$.
+These invariants rely upon the usual partition of the universal set into \emph{positives} and \emph{negatives}, but now we wish to complicate this somewhat.
+
+Sometimes, a relation must satisfy certain predicates, e.g., if a power set has a member $\{a,b\}$ then by definition it \emph{necessarily} has members $\{a\}$, $\{b\}$, and $\EmptySet$.
+In these cases, if we wish the predicates to hold in the random approximate relation model, we must \emph{relax} the model somewhat so that predicates hold.
+In what follows we consider many predicates with suggestive names.
+
+\subsection{Properties of binary relations}
+A binary relation $\Relation{R} \subset \Set{A} \times \Set{A}$ is \emph{reflexive} if and only if $\Pair{a}{a} \in \Relation{R}$ for every $a \in \Set{A}$.
+
+
+
+Transitivity. This is an example of a relation with an invariant that is difficult to satisfy in the random approximation. Show the probability.
+Some types of transitivity can be satisfied, however. For instance, if $a=b$ and $b=c$ then by transitivy $a=c$. This is an equivalence relation and, at the time of construction of a random approximation, we can hash each of these to the same value, i.e., $a$,$b$, and $c$ all hash to $a$.
+
+Subset relations are another invariant that cannot be easily satisfied.
+
+
+Irreflexive.
+
+Connex. Difficult to satisfy.
+
+
+\begin{theorem}
+	A random approximate relation $\ARelation{R}(\tprate,\fprate)$ of a symmetric relation $\Relation{R}$ induces a random approximate symmetric relation $\ARelation{R}[s]\!\left(\tprate,1-(1-\fprate)^2\right)$ if we say that $(x_1,x_2) \in \ARelation{R}[s]$ if $\Pair{x_1}{x_2} \in \ARelation{R}$ or $\Pair{x_2}{x_1} \in \ARelation{R}$.
+\end{theorem}
+\begin{proof}
+	\begin{equation}
+	\Prob{\Pair{x}{y} \in \ARelation{R} \SetUnion \Pair{y}{x} \in \ARelation{R} \Given \Pair{x}{y} \notin \Relation{R}}
+	\end{equation}
+\end{proof}
+
+We may \emph{compose} these binary relations with any of the properties we wish.
+
+
+
+
+
+
+A binary relation is just a set of pairs.
+
+
+A binary relation $\Relation{R} \subset \Set{A} \times \Set{A}$ is \emph{symmetric} if and only if whenever $\Pair{a}{b} \in \Relation{R}$, $\Pair{b}{a} \in \Relation{R}$ for any $a,b \in \Set{A}$.
+
+
+A binary relation $\Relation{R} \subset \Set{A} \times \Set{A}$ is \emph{reflexive} if and only if $\Pair{a}{a} \in \Relation{R}$ for every $a \in \Set{A}$.
+A random approximate symmetric binary relation must also have this property.
+
+
+% do the selection operation
+% 
+A binary relation $\Relation{R} \subset \Set{X} \times \Set{Y}$ is a \emph{functional} relation if $\Selection_{x} \Set{R}$ has a cardinality of $0$ or $1$. If there exists an $x \in \Set{X}$ such that its selection is zero, then the binary relation is a \emph{partial function}.
+
+
+
+\begin{remark}
+Some of these properties may be difficult to guarantee, especially for oblivious relations.
+However, \emph{tractability} is a separate issue from specification and definition.
+\end{remark}
+
+\subsection{Random approximate maps}
+\label{sec:map}
+The set $\Set{A} \mapsto \Set{B}$ is all functions from domain $\Set{A}$ to codomain $\Set{B}$, which may also be denoted by $\Set{B}^{\Set{A}}$ since there are $\Card{\Set{B}}^{\Card{\Set{A}}}$ functions that take input from $\Set{A}$ and \emph{map} it to output in $\Set{B}$.
+However, we consider the set of \emph{partial functions} $\Set{A} \pfun \Set{B}$, which has a cardinality of $(\Card{\Set{B}}+1)^{\Card{\Set{A}}}$.
+
+We restrict our attention to partial functions of \emph{countable domains}, which we refer to as \emph{maps}.
+Suppose we have some map $\PFun{f}$. Then, by definition, any $a \in \Set{A}$ can only map to at most one $b \in \Set{B}$ by $\PFun{f}$, and any random approximate map of $\PFun{f}$, denoted by $\APFun{f}$, must have the same property.
+
+\begin{notation}
+	When we wish to make the true positive and false positive rates explicit, we may denote a random approximate map of $\PFun{f}$ with a true positive rate $\tprate$ and false positive rate $\fprate$ by $\APFun{f}[\tprate][\fprate]$.
+\end{notation}
+Note that if the map $\PFun{f} \colon \Set{A} \mapsto \Set{B}$ is a total function, then $\APFun{f}[\tprate][] \colon \Set{A} \pfun \Set{B} $ is (probably) a map.
+
+Suppose function $\PFun{f}$ has a domain $\Set{A}$ and codomain $\Set{B}$.
+The \emph{domain} of $\PFun{f}$ may be denoted by $\Dom(\PFun{f})$.
+The \emph{codomain} of $\PFun{f}$ may be denoted by $\Codom(\PFun{f})$.
+The \emph{domain of definition} of $\operatorname{f}$ is the subset of the domain for which it is defined and may be denoted by $\Dod(\PFun{f})$.
+The \emph{range} of $\PFun{f}$ is defined as
+\begin{equation}
+\Range(\PFun{f}) \coloneqq
+\SetBuilder{y \in \Codom(\PFun{f})}{(x,y) \in \Dom(\PFun{f}) \times \Codom(\PFun{f}) \land x \in \Dod(\PFun{f})}\,.
+\end{equation}
+
+To address undefined elements in the domain, we implicitly assume the maps are \emph{augmented} in the following two ways:
+\begin{enumerate}
+	\item The \emph{augmented} codomain of $\PFun{f}$ is the sum type (or disjoint union) $\Codom(\PFun{f}) + \{\epsilon\}$, where $\epsilon$ denotes \emph{nothing}.
+	\item The \emph{augmented} function of $\PFun{f}$ maps any element $x \notin \Dod(\PFun{f})$ to $\epsilon$.
+\end{enumerate}
+For simplicity, we implicitly assume the augmented form and keep the notation the same as before.
+
+%In a similar way, the \emph{pre-image} of $\operatorname{f}$ is defined as
+%\begin{equation}
+%\Preimage(\operatorname{f}) =
+%\SetBuilder{x \in \Dom(\operatorname{f})}{(x,y) \in \Dom(\operatorname{f}) \times \Codom(\operatorname{f}) \land y \in \Image(\operatorname{f})}\,.
+%\end{equation}
+
+\begin{remark}
+	Approximation errors of the form $\APFun{f}(x) \neq \PFun{f}(x),x\in \Dod(\operatorname{f})$ and $x \in \Dod(\APFun{f})$, are outside the scope of the random approximate map model.
+	Certainly, these kind of approximation errors may also exist in a map, but the ``approximate'' in random approximate maps deals exclusively with false positives and false negatives on the \emph{domain of definition}, which induces false negatives and false positives on the \emph{range}.
+\end{remark}
+
+The false positive rate is defined as
+\begin{equation}
+\Prob{x \in \Dod(\APFun{f}) \Given x \notin \Dod(\PFun{f})} = \fprate
+\end{equation}
+and the true negative rate is defined as
+\begin{equation}
+\Prob{x \in \Dod(\APFun{f}) \Given x \in \Dod(\PFun{f})} = \tprate\,.
+\end{equation}
+
+With these definitions, we see that random approximate maps have similiar properties to random approximate sets on the domain.
+In particular, the \emph{domain of definition} is the random approximate set $\ASetStyle{\left[\Dod(\PFun{f})\right]}[\tprate][\fprate]$.
+In turn, this induces an approximation of the image of $\PFun{f}$, but the nature of the approximation depends on the way in which the function is defined.
+Two extremes are given by one-to-one and constant functions.
+If $\PFun{f}$ is one-to-one over the domain of definition,, then the image is the random approximate set $\ASetStyle{\left[\Image(\PFun{f})\right]}[\tprate][\fprate]$.
+If $\PFun{f}$ is a constant that maps to $c$, then $c \in \Image(\PFun{f})$ with probability $1 - (1 - \tprate)^d$ where $d$ is the cardinality of the domain.
+
+A primary operation on functions is \emph{composition}, which is a special case of composition of relations.
+The composition of $\PFun{f} \colon \Set{A} \mapsto \Set{B}$ and $\PFun{g} \colon \Set{B} \mapsto \Set{C}$ is the function $\PFun{f} \circ \PFun{g} \colon \Set{A} \mapsto \Set{C}$, defined by
+\begin{equation}
+\left(\PFun{f} \circ \PFun{g}\right)(a) = \SetBuilder{(a,c) \in \Set{A} \times \Set{C}}{(a,b) \in \PFun{f} \land (b,c) \in \PFun{g}}\,.
+\end{equation}
+Since these are partial functions, $a$ may not be defined if either $a \notin \Dom(\PFun{f})$ or $b \notin \Dom(\PFun{g})$.
+
+The composition of random approximate maps is a random approximate map given by the following theorem.
+\begin{theorem}
+	Consider two random approximate maps $\APFun{f}[\tprate_1][\fprate_1] \colon \Set{X} \mapsto \Set{Y}$ and $\APFun{g}[\tprate_2][\fprate_2] \colon \Set{Y} \mapsto \Set{Z}$.
+	The \emph{compositions} $\APFun{f}[\tprate_1][\fprate_1] \circ \APFun{g}[\tprate_2][\fprate_2] \colon \Set{X} \mapsto \Set{Z}$ and $\APFun{g}[\tprate_2][\fprate_2] \circ \APFun{f}[\tprate_1][\fprate_1] \colon \Set{X} \mapsto \Set{Z}$ are random approximate maps with a true positive rate $\tprate_1 \tprate_2$ and a false positive rate in the interval
+	\begin{equation}
+	\IntervalSpan\!\left(\fprate_1 \tprate_2 \SetUnion \tprate_1 \fprate_2 \SetUnion \fprate_1 \fprate_2\right)\,.
+	\end{equation}
+\end{theorem}
+\begin{proof}
+	The composition is defined as
+	\begin{equation}
+	\left(\PFun{f} \circ \PFun{g}\right)(a) = \SetBuilder{(a,c) \in \Set{A} \times \Set{C}}{(a,b) \in \PFun{f} \land (b,c) \in \PFun{g}}\,.
+	\end{equation}
+	Given that $a \in \Dom\!\left(\PFun{f} \circ \PFun{g}\right)$, the probability $a \notin \Dom(\APFun{f} \circ \APFun{g})$ is just the probability that  ...
+\end{proof}
+
+
+
+
+
+Point-wise operations on functions,
+\begin{equation}
+\PFun{f} + \PFun{g} \coloneq \lambda x \mapsto \PFun{f}(x) + \PFun{g}(x)
+\end{equation}
+
+
+
+
+
+
+
+
+We consider relations known as \emph{partial functions} as given by the following definition.
+\begin{definition}
+	A relation
+	\begin{equation}
+	\PFun{f} \subseteq \Set{X}[1] \times \cdots \times \Set{X}[n] \times \Set{Y}[1] \times \cdots \times \Set{Y}[m]\,,
+	\end{equation}
+	is a \emph{function} if $\Card{\Proj_{\Set{X}[1] \times \cdots \times \Set{X}[n]}(\PFun{f})} = \Card{\PFun{f}}$ and is a \emph{partial} function if, additionally, $\Card{\Proj_{\Set{X}[1] \times \cdots \times \Set{X}[n]}(\PFun{f})} < \Card{\Set{X}[1] \times \cdots \times \Set{X}[n]}$.
+	
+	We say that each tuple $\Tuple{x_1,\ldots,x_n}$ in the relation \emph{maps} to a tuple $\Tuple{y_1,\ldots,y_m} \in \Set{Y}[1] \times \cdots \times \Set{Y}[m]$. To make the mapping explicit, we denote the partial function by
+	\begin{equation}
+	\PFun{f} \colon \Set{X}[1] \times \cdots \times \Set{X}[n] \mapsto \Set{Y}[1] \times \cdots \times \Set{Y}[m]\,.
+	\end{equation}
+\end{definition}
+A partial function represents \emph{many}-to-\emph{one} relationships. Consequently, denoting a tuple
+\begin{equation}
+%\Tuple{x_1,\ldots,x_n} \in \Set{X}[1] \times \cdots \times \Set{X}[n]
+\end{equation}
+by its \emph{mapped} value $\Tuple{y_1,\ldots,y_m} = \PFun{f}(x_1,\ldots,x_n) \in \Set{Y}[1] \times \cdots \times \Set{Y}[m]$ is ambiguous unless the partial function is a bijection (one-to-one).
+
+In the finite case, the number of partial functions of the type $\PFun{f} \colon \Set{X}[1] \times \cdots \times \Set{X}[n] \mapsto \Set{Y}[1] \times \cdots \times \Set{Y}[m]$ is
+\begin{equation}
+\left(\Card{\Set{Y}} + 1\right)^{\Card{\Set{X}}}\,.
+\end{equation}
+
+The projection $\Proj_{\Set{X}[1] \times \cdots \times \Set{X}[n]}(\PFun{f})$ is also called the \emph{domain} of $\PFun{f}$, denoted by $\Dom(\PFun{f})$. The projection $\Proj_{\Set{Y}[1] \times \cdots \times \Set{Y}[m]}(\PFun{f})$ is also called the \emph{image} of $\PFun{f}$, denoted by $\Image(\PFun{f})$. The \emph{range} of $\PFun{f}$ is denoted by $\Range(\PFun{f}) = \Set{Y}[1] \times \cdots \times \Set{Y}[m]$.
+
+A \emph{table} is a convenient way to represent a partial function, where each tuple $\Tuple{x} \in \Dom(\PFun{f})$ is associated with $\PFun{f}(\Tuple{x}) \in \Image(\PFun{f})$. The column for the keys consists of \emph{unique} values from $\Set{X}$ and column for the values consists of (possibly repeated) values from $\Set{Y}$.
+\begin{example}
+	Suppose we have a partial function $\PFun{f} \colon \Set{Z}[1] \times \Set{Z}[2] \mapsto \Set{Q}$ defined by the table below.
+	\begin{table}[h]
+		\centering
+		\label{tbl:partialfunc}
+		\begin{tabular}{l l l} 
+			\toprule
+			$\Set{Z}[1]$ & $\Set{Z}[2]$ & $\Set{Q}$\\
+			\midrule
+			$1$ & $5$ & $\frac{1}{5}$\\
+			$2$ & $10$ & $\frac{1}{5}$\\
+			$10$ & $2$ & $5$\\
+			\bottomrule
+		\end{tabular}
+		\caption*{$\Set{Z}[1] \times \Set{Z}[2] \mapsto \Set{Q}$.}
+	\end{table}
+	We see that $\Dom(\PFun{f}) = \{\Pair{1}{5},\Pair{2}{10},\Pair{10}{2}\}$ and $\Image(\PFun{f}) = \left\{\frac{1}{5},5\right\}$. As a partial function, we may umambiguously denote any value in the \nth{3} position of the relation by the unique combination of tuple values in the \nth{1} and \nth{2} positions, i.e., $\PFun{f}(10,2)=5$.
+\end{example}
+
+\emph{Maps} and \emph{partial functions} are synonymous, but the term \emph{map} is more common in the context of a partial function of order $2$ where the elements of the domain are denoted \emph{keys} and the elements of the range may be denoted \emph{values}.
+
+
+
+
+
+
+
+
+\subsubsection{Abstract data type}
+A \emph{type} is a set and the elements of the set are called the \emph{values} of the type. An \emph{abstract data type} is a type and a set of operations on values of the type. For example, the \emph{integer} abstract data type is defined by the set of integers and standard operations like addition and subtraction. A \emph{data structure} is a particular way of organizing data and may implement one or more abstract data types. An \emph{immutable} data structure has static state; once constructed, its state does not change until it is destroyed.
+
+The abstract data type of the \emph{immutable} approximate set is given by the following definition.
+\begin{definition}
+	\label{def:approx_pfun}
+	A relation $\APFun{f} = \Set{X}[1] \times \cdots \times \Set{X}[n] \times \Set{Y}[1] \times \cdots \times \Set{Y}[m]$ is an \emph{approximate partial function} of $\PFun{f} \colon \Set{X}[1] \times \cdots \times \Set{X}[n] \mapsto \Set{Y}[1] \times \cdots \times \Set{Y}[m]$ if the following conditions hold:
+	
+	Let a random tuple that is selected uniformly at random from the universe $\Set{X}[1] \times \cdots \times \Set{X}[n]$ be denoted by $\Tuple{\RV{X}} = \Tuple{\RV{X_1},\cdots,\RV{X_n}}$. The partial function $\APFun{f}$ is an approximate partial function of $\PFun{f}$ with a false domain rate $\fprate$ and false complementary domain rate $\fnrate$ if the following conditions hold:
+	\begin{enumerate}[(i)]
+		\item If $\Tuple{\RV{X}}$ is in the domain of $\PFun{f}$, it is not in the domain of $\APFun{f}$ with a probability $\fnrate$,
+		\begin{equation}
+		\Prob{\Tuple{\RV{X}} \notin \Dom(\APFun{f}) \Given \Tuple{\RV{X}} \in \Dom(\PFun{f})} = \fnrate\,.
+		\end{equation}    
+		\item If $\Tuple{\RV{X}}$ is \emph{not} in the domain of $\PFun{f}$, it is in the domain of $\APFun{f}$ with a probability $\fprate$,
+		\begin{equation}
+		\Prob{\Tuple{\RV{X}} \in \Dom(\APFun{f}) \Given \Tuple{\RV{X}} \notin \Dom(\APFun{f})} = \fprate\,.
+		\end{equation}
+	\end{enumerate}
+\end{definition}
+
+\subsubsection{Composition}
+
+Composition...from relational stuff.
+
+\subsubsection{Currying}
+
+Currying...
+% === End of sections/properties.tex ===
+
+% === Content from sections/predicates.tex ===
+\providecommand{\mainx}{..}
+
+\newcommand{\tsr}{\gamma}
+
+\section{Binary relations: subset, equality}
+The \emph{subset} relation has a predicate
+\begin{equation}
+	\subseteq \colon \PS{\Set{U}} \times \PS{\Set{U}} \mapsto \{0,1\}
+\end{equation}
+defined as
+\begin{equation}
+	\Set{A} \subseteq \Set{B} = \prod_{x \in \Set{A}} 
+	\SetIndicator{\Set{B}}(x)\,.
+\end{equation}
+Suppose $\Set{A} \subseteq \Set{B}$.
+If we substitute $\Set{A}$ with $\ASet{A}[\tprate_1][\fprate_1]$ and $\Set{B}$ with $\ASet{B}[\tprate_2][\fprate_2]$, the result is a Boolean random variable defined as
+\begin{equation}
+	\RV{Y} = \prod_{x \in \ASet{A}} \SetIndicator{\ASet{B}}(x)\,,
+\end{equation}
+which is \emph{Bernoulli} distributed, i.e.,
+\begin{equation}
+	\RV{Y} \sim \berdist(p)
+\end{equation}
+where
+\begin{equation}
+	p = \left(1 - \tprate_1 \fnrate_2 \right)^{\Card{\Set{A}}}
+\left(1 - \fprate_1\fnrate_2\right)^{\Card{\Set{B}} - \Card{\Set{A}}}
+\left(1 - \fprate_1 \tnrate_2\right)^{\Card{\Set{U}} - 
+	\Card{\Set{B}}}\,.
+\end{equation}
+By definition, the probability that the Bernoulli trial ``succeeds'' is $p$, thus
+\begin{equation}
+	\Prob{\prod_{x \in \ASet{A}} \SetIndicator{\Set{B}}(x) = 1} = p\,.
+\end{equation}
+Recall in \cref{sec:powerset} we had shown that the power set of a random approximate set is a \emph{constrained} random approximate set with a member-of relation on the subsets of the universal set, i.e., a probabilistic subset relation is induced.
+Here, we show that, more generally, the probabilistic subset relation is induced by the probabilistic member-of relation.
+
+However, the induced probabilistic subset relation is not trivially defined and is a function of many other characteristics, i.e., cardinality of each of the involved sets.
+
+The probabilistic \emph{member-of} relation in the random approximate set model \emph{induces} other probabilistic relations. For instance, we claim without proof that if $\Set{A} \subseteq \Set{B}$, then the subset relation $\ASet{X}(\tprate_1,\fprate_1) \subseteq \ASet{Y}(\tprate_2,\fprate_2)$ holds with a probability given by
+\begin{equation}
+\left(1 - \tprate_1 \fnrate_2 \right)^{\Card{\Set{A}}}
+\left(1 - \fprate_1\fnrate_2\right)^{\Card{\Set{B}} - \Card{\Set{A}}}
+\left(1 - \fprate_1 \tnrate_2\right)^{\Card{\Set{U}} - 
+	\Card{\Set{B}}}
+\end{equation}
+and, similarly, two independent observations of a random approximate set of $\Set{A}$ hold the equality relation with a probability given by
+\begin{equation}
+(\tprate_1 \tprate_2 + \fnrate_1 \fnrate_2 - \tprate_1 \tprate_2 \fnrate_1 \fnrate_2)^{\Card{\Set{A}}} (\fprate_1 \fprate_2 + \tnrate_1 \tnrate_2 - \fprate_1 \fprate_2 \tnrate_1 \tnrate_2)^{\Card{\Set{U}} - \Card{\Set{A}}}
+\end{equation}
+where $\fnrate_2 = 1 - \tprate_2$ and $\tnrate_2 = 1 - \fprate_2$.
+
+Relations like equality and subset have many structural properties, like transitivity, e.g., if $\Set{A} \subseteq \Set{B}$ and $\Set{B} \subseteq \Set{C}$, then $\Set{A} \subseteq \Set{C}$.
+In the random approximate set model, such relationships \emph{continue} to hold with some negligible probability when compared to the false positive and false negative rates of the member-of relations.
+
+In \cref{sec:bool_search}, we are \emph{primarily} interested in two particular relations.
+\begin{theorem}[True subset rate]
+	Given a non-random approximate set $\Set{A}$ that is a subset of $\Set{B}$, $\Set{A}$ is a subset of a random approximate set $\ASet{B}(\tprate,\,\cdot\,)$ with probability $\tprate^k$, $k=\Card{\Set{A}}$.
+\end{theorem}
+\begin{proof}
+	?
+\end{proof}
+
+If $\fprate_1 > 0$ (and $\tnrate > 0$), as $\Card{\Set{U}} \to \infty$ the conditional probability
+\begin{equation}
+\Prob{\ASet{A}(\tprate_1,\fprate_1) \subseteq \ASet{B}(\tprate_2,\fprate_2) \Given \Set{A} \subseteq \Set{B}}
+\end{equation}
+goes to $0$.
+
+The conditional probability
+\begin{equation}
+\Prob{\ASet{X}(\tprate_1,\fprate_1) \subseteq \PASet{Y}(\fprate_2) \Given \Set{X} \subseteq \Set{Y}}
+\end{equation}
+is given by
+\begin{equation}
+\left(1 - \fprate_1(1 - \fprate_2)\right)^{\Card{\Set{U}} - \Card{\Set{Y}}}\,.
+\end{equation}
+
+
+\begin{equation}
+\Prob{\PASet{X}(\fprate_1) = \PASet{Y}(\fprate_2) \Given \Set{X} = \Set{Y}}
+\end{equation}
+is given by
+\begin{equation}
+\left[\left(1 - \fprate_1 + \fprate_2^2\right)\left(1 - \fprate_2 + \fprate_1^2\right)\right]^{\Card{\Set{U}} - \Card{\Set{X}}}\,.
+\end{equation}
+
+If $\fprate = \fprate_1 = \fprate_2$, then the above simplifies to
+\begin{equation}
+\left(1 - \fprate + \fprate^2\right)^{2 (\Card{\Set{U}} - \Card{\Set{X}})}\,.
+\end{equation}
+
+
+%If $\Card{\Set{Y}} \ll \Card{\Set{U}}$, then for any non-zero false positive 
+%rate, the rate grows as $\mathcal{O}\left(1 - \fprate_1 + \fprate_1 
+%\fprate_2\right)^\Card{\Set{U}}$.
+
+
+%\begin{corollary}
+%    Given a universal set $\Set{U}$ and $\Set{X} \subseteq \Set{Y}$,  
+%    $\PASet{X}(\fprate_1) \subseteq \PASet{Y}(\fprate_2)$ with probability
+%    \begin{equation}
+%    \left(1 - \fprate_1(1 - \fprate_2)\right)^{\Card{\Set{U}} - \Card{\Set{Y}}}
+%    \end{equation}
+%    and $\NASet{X}(\tprate_1) \subseteq \NASet{Y}(\tprate_2)$ with probability
+%    \begin{equation}
+%    \left(1 - \tprate_1(1 - \tprate_2)\right)^{\Card{\Set{X}}}\,.
+%    \end{equation}
+%\end{corollary}
+
+%\begin{corollary}
+%Given a universal set $\Set{U}$ and $\Set{X} \subseteq \Set{Y}$, $\Set{X} 
+%\subseteq \ASet{Y}(\fprate,\tprate)$ with probability 
+%$\tprate^{\Card{\Set{X}}}$.
+%\end{corollary}
+%\begin{proof}
+%Since $\Set{X}$ is not an approximate set, its true positive rate is unity and 
+%its false posiive rate is zero. Making these substitutions into \cref{??} 
+%yields the result.
+%\end{proof}
+
+
+
+%TODO: move the interval material to this section.
+%Now also do a treatment on intervals so that we don't need to a priori know 
+%%%the 
+%size of the sets, their intersections, and so on. This will mean moving some 
+%%%of 
+%the interval stuff here, which is fine.%
+
+
+%\begin{theorem}
+%Given a universal set $\Set{U}$ and $\Set{X} \not\subset \Set{Y}$, 
+%$\ASet{X}(\tprate_x,\fprate_x) \subset \ASet{Y}(\tprate_y,\fprate_y)$ 
+%with a probability in the interval
+%\begin{equation}
+%    [\fprate^k, \fprate \tprate^{k-1}]\,,
+%\end{equation}
+%where $k = \Card{\Set{X}}$.
+%\end{theorem}
+%\begin{proof}
+%TODO: maybe move this to after the induced random approximate sets, since that 
+%provides a general way to do this sort of proof.
+%\end{proof}
+
+Suppose set $\Set{X} = \{x_{j_1},\ldots,x_{j_k}\}$. The false 
+subset rate is given by the probability
+\begin{equation}
+\fprate_k = \Prob{\Set{X} \subseteq \ASet{S} \Given 
+	\Set{X} \not\subseteq \Set{S}}\,,
+\end{equation}
+which may be rewritten as
+\begin{equation}
+\fprate_k = \Prob{\RV{B_{j_1}} \cap \cdots \cap \RV{B_{j_k}}
+	\Given \neg \left(\RV{A_{j_1}} \cap \cdots \cap 
+	\RV{A_{j_k}}\right)}\,.
+\end{equation}
+By \cref{?}, $\RV{B_1},\ldots,\RV{B_u}$ are statistically 
+independent. Making this simplification results in
+\begin{equation}
+\fprate_k = \prod_{p=1}^{k} \Prob{\RV{B_{j_p}} \Given 
+	\SetComplement[\RV{A_{j_1}} \cap \cdots \cap \RV{A_{j_k}}]}\,.
+\end{equation}
+
+Proof of theorem~\ref{thm:subset}.
+By \cref{thm:true_subset_rate},
+\begin{equation}
+\tsr = \Prob{\ASet{X} \subseteq \ASet{Y} \Given \Set{X} \subseteq 
+	\Set{Y}}\,.
+\end{equation}
+
+Note that in the Boolean vector representation, $\Set{X}$ is a subset of $\Set{Y}$ if $x_j \implies y_j$, i.e., if $x_j$ then $y_j$, otherwise $y_j$ can 
+be either true or false.
+An equivalent expression for $x_j \implies y_j$ is $\neg (x_j \land \neg y_j)$.
+	
+Switching to the Boolean vector representation, we may rewrite $\gamma$ as
+\begin{equation}
+\tsr = \Prob{\bigcap_{j=1}^{u} \neg \left(\AVecComp{X}[j] \land \neg 
+	\AVecComp{Y}[j]\right) \Given E}
+\end{equation}
+where $E$ is the set of Boolean vectors satisfying $x_k \implies y_k$ for $k=1,\ldots,u$.
+
+By the axioms of the approximate set model, each of these events are independent, in which case the probability of the intersection of the events is equal to the product of the probabilities of the events,
+\begin{align}
+\tsr
+&= \prod_{j=1}^{u} \Prob{\neg\left(\AVecComp{X}[j] 
+	\land \neg \AVecComp{Y}[j]\right) \Given E}\\
+&= \prod_{j=1}^{u} \left(1 - \Prob{\AVecComp{X}[j] 
+	\land \neg \AVecComp{Y}[j] \Given E}\right)\,.
+\end{align}
+By the axioms of the approximate set model, $\AVecComp{Y}[j]$ is only dependent on $y_j$ and $\AVecComp{X}[j]$ is only dependent on $x_j$.
+Thus, we may rewrite 
+$\tsr$ as
+\begin{equation}
+\tsr = \prod_{j=1}^{u}\left(
+1 - \Prob{\AVecComp{X}[j] \Given x_j}
+\Prob{\neg \AVecComp{Y}[j] \Given y_j}\right)\,,
+\end{equation}
+where $x_j$ and $y_j$ are Boolean values satisying $E$.
+
+Since $\Set{X} \subseteq \Set{Y}$, an exhaustive, mutually exclusive set of sets is given by $\Set{X}$, $\SetDiff[\Set{Y}][\Set{X}]$, and $\SetComplement[\Set{Y}]$.
+
+Let set $\Set{I}$ index the elements in $\Set{X}$, set $\Set{J}$ index the elements in $\SetDiff[\Set{Y}][\Set{X}]$, and set $\Set{K}$ index the elements in $\SetComplement[\Set{Y}]$.
+
+The elements indexed by $\Set{I}$ are members of $\Set{X}$ and $\Set{Y}$, i.e., $x_i$ and $y_i$ are both true.
+
+The elements indexed by $\Set{J}$ are members of $\Set{Y}$ but not $\Set{X}$, i.e., $x_j$ is false and $y_j$ is true.
+
+The elements indexed by $\Set{K}$ are members of neither, i.e., $x_j$ and $y_j$ are false.
+
+%%% THIS IS NOT FINISHED
+\begin{equation}
+\begin{split}
+\tsr =
+&\prod_{i \in \Set{I}}
+\left(1-\Prob{\AVecComp{X}[i] \Given x_i}
+\Prob{\neg \AVecComp{Y}[i] \Given y_i}\right)
+\prod_{j \in \Set{J}}
+\left(1-\Prob{\AVecComp{X}[j] \Given \neg x_j}
+\Prob{\neg \AVecComp{Y}[j] \Given y_j}\right)\\
+&\qquad \prod_{k \in \Set{K}}
+\left(1-\Prob{\AVecComp{X}[k] \Given \neg x_k}
+\Prob{\neg \AVecComp{Y}[k] \Given \neg y_k}\right)\,.  
+\end{split}    
+\end{equation}
+
+
+
+\begin{equation}
+\tsr =
+\prod_{i \in \Set{I}}
+\left(1 - \tprate_1
+(1 - \tprate_2)\right)
+\prod_{j \in \Set{J}}
+\left(1 - \fprate_1
+(1 - \tprate_2)\right)
+\prod_{k \in \Set{K}}
+\left(1 - \fprate_1
+(1 - \fprate_2)\right)
+\end{equation}
+
+
+
+\begin{equation}
+\tsr =
+\prod_{i \in \Set{I}}
+\left(1 - \tprate_1
+(1 - \tprate_2)\right)
+\prod_{j \in \Set{J}}
+\left(1 - \fprate_1
+(1 - \tprate_2)\right)
+\prod_{k \in \Set{K}}
+\left(1 - \fprate_1
+(1 - \fprate_2)\right)
+\end{equation}
+
+
+
+By \cref{dummyrefs}, $\Prob{x \in \ASet{X} \Given x \in \Set{X}} = \tprate_1$, 
+$\Prob{x \in \ASet{X} \Given x \notin \Set{X}} = \fprate_1$, $\Prob{x \in 
+	\ASet{Y} \Given x \in \Set{Y}} = \tprate_2$, and $\Prob{x \in \ASet{Y} \Given x 
+	\notin \Set{Y}} = \fprate_1$. Making these substitutions yields the result
+\begin{equation}
+\begin{split}
+\tsr =
+&\prod_{x \in \Set{V}[1]}
+\left(1 -
+\tprate_1
+(1 - \tprate_2)
+\right)\\
+&\prod_{x \in \Set{V}[2]}
+\left(1 -
+\fprate_1
+(1 - \tprate_2)
+\right)\\
+&\prod_{x \in \Set{V}[3]}
+\left(1 -
+\fprate_1
+(1 - \fprate_2)
+\right)\,.  
+\end{split}    
+\end{equation}
+Each of the above products is just repeated multiplication and thus may be 
+replaced by powers,
+\begin{equation}
+\begin{split}
+\tsr &=
+\left(1 - \tprate_1(1 - \tprate_2)\right)^{\Card{\Set{V}[1]}}\\
+&\qquad \left(1 - \fprate_1(1 - \tprate_2)\right)^{\Card{\Set{V}[2]}}
+\left(1 - \fprate_1(1 - \fprate_2)\right)^{\Card{\Set{V}[3]}}\,.  
+\end{split}
+\end{equation}
+% === End of sections/predicates.tex ===
+
+% === Content from sections/test.tex ===
+% ===============================================================================
+% WARNING: MISSING FILE - sections/test.tex
+% 
+% The subfile 'sections/test.tex' was referenced in main.tex but could not be found.
+% Expected location: sections/test.tex
+% 
+% Based on the filename, this section might have contained:
+% - Content related to: sections/test
+%
+% You may need to:
+% 1. Check if the file was moved or renamed
+% 2. Create the missing file with appropriate content
+% 3. Update the \subfile{} reference in main.tex
+% ===============================================================================
+% === End of sections/test.tex ===
+
+% === Content from sections/unused/optimality.tex ===
+% ===============================================================================
+% WARNING: MISSING FILE - sections/unused/optimality.tex
+% 
+% The subfile 'sections/unused/optimality.tex' was referenced in main.tex but could not be found.
+% Expected location: sections/unused/optimality.tex
+% 
+% Based on the filename, this section might have contained:
+% - Content related to: sections/unused/optimality
+%
+% You may need to:
+% 1. Check if the file was moved or renamed
+% 2. Create the missing file with appropriate content
+% 3. Update the \subfile{} reference in main.tex
+% ===============================================================================
+% === End of sections/unused/optimality.tex ===
+
+% === Content from sections/unused/oblivious_rel_model.tex ===
+% ===============================================================================
+% WARNING: MISSING FILE - sections/unused/oblivious_rel_model.tex
+% 
+% The subfile 'sections/unused/oblivious_rel_model.tex' was referenced in main.tex but could not be found.
+% Expected location: sections/unused/oblivious_rel_model.tex
+% 
+% Based on the filename, this section might have contained:
+% - Content related to: sections/unused/oblivious rel model
+%
+% You may need to:
+% 1. Check if the file was moved or renamed
+% 2. Create the missing file with appropriate content
+% 3. Update the \subfile{} reference in main.tex
+% ===============================================================================
+% === End of sections/unused/oblivious_rel_model.tex ===
+
+% === Content from sections/appendix.tex ===
+\begin{comment}
+% ===============================================================================
+% WARNING: MISSING FILE - sections/appendix.tex
+% 
+% The subfile 'sections/appendix.tex' was referenced in main.tex but could not be found.
+% Expected location: sections/appendix.tex
+% 
+% Based on the filename, this section might have contained:
+% - Appendix material
+%
+% You may need to:
+% 1. Check if the file was moved or renamed
+% 2. Create the missing file with appropriate content
+% 3. Update the \subfile{} reference in main.tex
+% ===============================================================================
+\end{comment}
+% === End of sections/appendix.tex ===
+
+\printglossary
+\bibliography{references}
+\end{document}

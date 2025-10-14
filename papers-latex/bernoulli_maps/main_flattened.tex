@@ -1,0 +1,2403 @@
+%\documentclass[final,journal,compsoc,hidelinks]{article}
+\documentclass[11pt,final,hidelinks]{article}
+\usepackage{lmodern}
+\usepackage[nohints]{minitoc}
+\usepackage[margin=1in]{geometry}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\graphicspath{{img/}}
+\usepackage[activate={true,nocompatibility},final,tracking=true,kerning=true,spacing=true,factor=1100,stretch=10,shrink=10]{microtype}
+\microtypecontext{spacing=nonfrench}
+\usepackage[noend]{algorithm2e}
+\usepackage{caption}
+\usepackage{bbm}
+\usepackage{mathtools}
+\usepackage{commath}
+\usepackage{enumerate}
+\usepackage{amsmath}
+\usepackage{subfiles}
+\usepackage{booktabs}
+%\usepackage[xindy,toc,acronyms,symbols]{glossaries}
+\usepackage{latexsym}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{wasysym}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usepackage{tikzscale}
+\usepackage[square,numbers]{natbib}
+\bibliographystyle{plainnat}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{cleveref}
+\usepackage[super]{nth}
+\usepackage{siunitx}
+\usepackage[section]{placeins}
+%\usepackage{amssymb} % duplicate
+%\usepackage{listings}
+\lstset{language=C++,basicstyle=\ttfamily\small,breaklines=true} % requires shell-escape
+\usepackage{multicol}
+\usepackage{stmaryrd}
+
+% ===== BEGIN CUSTOM MACRO DEFINITIONS FROM .sty FILES =====
+
+% From functionnotation.sty
+%
+%
+%
+%
+%   \BitString      B^* denotes arbitrary length bit strings
+%   \BitString[n]   B^n denotes bit strings of size n
+%   \BitSet         set B denotes {0,1}
+%
+%
+\NeedsTeXFormat{LaTeX2e}[1994/06/01]
+\ProvidesPackage{functionnotation}[2018/01/01 alex towell's function notation]
+
+\RequirePackage{xparse}
+\RequirePackage{bm}
+\RequirePackage{bbm}
+\RequirePackage{amssymb}
+\RequirePackage{mathtools}
+\RequirePackage{listings}
+
+\providecommand{\Given}{\vert}
+
+\DeclarePairedDelimiterX\FuncArgs[1]{(}{)}{\renewcommand\Given{\nonscript\:\delimsize\vert\nonscript\:\mathopen{}}#1}
+
+\DeclarePairedDelimiterX\FuncArgsB[1]{[}{]}{\renewcommand\Given{\nonscript\:\delimsize\vert\nonscript\:\mathopen{}}#1}
+
+\NewDocumentCommand{\FunctionFamily}{mmo}{%
+    \IfNoValueTF{#3}
+        {\operatorname{#1}\FuncArgs*{#2}}
+        {\operatorname{#1}_{#3}\mkern-1mu\FuncArgs*{#2}}
+}
+
+\NewDocumentCommand{\Bracket}{mmo}{%
+    \IfNoValueTF{#3}
+        {\operatorname{#1}\FuncArgsB*{#2}}
+        {\operatorname{#1}_{#3}\FuncArgsB*{#2}}
+}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\newcommand{\cat}{\mathbin{+\mkern-10mu+}}
+
+\lstdefinelanguage{lambdacalc}{%
+  morekeywords={%
+    if,then,else,fix % keywords go here
+  },%
+  morekeywords={[2]int},   % types go here
+  otherkeywords={:}, % operators go here
+  literate={% replace strings with symbols
+    {->}{{$\to$}}{2}
+    {lambda}{{$\lambda$}}{1}
+  },
+  basicstyle={\sffamily},
+  keywordstyle={\bfseries},
+  keywordstyle={[2]\itshape}, % style for types
+  keepspaces,
+  mathescape % optional
+}[keywords,comments,strings]%
+
+% From setnotation.sty
+%   \BitString      B^* denotes arbitrary length bit strings
+%   \BitString[n]   B^n denotes bit strings of size n
+%   \BitSet         set B denotes {0,1}
+
+\NeedsTeXFormat{LaTeX2e}[1994/06/01]
+\ProvidesPackage{setnotation}[2018/01/01 alex towell's set notation (style) for his various papers]
+
+\RequirePackage{xparse}
+\RequirePackage{bm}
+\RequirePackage{bbm}
+\RequirePackage{amssymb}
+\RequirePackage{mathtools}
+%\RequirePackage{alexmisc}
+%\RequirePackage{setnotation}  % Removed circular dependency
+\RequirePackage{algorithm2e}
+
+\newcommand{\blackboardsetstyle}[1]{\mathbbm{#1}}
+\newcommand{\blackboardsetsubstyle}[1]{\pmb{#1}}
+\newcommand{\blackboardsetsupstyle}[1]{\pmb{#1}}
+
+\newcommand{\boldsetstyle}[1]{\pmb{\mathsf{#1}}}
+\newcommand{\boldsetsubstyle}[1]{\pmb{#1}}
+\newcommand{\boldsetsupstyle}[1]{\pmb{#1}}
+
+\newcommand{\fancysetstyle}[1]{\mathcal{#1}}
+\newcommand{\fancysetsubstyle}[1]{#1}
+\newcommand{\fancysetsupstyle}[1]{#1}
+
+\newcommand{\plainsetstyle}[1]{\mathsf{#1}}
+\newcommand{\plainsetsubstyle}[1]{\mathsf{#1}}
+\newcommand{\plainsetsupstyle}[1]{\mathsf{#1}}
+
+\newcommand{\setstyle}[1]{\plainsetstyle{#1}}
+\newcommand{\setsubstyle}[1]{\plainsetsubstyle{#1}}
+\newcommand{\setsupstyle}[1]{\plainsetsupstyle{#1}}
+
+\DeclareOption{blackboard}
+{
+    \renewcommand{\setstyle}[1]{\blackboardsetstyle{#1}}
+    \renewcommand{\setsubstyle}[1]{\blackboardsetsubstyle{#1}}
+    \renewcommand{\setsupstyle}[1]{\blackboardsetsupstyle{#1}}
+}
+\DeclareOption{bold}
+{
+    \renewcommand{\setstyle}[1]{\boldsetstyle{#1}}
+    \renewcommand{\setsubstyle}[1]{\boldsetsubstyle{#1}}
+    \renewcommand{\setsupstyle}[1]{\boldsetsupstyle{#1}}
+}
+\DeclareOption{fancy}
+{
+    \renewcommand{\setstyle}[1]{\fancysetstyle{#1}}
+    \renewcommand{\setsubstyle}[1]{\fancysetsubstyle{#1}}
+    \renewcommand{\setsupstyle}[1]{\fancysetsupstyle{#1}}
+}
+\DeclareOption{plain}
+{
+    \renewcommand{\setstyle}[1]{\plainsetstyle{#1}}
+    \renewcommand{\setsubstyle}[1]{\plainsetsubstyle{#1}}
+    \renewcommand{\setsupstyle}[1]{\plainsetsupstyle{#1}}
+}
+
+\ExecuteOptions{plain}
+\ProcessOptions\relax
+
+\NewDocumentCommand{\Set}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {\setstyle{#1}}
+            {\setstyle{#1}_{\setsubstyle{#2}}}
+    }
+    {\setstyle{#1}_{\setsubstyle{#2}}^{\setsupstyle{#3}}}
+}
+
+\NewDocumentCommand{\FancySet}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {\fancysetstyle{#1}}
+            {\fancysetstyle{#1}_{\fancysetsubstyle{#2}}}
+    }
+    {\fancysetstyle{#1}_{\fancysetsubstyle{#2}}^{\fancysetsupstyle{#3}}}
+}
+
+\NewDocumentCommand{\BlackboardSet}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {\blackboardsetstyle{#1}}
+            {\blackboardsetstyle{#1}_{\blackboardsetsubstyle{#2}}}
+    }
+    {\blackboardsetstyle{#1}_{\blackboardsetsubstyle{#2}}^{\blackboardsetsupstyle{#3}}}
+}
+
+\NewDocumentCommand{\PlainSet}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {\plainsetstyle{#1}}
+            {\plainsetstyle{#1}_{\plainsetsubstyle{#2}}}
+    }
+    {\plainsetstyle{#1}_{\plainsetsubstyle{#2}}^{\plainsetsupstyle{#3}}}
+}
+
+\NewDocumentCommand{\BoldSet}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {\boldsetstyle{#1}}
+            {\boldsetstyle{#1}_{\boldsetsubstyle{#2}}}
+    }
+    {\boldsetstyle{#1}_{\boldsetsubstyle{#2}}^{\boldsetsupstyle{#3}}}
+}
+
+% various set-theoretic operations
+\NewDocumentCommand{\SetContains}{oo}{%
+    \IfNoValueTF{#1}
+        {
+        \IfNoValueTF{#2}
+            {\in}
+            {\in #2}
+        }
+        {
+        \IfNoValueTF{#2}
+            {#1 \in}
+            {#1 \in #2}
+        }
+}
+
+\NewDocumentCommand{\SetNotContains}{oo}{%
+    \IfNoValueTF{#1}
+        {
+        \IfNoValueTF{#2}
+            {\notin}
+            {\notin #2}
+        }
+        {
+        \IfNoValueTF{#2}
+            {#1 \notin}
+            {#1 \notin #2}
+        }
+}
+
+\NewDocumentCommand{\SetUnion}{oo}{%
+    \IfNoValueTF{#1}
+        {
+        \IfNoValueTF{#2}
+            {\cup}
+            {\cup #2}
+        }
+        {
+        \IfNoValueTF{#2}
+            {#1 \cup}
+            {#1 \cup #2}
+        }
+}
+
+\NewDocumentCommand{\SetComplement}{o}{%
+    \IfNoValueTF{#1}
+        {\overline{\phantom{\Set{S}}}}
+        {\overline{#1}}
+}
+
+\NewDocumentCommand{\SetIntersection}{oo}{%
+    \IfNoValueTF{#1}
+        {
+        \IfNoValueTF{#2}
+            {\cap}
+            {\cap #2}
+        }
+        {
+        \IfNoValueTF{#2}
+            {#1 \cap}
+            {#1 \cap #2}
+        }
+}
+\SetKwFunction{IntervalSpan}{span}
+
+\NewDocumentCommand{\SetDiff}{oo}{%
+    \IfNoValueTF{#1}
+        {
+        \IfNoValueTF{#2}
+            {\smallsetminus}
+            {\smallsetminus #2}
+        }
+        {
+        \IfNoValueTF{#2}
+            {#1 \smallsetminus}
+            {#1 \smallsetminus #2}
+        }
+}
+
+
+\newcommand{\SetIndicator}[1]{\BlackboardSet{1}_{#1}}
+\DeclarePairedDelimiter\Card{\lvert}{\rvert}
+
+\DeclarePairedDelimiterX\Pair[2]{\langle}{\rangle}{#1\,,#2}
+
+\newcommand{\EmptySet}{\varnothing}
+\newcommand{\PowerSet}{\operatorname{\mathcal{P}}}
+\newcommand{\PS}[1]{2^{#1}}
+\newcommand{\SubsetK}[2]{\left[{#1}\right]^{#2}}
+
+\newcommand{\BitSet}{\FancySet{B}}
+\newcommand{\BitStringSet}{\BitSet[][*]}
+\newcommand{\RealSet}{\BlackboardSet{R}}
+\newcommand{\NatSet}{\BlackboardSet{N}}
+\newcommand{\IntSet}{\BlackboardSet{Z}}
+\newcommand{\RatSet}{\BlackboardSet{Q}}
+\newcommand{\ComplexSet}{\BlackboardSet{C}}
+
+\DeclarePairedDelimiterX\SetBuilder[2]{\{}{\}}{\,#1 \;\delimsize\vert\; #2\,}
+
+\DeclarePairedDelimiterX\Interval[1]{[}{]}{#1}
+
+\NewDocumentCommand{\SetInterval}{mo}{%
+    \IfNoValueTF{#2}
+        {\Interval{#1}}
+        {\Interval{\underline{#1},\overline{#1}}}
+}
+
+
+\SetKwFunction{IntervalSpan}{span}
+
+% From approxsetnotation.sty
+
+\RequirePackage{setnotation}
+\RequirePackage{probabilitynotation}
+\RequirePackage{algorithm2e}
+\RequirePackage{siunitx}
+\RequirePackage{approx_data_type_notation}
+
+\newcommand{\Rho}{\mathrm{P}}
+
+\NewDocumentCommand{\AVec}{moo}{
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {{\vec{#1}}^{\pm}}
+            {{\vec{#1}}^{#2}}
+    }
+    {{\vec{#1}}_{#2}^{#3}}
+}
+
+\NewDocumentCommand{\AVecComp}{mo}{
+   \IfNoValueTF{#2}
+        {\RV{#1}^\pm}
+        {\RV{#1}_\RV{#2}^\pm}
+}
+
+\NewDocumentCommand{\ASet}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {{\setstyle{#1}}^{\pm}}
+            {{\setstyle{#1}}^{#2}}
+    }
+    {{\setstyle{#1}}_{#2}^{#3}}
+}
+
+\NewDocumentCommand{\ASetFO}{mo}{%
+    \IfNoValueTF{#2}
+        {{\setstyle{#1}}^{\epsilon}}
+        {{\setstyle{#1}}^{#2}}
+}
+
+
+\NewDocumentCommand{\PASet}{mo}{%
+    \IfNoValueTF{#2}
+        {{\setstyle{#1}}^{+}}
+        {{\setstyle{#1}}^{+}_{#2}}
+}
+
+\NewDocumentCommand{\NASet}{mo}{%
+    \IfNoValueTF{#2}
+        {{\setstyle{#1}}^{-}}
+        {{\setstyle{#1}}^{-}_{#2}}
+}
+
+
+\NewDocumentCommand{\ASetType}{m}{%
+    {#1}^{\pm}
+}
+
+\NewDocumentCommand{\ASetStyle}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {{#1}^{\pm}}
+            {{#1}^{#2}}
+    }
+    {{#1}_{#2}^{#3}}
+}
+
+
+\NewDocumentCommand{\PASetType}{m}{%
+    {#1}^{\varepsilon}
+}
+
+%\NewDocumentCommand{\ASet}{moo}{%
+%    \IfNoValueTF{#3}
+%    {
+%        \IfNoValueTF{#2}
+%            {\Set{#1}[][\sigma]}
+%            {\Set{#1}[#2][\sigma]}
+%    }
+%    {\Set{#1}[#2][#3]}
+%}
+%}
+%\NewDocumentCommand{\PASet}{mo}{%
+%    \IfNoValueTF{#2}
+%        {\ASet{#1}[][\fprate]}
+%        {\ASet{#1}[#2][\fprate]}
+%}
+%\NewDocumentCommand{\NASet}{mo}{%
+%    \IfNoValueTF{#2}
+%        {\ASet{#1}[][\fnrate]}
+%        {\ASet{#1}[#2][\fnrate]}
+%}
+
+\newcommand{\positive}{p}
+\newcommand{\negative}{n}
+\newcommand{\p}{p}
+\newcommand{\n}{n}
+
+\SetKwFunction{informed}{informed}
+\SetKwFunction{ppv}{ppv}
+\SetKwFunction{npv}{npv}
+\SetKwFunction{tpr}{tpr}
+\SetKwFunction{fpr}{fpr}
+\SetKwFunction{fnr}{fnr}
+\SetKwFunction{tnr}{tnr}
+\SetKwFunction{acc}{acc}
+\SetKwFunction{fdr}{fdr}
+\SetKwFunction{forFn}{for}
+
+%\DeclareMathOperator{\npv}{\mathsf{npv}}
+%\DeclareMathOperator{\ppv}{\mathsf{ppv}}
+%\DeclareMathOperator{\tpr}{\mathsf{tpr}}
+%\DeclareMathOperator{\fpr}{\mathsf{fpr}}
+%\DeclareMathOperator{\tnr}{\mathsf{tnr}}
+%\DeclareMathOperator{\fnr}{\mathsf{fnr}}
+%\DeclareMathOperator{\acc}{\mathsf{acc}}
+%\DeclareMathOperator{\fdr}{\mathsf{fdr}}
+%\DeclareMathOperator{\for}{\mathsf{for}}
+
+\newcommand{\POS}{\RV{P}}
+\newcommand{\NEG}{\RV{N}}
+\newcommand{\PPV}{\RV{PPV}}
+\newcommand{\NPV}{\RV{NPV}}
+\newcommand{\ACC}{\RV{ACC}}
+\newcommand{\FOR}{\RV{FOR}}
+\newcommand{\FDR}{\RV{FDR}}
+\newcommand{\FNR}{\mathcal{W}}
+\newcommand{\TNR}{\mathcal{N}}
+\newcommand{\FPR}{\mathcal{E}}
+\newcommand{\TPR}{\mathcal{T}}
+\newcommand{\TP}{\RV{TP}}
+\newcommand{\FP}{\RV{FP}}
+\newcommand{\FN}{\RV{FN}}
+\newcommand{\TN}{\RV{TN}}
+
+% From approx_data_type_notation.sty
+
+\newcommand{\tprate}{\tau}
+\newcommand{\fprate}{\varepsilon}
+\newcommand{\fnrate}{\omega}
+\newcommand{\tnrate}{\eta}
+\newcommand{\fprateob}{\hat{\fprate}}
+\newcommand{\fnrateob}{\hat{\fnrate}}
+\newcommand{\tprateob}{\hat{\tprate}}
+\newcommand{\tnrateob}{\hat{\tnrate}}
+
+% functor for random approximate data type
+\SetKwFunction{Approx}{a}
+
+
+\NewDocumentCommand{\ATOverUnder}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {\underset{\mathsmaller{-}}{\overset{\mathsmaller{+}}{#1}}}
+            {\underset{\mathsmaller{-}}{\overset{\mathsmaller{\mathsmaller{#2}}}{#1}}}
+    }
+    {\underset{\mathsmaller{#3}}{\overset{\mathsmaller{#2}}{#1}}}
+}
+
+\NewDocumentCommand{\ATL}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {{}^{+}_{-}\!#1}
+            {{}^{#2}_{-}\!#1}
+    }
+    {{}_{#2}^{#3}\!#1}
+}
+
+
+\NewDocumentCommand{\AT}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {{#1}^{\pm}}
+            {{#1}^{#2}}
+    }
+    {{#1}_{#2}^{#3}}
+}
+
+\NewDocumentCommand{\LongAT}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {\Approx\!\left(#1\right)}
+            {\Approx^{#2}\!\left(#1\right)}
+    }
+    {\Approx_{#2}^{#3}\!\left(#1\right)}
+}
+
+
+\NewDocumentCommand{\PAT}{mo}{%
+    \IfNoValueTF{#2}
+        {{#1}^{+}}
+        {{#1}^{+}_{#2}}
+}
+
+\NewDocumentCommand{\NAT}{mo}{%
+    \IfNoValueTF{#2}
+        {{#1}^{-}}
+        {{#1}^{-}_{#2}}
+}
+
+% approximate partial functions (from approximate relations)
+\NewDocumentCommand{\APFun}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {\PFun{\AT{#1}}}
+            {\PFun{\AT{#1}[#2][-]}}
+    }
+    {\PFun{\AT{#1}[#2][#3]}}
+}
+
+\NewDocumentCommand{\PAPFun}{mo}{%
+    \IfNoValueTF{#2}
+        {\APFun{#1}[][\fprate]}
+        {\APFun{#1}[#2][\fprate]}
+}
+
+\NewDocumentCommand{\NAPFun}{mo}{%
+    \IfNoValueTF{#2}
+        {\APFun{#1}[][\fnrate]}
+        {\APFun{#1}[#2][\fnrate]}
+}
+
+\SetKwData{Integer}{integer}
+
+% From probabilitynotation.sty
+
+\RequirePackage{xparse}
+\RequirePackage{bm}
+\RequirePackage{bbm}
+\RequirePackage{amssymb}
+\RequirePackage{mathtools}
+%\RequirePackage{alexmisc}
+\RequirePackage{functionnotation}
+\RequirePackage{algorithm2e}
+
+\newcommand{\RV}[1]{\mathrm{#1}}
+
+\newcommand{\ProbFn}{\mathrm{P}}
+
+\newcommand{\Pdf}{\operatorname{f}}
+
+\NewDocumentCommand{\Prob}{mo}{%
+    \Bracket{\ProbFn}{#1}[#2]
+}
+
+\NewDocumentCommand{\Expect}{mo}{%
+    \Bracket{\mathrm{E}}{#1}[#2]
+}
+
+\NewDocumentCommand{\Var}{mo}{%
+    \Bracket{\mathrm{V}}{#1}[#2]
+}
+
+\NewDocumentCommand{\PDF}{mo}{%
+    \FunctionFamily{\Pdf}{#1}[#2]
+}
+
+\NewDocumentCommand{\CDF}{mo}{%
+    \FunctionFamily{F}{#1}[#2]
+}
+
+\NewDocumentCommand{\RDF}{mo}{%
+    \FunctionFamily{R}{#1}[#2]
+}
+
+\NewDocumentCommand{\Entropy}{mo}{%
+    \FunctionFamily{\mathcal{H}}{#1}[#2]
+}
+
+\NewDocumentCommand{\Likelihood}{mo}{%
+    \FunctionFamily{\mathcal{L}}{#1}[#2]
+}
+
+%\DeclareMathOperator{\var}{\rm{Var}}
+\DeclareMathOperator{\bias}{bias}
+\DeclareMathOperator{\mse}{\mathrm{MSE}}
+
+
+\newcommand{\mvn}{\mathrm{MVN}}
+\newcommand{\unifdist}{\mathrm{UNIF}}
+\newcommand{\dudist}{\mathrm{DU}}
+\newcommand{\berdist}{\mathrm{BER}}
+\newcommand{\expdist}{\mathrm{EXP}}
+\newcommand{\geodist}{\mathrm{GEO}}
+\newcommand{\normdist}{\mathcal{N}}
+\newcommand{\bindist}{\mathrm{BIN}}
+\newcommand{\poidist}{\mathrm{POI}}
+\newcommand{\nbdist}{\mathrm{NB}}
+
+
+
+%\SetKwFunction{dudist}{DU}
+%\SetKwFunction{berdist}{BER}
+%\SetKwFunction{expdist}{EXP}
+%\SetKwFunction{geodist}{GEO}
+%\SetKwFunction{bindist}{BIN}
+
+
+% From relationnotation.sty
+%
+%
+%
+\NeedsTeXFormat{LaTeX2e}[1994/06/01]
+\ProvidesPackage{relationnotation}[2018/01/01 alex towell's set notation (style) for his various papers]
+
+\RequirePackage{xparse}
+\RequirePackage{bm}
+\RequirePackage{bbm}
+\RequirePackage{amssymb}
+\RequirePackage{mathtools}
+\RequirePackage{algorithm2e}
+
+\newcommand{\blackboardrelationstyle}[1]{\mathbbm{#1}}
+\newcommand{\blackboardrelationsubstyle}[1]{\pmb{#1}}
+\newcommand{\blackboardrelationsupstyle}[1]{\pmb{#1}}
+
+\newcommand{\boldrelationstyle}[1]{\pmb{\mathsf{#1}}}
+\newcommand{\boldrelationsubstyle}[1]{\pmb{#1}}
+\newcommand{\boldrelationsupstyle}[1]{\pmb{#1}}
+
+\newcommand{\fancyrelationstyle}[1]{\mathcal{#1}}
+\newcommand{\fancyrelationsubstyle}[1]{#1}
+\newcommand{\fancyrelationsupstyle}[1]{#1}
+
+\newcommand{\plainrelationstyle}[1]{\mathsf{#1}}
+\newcommand{\plainrelationsubstyle}[1]{\mathsf{#1}}
+\newcommand{\plainrelationsupstyle}[1]{\mathsf{#1}}
+
+\newcommand{\relationstyle}[1]{\plainrelationstyle{#1}}
+\newcommand{\relationsubstyle}[1]{\plainrelationsubstyle{#1}}
+\newcommand{\relationsupstyle}[1]{\plainrelationsupstyle{#1}}
+
+\DeclareOption{blackboard}
+{
+    \renewcommand{\relationstyle}[1]{\blackboardrelationstyle{#1}}
+    \renewcommand{\relationsubstyle}[1]{\blackboardrelationsubstyle{#1}}
+    \renewcommand{\relationsupstyle}[1]{\blackboardrelationsupstyle{#1}}
+}
+\DeclareOption{bold}
+{
+    \renewcommand{\relationstyle}[1]{\boldrelationstyle{#1}}
+    \renewcommand{\relationsubstyle}[1]{\boldrelationsubstyle{#1}}
+    \renewcommand{\relationsupstyle}[1]{\boldrelationsupstyle{#1}}
+}
+\DeclareOption{fancy}
+{
+    \renewcommand{\relationstyle}[1]{\fancyrelationstyle{#1}}
+    \renewcommand{\relationsubstyle}[1]{\fancyrelationsubstyle{#1}}
+    \renewcommand{\relationsupstyle}[1]{\fancyrelationsupstyle{#1}}
+}
+\DeclareOption{plain}
+{
+    \renewcommand{\relationstyle}[1]{\plainrelationstyle{#1}}
+    \renewcommand{\relationsubstyle}[1]{\plainrelationsubstyle{#1}}
+    \renewcommand{\relationsupstyle}[1]{\plainrelationsupstyle{#1}}
+}
+
+\ExecuteOptions{plain}
+\ProcessOptions\relax
+
+\NewDocumentCommand{\Relation}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {\relationstyle{#1}}
+            {\relationstyle{#1}_{\setsubstyle{#2}}}
+    }
+    {\relationstyle{#1}_{\setsubstyle{#2}}^{\setsupstyle{#3}}}
+}
+
+\NewDocumentCommand{\FancyRelation}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {\fancyrelationstyle{#1}}
+            {\fancyrelationstyle{#1}_{\fancysetsubstyle{#2}}}
+    }
+    {\fancyrelationstyle{#1}_{\fancysetsubstyle{#2}}^{\fancysetsupstyle{#3}}}
+}
+
+\NewDocumentCommand{\BlackboardRelation}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {\blackboardrelationstyle{#1}}
+            {\blackboardrelationstyle{#1}_{\blackboardrelationsubstyle{#2}}}
+    }
+    {\blackboardrelationstyle{#1}_{\blackboardrelationsubstyle{#2}}^{\blackboardrelationsupstyle{#3}}}
+}
+
+\NewDocumentCommand{\PlainRelation}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {\plainrelationstyle{#1}}
+            {\plainrelationstyle{#1}_{\plainrelationsubstyle{#2}}}
+    }
+    {\plainrelationstyle{#1}_{\plainrelationsubstyle{#2}}^{\plainrelationsupstyle{#3}}}
+}
+
+\NewDocumentCommand{\BoldRelation}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {\boldrelationstyle{#1}}
+            {\boldrelationstyle{#1}_{\boldrelationsubstyle{#2}}}
+    }
+    {\boldrelationstyle{#1}_{\boldrelationsubstyle{#2}}^{\boldrelationsupstyle{#3}}}
+}
+
+
+\newcommand{\partialfunstyle}[1]{\operatorname{#1}}
+\newcommand{\partialfunsubstyle}[1]{#1}
+\newcommand{\partialfunsupstyle}[1]{#1}
+
+\newcommand{\funstyle}[1]{\operatorname{#1}}
+\newcommand{\funsubstyle}[1]{#1}
+\newcommand{\funsupstyle}[1]{#1}
+
+
+\NewDocumentCommand{\Fun}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {\funstyle{#1}}
+            {\funstyle{#1}_{\funsubstyle{#2}}}
+    }
+    {\funstyle{#1}_{\funsubstyle{#2}}^{\funsupstyle{#3}}}
+}
+
+
+\NewDocumentCommand{\PFun}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {\partialfunstyle{#1}}
+            {\partialfunstyle{#1}_{\partialfunsubstyle{#2}}}
+    }
+    {\partialfunstyle{#1}_{\partialfunsubstyle{#2}}^{\partialfunsupstyle{#3}}}
+}
+
+
+%\DeclarePairedDelimiterX\Pair[2]{\langle}{\rangle}{#1\,,#2}
+\DeclarePairedDelimiterX\Tuple[1]{\langle}{\rangle}{#1}
+
+%\newcommand{\Join}{\bowtie}
+\newcommand{\Proj}{\Pi}
+\newcommand{\Selection}{\sigma}
+
+%\SetKwFunction{Proj}{proj}
+\SetKwFunction{Dom}{dom}
+\SetKwFunction{Codom}{codom}
+\SetKwFunction{Dod}{def}
+\SetKwFunction{Image}{image}
+\SetKwFunction{Preimage}{preimage}
+\SetKwFunction{Range}{range}
+\SetKwFunction{Related}{related}
+
+\newcommand\pfun{\mathrel{\ooalign{\hfil$\mapstochar$\hfil\cr$\to$\cr}}}
+
+% From approxrelationnotation.sty
+
+\RequirePackage{relationnotation}
+\RequirePackage{approxsetnotation}
+
+\NewDocumentCommand{\ARelation}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {\Relation{#1}[][\sigma]}
+            {\Relation{#1}[#2][\sigma]}
+    }
+    {\Set{#1}[#2][#3]}
+}
+
+\NewDocumentCommand{\ARelationType}{m}{%
+    {#1}^{\sigma}
+}
+
+% From envnotation.sty
+% Environment configurations for Alex Towell.
+%
+% Includes things like theorems, proofs with separate counters, and so on.
+% TODO: make another proof environment without the separate counter, because
+% sometimes the proof is not connected to a particular theorem.
+%
+% TODO: provide an option so that we can specify whether defs, postulates, theorems, or lemmas are numbered by chapter, section, etc. default: chapter
+\NeedsTeXFormat{LaTeX2e}[1994/06/01]
+\ProvidesPackage{envnotation}[2018/01/01 alex towell's environment notation (style) for his various papers]
+
+\RequirePackage{amsmath}
+\RequirePackage{etoolbox}
+\RequirePackage{xparse}
+\RequirePackage{cleveref}
+
+\newcommand{\envnumstyle}{chapter}
+\DeclareOption{chapter}
+{
+    \renewcommand{\envnumstyle}{chapter}
+}
+\DeclareOption{section}
+{
+    \renewcommand{\envnumstyle}{section}
+}
+
+\ExecuteOptions{envchapter}
+\ProcessOptions\relax
+
+\newcounter{proofeqcounter}
+\AtBeginEnvironment{proof}{\setcounter{proofeqcounter}{\value{equation}}
+\setcounter{equation}{0}\renewcommand{\theequation}{\alph{equation}}}
+\AtEndEnvironment{proof}{\setcounter{equation}{\value{proofeqcounter}}}
+
+\theoremstyle{plain}
+\newtheorem{lemma}{Lemma}[\envnumstyle]
+\newtheorem{theorem}{Theorem}[\envnumstyle]
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{definition}{Definition}[\envnumstyle]
+\newtheorem{postulate}{Postulate}[\envnumstyle]
+\newtheorem{conjecture}{Conjecture}[\envnumstyle]
+
+\newtheorem{assumption}{Assumption}
+\crefname{assumption}{ assumption }{ assumptions }
+\Crefname{assumption}{ Assumption }{ assumptions }
+
+\newtheorem{axiom}{Axiom}
+\crefname{axiom}{ axiom }{ axioms }
+\Crefname{axiom}{ Axiom }{ Axioms }
+
+
+\newcounter{examplecounter}
+
+\newenvironment{example}
+{
+    \refstepcounter{examplecounter}%
+    \par\vspace{\baselineskip}\noindent 
+    \textbf{Example \theexamplecounter}%
+    \begin{itshape}
+    \quad
+}
+{
+    \end{itshape}
+    \par\vspace{\baselineskip}% 
+    \noindent\ignorespacesafterend     
+}
+
+\newcounter{exampleeqcounter}
+\AtBeginEnvironment{example}{\setcounter{exampleeqcounter}{\value{equation}}
+\setcounter{equation}{0}\renewcommand{\theequation}{\alph{equation}}}
+\AtEndEnvironment{example}{\setcounter{equation}{\value{exampleeqcounter}}}
+
+\newtheorem*{remarkx}{Remark}
+\newenvironment{remark}
+  {\pushQED{\qed}\renewcommand{\qedsymbol}{$\triangle$}\remarkx}
+  {\popQED\endremarkx}
+
+\newtheorem*{notation}{Notation}
+
+% From algorithmnotation.sty
+%
+%
+%
+\NeedsTeXFormat{LaTeX2e}[1994/06/01]
+\ProvidesPackage{algorithmnotation}[2018/01/01 alex towell's algorithm notation for his various papers]
+
+\RequirePackage{algorithm2e}
+
+\RestyleAlgo{ruled}
+\LinesNumbered
+
+
+% values of types
+\SetKw{True}{true}
+\SetKw{False}{false}
+\SetKwData{Null}{null}
+
+% types
+\SetKwData{Bool}{Bool}
+\SetKwData{Void}{Void}
+\SetKwData{Unit}{Unit}
+\SetKwData{List}{List}
+
+% keywords
+\SetKw{Break}{break}
+
+
+
+\SetKwFunction{NotFn}{not}
+\SetKwFunction{TrueFn}{true}
+\SetKwFunction{FalseFn}{false}
+\SetKwFunction{NegateFn}{negate}
+\SetKwFunction{AndFn}{and}
+\SetKwFunction{OrFn}{or}
+\SetKwFunction{XorFn}{xor}
+\SetKwFunction{NorFn}{nor}
+
+\SetKwFunction{AbsoluteEfficiency}{E}
+\SetKwFunction{RE}{RE}
+\SetKwFunction{Find}{find}
+\SetKwFunction{Ref}{ref}
+\SetKwFunction{Left}{left}
+\SetKwFunction{Right}{right}
+\SetKwFunction{Head}{head}
+\SetKwFunction{Tail}{tail}
+\SetKwFunction{IdFun}{id}
+\newcommand{\hash}{\Fun{h}}
+%\SetKwFunction{hash}{h}
+\SetKwFunction{ph}{ph}
+\SetKwFunction{bf}{BF}
+%\SetKwFunction{ro}{$\hash^*$}
+\SetKwFunction{BL}{$\ell$}
+
+\SetKwInOut{Params}{params}
+\SetKwInOut{KwIn}{input}
+\SetKwInOut{KwOut}{output}
+
+
+\newcommand{\Maybe}[1]{\FuncSty{m}\!\left({#1}\right)}
+
+\SetKwData{found}{found}
+
+\newlength\alglen
+\newcommand\alginput[1]{%
+  \settowidth\alglen{\KwIn{}}%
+  \setlength\hangindent{\alglen}%
+  \hspace*{\alglen}#1\\}
+
+% From matrixnotation.sty
+%
+% Matrix notation for Alex Towell.
+%
+\NeedsTeXFormat{LaTeX2e}[1994/06/01]
+\ProvidesPackage{matrixnotation}[2018/01/01 alex towell's matrix notation (style) for his various papers]
+
+\RequirePackage{amsmath}
+
+\renewcommand{\vec}[1]{\boldsymbol{\mathbf{#1}}}
+\newcommand{\matrx}[1]{\boldsymbol{#1}}
+\newcommand{\Transpose}{\mathsf{T}}
+
+\DeclareMathOperator{\trace}{tr}
+
+\newcount\colveccount
+\newcommand*\colvec[1]{
+        \global\colveccount#1
+        \begin{pmatrix}
+        \colvecnext
+}
+\def\colvecnext#1{
+        #1
+        \global\advance\colveccount-1
+        \ifnum\colveccount>0
+                \\
+                \expandafter\colvecnext
+        \else
+                \end{pmatrix}
+        \fi
+}
+
+% From obliviousnotation.sty
+%
+%
+%
+%
+%   \BitString      B^* denotes arbitrary length bit strings
+%   \BitString[n]   B^n denotes bit strings of size n
+%   \BitSet         set B denotes {0,1}
+%
+%
+
+
+\NeedsTeXFormat{LaTeX2e}[1994/06/01]
+\ProvidesPackage{obliviousnotation}[2018/01/01 alex towell's oblivious set notation for his various papers]
+
+\RequirePackage{setnotation}
+\RequirePackage{approxsetnotation}
+\RequirePackage{algorithm2e}
+%\RequirePackage{accents}
+\RequirePackage{txfonts}
+
+%\SetKwFunction{Obfuscate}{o}
+\newcommand{\LongOT}[1]{$\textrm{cipher}(#1)$}
+
+%\NewDocumentCommand{\LongOT}{mo}{%
+%    \IfNoValueTF{#2}
+%        {\Obfuscate\!\left(#1\right)}
+%        {\Obfuscate^{#2}\!\left(#1\right)}
+%}
+
+%\setlength{\dashlength}{1pt}%     % length of dash + gap
+%\setlength{\dashdash}{1pt}%     % length of dash
+%\setlength{\fboxrule}{1pt}%     % width of line
+%\setlength{\fboxsep}{.5pt}%        % separation between box and inner content
+
+
+
+%\makeatletter
+%\renewcommand{\boxed}[1]{\text{\fboxsep=.2em\fbox{\m@th$\displaystyle#1$}}}
+%\makeatother
+
+\setlength{\fboxsep}{1.6pt}
+\newcommand{\OTL}[1]{\boxed{#1}}
+
+%\newcommand{\OMap}{\raisebox{1.4pt}{\boxed{\mapsto}}}
+\newcommand{\POMap}{\raisebox{1.4pt}{\boxed{\pfun}}}
+
+%\renewcommand{\OMap}{
+%$\;$
+%\begin{tikzpicture}[scale=.15]
+%  \draw[|->] (-3,0) -- (-2.5,0) -- (-2.25,.25) -- (-2,-.25) -- (-1.75,0) -- (-.75,0);
+%\end{tikzpicture}
+%$\;$}
+
+\renewcommand{\OMap}{\boxright}
+ 
+
+\newcommand{\OT}[1]{\breve{#1}}
+
+
+\SetKwFunction{Repr}{repr}
+%\DeclareMathOperator{\Repr}{repr}
+
+\SetKwFunction{Signal}{signal}
+
+%\newcommand{\Poison}[1]{\breve{#1}}
+%\DeclareMathOperator{\Poi}{poi}
+
+\SetKwFunction{Poison}{noise}
+
+%\newcommand{\Poi}[1]{\underset{\frown}{#1}}
+%\renewcommand{\Poi}[1]{{}^{\varsigma\!}#1}
+
+
+\def\presuper#1#2%
+  {\mathop{}%
+   \mathopen{\vphantom{#2}}^{#1}%
+   \kern-\scriptspace%
+   #2}
+
+   \renewcommand{\Poi}[1]{\presuper{*}{#1}}
+
+  %\overset{\smile}{\underset{\frown}{t t t t}}$
+
+
+%\renewcommand{\Poison}[1]{\Poi{#1}}
+
+
+%\renewcommand{\OT}[1]{\accentset{\tilde}{a}}
+
+%\NewDocumentCommand{\OSet}{mo}{%
+%    \IfNoValueTF{#2}
+%        {\Set{\OT{#1}}}
+%        {\Set{\OT{#1}}[#2]}
+%}
+
+%\SetKwData{Obfuscated}{obfuscated}
+
+%\NewDocumentCommand{\OASet}{mo}{%
+%    \IfNoValueTF{#2}
+%        {\ASet{\OT{#1}}[]}
+%        {\ASet{\OT{#1}}[#2]}
+%}
+
+%\NewDocumentCommand{\OPASet}{mo}{%
+%    \IfNoValueTF{#2}
+%        {\PASet{\check{#1}}[]}
+%        {\PASet{\check{#1}}[#2]}
+%}
+
+%\NewDocumentCommand{\ONASet}{mo}{%
+%    \IfNoValueTF{#2}
+%        {\PASet{\check{#1}}[]}
+%        {\PASet{\check{#1}}[#2]}
+%}
+
+
+% From alexmisc.sty
+%
+%
+%
+%
+%   \BitString      B^* denotes arbitrary length bit strings
+%   \BitString[n]   B^n denotes bit strings of size n
+%   \BitSet         set B denotes {0,1}
+%
+%
+\NeedsTeXFormat{LaTeX2e}[1994/06/01]
+\ProvidesPackage{alexmisc}[2018/01/01 alex towell's misc stuff]
+
+\RequirePackage{xparse}
+\RequirePackage{bm}
+\RequirePackage{bbm}
+\RequirePackage{amssymb}
+\RequirePackage{mathtools}
+\RequirePackage{pgfplots}
+
+%\PassOptionsToPackage{unicode}{hyperref}
+%\PassOptionsToPackage{naturalnames}{hyperref}
+
+\definecolor{ltgray}{rgb}{0.7,0.7,0.7}
+\newcommand{\ith}{$i^{\text{th }}$}
+
+% for nice tables
+\renewcommand{\arraystretch}{1.3}
+%\bibliographystyle{plainnat}
+
+\usetikzlibrary{arrows,shapes,positioning}
+\usetikzlibrary{calc,decorations.markings}
+\usetikzlibrary{plotmarks}
+
+%\usepgfplotslibrary{patchplots} % THIS MAY BE WHY THAT ONE FIG NOT WORKING!
+\pgfplotsset{compat=newest}
+
+\newcommand{\COMMENT}[1]{}
+
+%\providecommand{\Given}{\vert}
+
+\DeclarePairedDelimiterX\FuncArgs[1]{(}{)}{\renewcommand\Given{\nonscript\:\delimsize\vert\nonscript\:\mathopen{}}#1}
+
+\DeclarePairedDelimiterX\FuncArgsB[1]{[}{]}{\renewcommand\Given{\nonscript\:\delimsize\vert\nonscript\:\mathopen{}}#1}
+
+\NewDocumentCommand{\FunctionFamily}{mmo}{%
+    \IfNoValueTF{#3}
+        {\operatorname{#1}\FuncArgs*{#2}}
+        {\operatorname{#1}_{#3}\mkern-1mu\FuncArgs*{#2}}
+}
+
+\NewDocumentCommand{\Bracket}{mmo}{%
+    \IfNoValueTF{#3}
+        {\operatorname{#1}\FuncArgsB*{#2}}
+        {\operatorname{#1}_{#3}\FuncArgsB*{#2}}
+}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\SetKwFunction{Loss}{loss}
+
+% From statistics.sty
+
+\RequirePackage{xparse}
+\RequirePackage{bm}
+\RequirePackage{bbm}
+\RequirePackage{amssymb}
+\RequirePackage{mathtools}
+%\RequirePackage{alexmisc}
+\RequirePackage{functionnotation}
+\RequirePackage{algorithm2e}
+
+\newcommand{\ptestimate}[1]{\hat{#1}}
+
+
+% ===== END CUSTOM MACRO DEFINITIONS =====
+
+\newcommand{\COMMENT}[1]{}
+
+\SetKwFunction{Loss}{loss}
+\SetKwFunction{HasKey}{has\_key}
+\SetKwData{Nothing}{nothing}
+
+\newcommand{\mathlg}[1]{\mathlarger{\mathlarger{\mathlarger{#1}}}}
+
+% Command definitions - moved before redefining as SetKwFunction
+\providecommand{\Nothing}{\mathsf{nothing}}
+\providecommand{\Encode}{\mathsf{encode}}
+\providecommand{\Decode}{\mathsf{decode}}
+\providecommand{\trunc}{\mathsf{trunc}}
+\newcommand{\BL}{\ell}  % Bit length function
+\providecommand{\FuncSty}[1]{\mathsf{#1}}
+
+\SetKwFunction{Match}{match}
+\SetKwFunction{MakeSHM}{construct\_shm}
+\SetKwData{SHM}{SHM}
+
+\SetKwFunction{GenerateSeeds}{generate\_hash\_seeds}
+
+\SetKwFunction{MakeSingularHashMap}{construct\_singular\_hash\_map}
+
+\SetKwData{found}{found}
+\SetKwData{truecode}{true\_code}
+\SetKwData{code}{test\_code}
+\SetKwData{Code}{code}
+\SetKwData{Success}{success}
+
+
+\SetKwFunction{trunc}{tr}
+\SetKwFunction{Encode}{encode}
+\SetKwFunction{Decode}{decode}
+
+
+
+\title
+{
+    The algebra of the \emph{random approximate map} model
+}
+\author
+{
+    Alexander Towell\\
+    \texttt{atowell@siue.edu}
+}
+\date{}
+
+%\loadglsentries{gloss}
+
+\newcommand{\amapsto}[2]{\,\ATOverUnder{\mapsto}[#1][\text{\raisebox{3pt}{$#2$}}]\,}
+
+\newcommand{\AFun}[1]{\mathrm{AF}(#1)}  % Auto-generated definition
+
+% Theorem environments are already defined by the style files
+
+\begin{document}
+\maketitle
+\begin{abstract}
+We present a formal algebraic framework for \emph{random approximate maps}---probabilistic data structures that trade exactness for space efficiency.
+Building on rate-distortion theory, we develop a hierarchy of approximate map models characterized by false positive rate $\fprate$ and false negative rate $\fnrate$.
+We prove that compositions of first-order approximate maps yield higher-order approximations with quantifiable error bounds, and establish the relationship between approximate maps, sets, and relations through their indicator functions.
+For practical applications, we introduce the \emph{singular hash map}, a theoretical construction that achieves optimal space complexity of $-\log_2 \fprate + \mu$ bits per element asymptotically.
+Our framework provides a unified foundation for analyzing probabilistic data structures including Bloom filters, sketch algorithms, and locality-sensitive hashing schemes.
+\end{abstract}
+
+\tableofcontents
+%\listoffigures
+%\listofalgorithms
+
+% Introduction section
+\input{sections/intro_improved}
+
+% Related work section
+\input{sections/related_work}
+This association may only be partial over the domain, in which case it is a \emph{partial function} and otherwise is a \emph{total function}.
+A total function is commonly called just a \emph{function}.
+A partial function $\Fun{f} \colon \Set{X} \pfun \Set{Y}$ may be thought of as a total function $\Fun{f} \colon \Set{X} \mapsto \Maybe \Set{Y}$.
+
+Let $\Fun{f} \colon \Set{X} \mapsto \Set{Y}$ be a function.
+The concept of a Bernoulli map of $\Fun{f}$, denoted by $\AFun{f} \colon \Set{X} \mapsto \Set{Y}$, models $\Fun{f}$ with \emph{error}, either do to rate distortion, noise, or ignorance, such that
+\begin{equation}
+    \Prob{\AFun{f}(x) \neq \Fun{f}(x) \Given x \in \Set{A}} = \epsilon_{\Set{A}}\,.
+\end{equation}
+
+
+
+
+with two general categories of error:
+\begin{enumerate}
+	\item Elements in the domain of definition may be undefined.
+	\item Undefined elements may be defined.
+\end{enumerate}
+
+There are also random approximate value types.
+
+The \Void and \Unit types have respectively $0$ and $1$ elements, therefore there are no approximations of these types.
+The most primitive type which has an approximation is the approximate Boolean type, in which which under the \emph{random approximate type model}, the element $\True_\fprate^\tprate$ is Bernoulli distributed that realizes $\True$ with probability $\tprate$ and $\False$ with probability $\fprate$ and similarly for $\False_\fprate^\tprate$.
+
+Given \Void, \Unit, and $\Bool^{\sigma}$, we may algebraically compose them to generate other types.
+For instance, the product type $\Bool^{\sigma} \times \Bool^{\sigma}$ is a random approximate product of Booleans.
+By the product rule in probability,
+\begin{equation}
+	\Prob{\Pair{\True_{\fprate_1}^{\tprate_1}}{\True_{\fprate_2}^{\tprate_2}} = \Pair{\True}{\True}} = \tprate_1 \tprate_2\,.
+\end{equation}
+
+Under the random approximate Boolean model, the logical functions $\AndFn \colon \Bool \times \Bool \mapsto \Bool$ and $\NotFn \colon \Bool \mapsto \Bool$ are also random.
+In particular, $\NotFn(\True_b^a)$ and $\NotFn(\False_b^a)$ are respectively distributed as  $\False_a^b$ and  $\True_a^b$.
+
+These results generate the random approximate Boolean algebra
+\begin{equation}
+\label{eq:boolalg}
+\left(
+	\Bool_{\fprate_1}^{\tprate_1} \times \Bool_{\fprate_2}^{\tprate_2},
+	\AndFn, \OrFn, \NotFn,
+	\Pair{\True_{\fprate_1}^{\tprate_1}}{\True_{\fprate_2}^{\tprate_2}},
+	\Pair{\False_{\fprate_1}^{\tprate_1}}{\False_{\fprate_2}^{\tprate_2}}
+\right)\,,
+\end{equation}
+which only \emph{approximately} obeys the axioms.
+
+Any set $\Set{U}$ with operations set-intersection and set-complement may be used to form the Boolean algebra
+\begin{equation}
+\left(
+	\PS{\Set{U}},
+	\SetIntersection, \SetUnion, \SetComplement,
+	\Set{U},
+	\EmptySet
+\right)\,.
+\end{equation}
+If $\Card{\PS{\Set{U}}} = 4$, then it is \emph{isomorphic} to the Boolean algebra given by \cref{eq:boolalg}.
+The \emph{approximate algebra of sets} over a universe $\Set{U}$ is thus given by
+\begin{equation}
+\left(
+	\left(\Bool_{\fprate}^{\tprate}\right)^n,
+	\AndFn, \OrFn, \NotFn,
+	\left(\True_{0}^{1}\right)^n,
+	\left(\False_{0}^{1}\right)^n
+\right)\,.
+\end{equation}
+
+
+Functions of the type $\Set{X} \mapsto \Set{Y}$ where $\Set{X}$ and $\Set{Y}$ may be any algebraic type, e.g., $\Set{X} = \Set{X}[1] \times \Set{X}[2]$ for a \emph{binary function}, has an algebraic notation $\Set{Y}^{\Set{X}}$.
+
+A \emph{random approximate exponential type} is a partial or total function, $\APFun{f} \colon \Set{X} \pfun \Set{Y}$, with a domain of definition $\Dod(\APFun{f}[\tprate][\fprate]) = \ASet{\left(\Dod(\Fun{f})\right)}[\tprate][\fprate]$ but whose range depends on the function.
+For example, if $\PFun{f}$ is a bijection when restricted to its domain of definition, then $\Range\!\left(\APFun{f}[\tprate][\fprate]\right) = \ASet{\left(\Range(\Fun{f})\right)}[\tprate][\fprate]$.
+
+The approximate map is an example of a class of \emph{approximate relations} where the relation has a functional constraint.
+Other constraints include properties like \emph{symmetric} or \emph{reflexivity}.
+Some constraints, however, are difficult to implement under the random approximate type model.
+However, note that, more generally, the approximation error can be applied to \emph{any} predicate.
+%In other words, $\SetBuilder{ y }{ (x,y) \in \Set{X} \times \Set{Y} }$ is either the empty set or singleton set.
+
+
+
+
+
+The approximate map is closely related to the \emph{approximate set}\cite{aset} and \emph{approximate relation}\cite{arelation}.
+Approximate maps are one of the key components in an algebraic data type corresponding to the \emph{exponential type}.
+
+
+Bernoulli distributed, such that anything that composes them, e.g., a \emph{random approximate set} over a universe of $n$ elements may be modeled as the product of $n$ random approximate Booleans.
+
+
+
+In \cref{sec:map}, we precisely define the approximate map.
+In the subsequent sections, we explore properties of approximate maps, such as its \emph{mean average precision} with respect to particular scoring functions.
+In \cref{sec:comp_map}, we consider compositions of approximate maps, which are themselves approximate maps.
+In \cref{sec:pred}, we show how the approximate map may optimally implement the abstract data type of the \emph{approximate relation}.
+Finally, in later sections, we explore approximate rank-ordered search based on \emph{first-order} random approximate maps.
+% === End of sections/intro.tex ===
+
+% === Content from sections/approxmaps.tex ===
+\providecommand{\mainx}{..}
+
+\section{Approximate maps}
+\label{sec:}
+\label{sec:map}
+The concept of a \emph{map} is dependent upon the concept of a \emph{set}.
+\begin{definition}
+	A set is an unordered collection of distinct elements from a universe of elements.
+\end{definition}
+
+A countable set is a \emph{finite set} or a \emph{countably infinite set}. A \emph{finite set} has a finite number of elements. For example,
+\[
+\Set{S} = \{ 1, 3, 5 \}
+\]
+is a finite set with three elements. A \emph{countably infinite set} can be put in one-to-one correspondence with the set of natural numbers.
+
+The cardinality of a set $\Set{S}$ is a measure of the number of elements in the set, denoted by
+\begin{equation}
+\Card{\Set{\Set{S}}}\,.
+\end{equation}
+The cardinality of a \emph{finite set} is a non-negative integer and counts the number of elements in the set, e.g.,
+\[
+\Card{\left\{ 1, 3, 5\right\}} = 3\,.
+\]
+
+\begin{definition}[Cartesian product]
+	Let $\Set{A}$ and $\Set{B}$ be sets. The set $\Set{A} \times \Set{B}= \left\{(a, b) \colon a \in \Set{A} \land b \in \Set{B}\right\}$ is called the Cartesian product of the sets $\Set{A}$ and $\Set{B}$.
+\end{definition}
+
+\begin{definition}[Binary relation]
+	Let $\Set{A}$ and $\Set{B}$ be sets. By a relation $\mathcal{R}$ on $\Set{A}$ and $\Set{B}$, we mean a subset of the Cartesian product $\Set{A} \times \Set{B}$. Since the Cartesian product is over two sets, we denote this relation a \emph{binary} relation.
+\end{definition}
+Relations may be generalized to $n$-ary relations, which are subsets of the Cartesian product over $n$ sets. We consider only \emph{binary relations} known as \emph{maps} as given by the following definition.
+\begin{definition}
+	A \emph{map} $\Fun{f} \colon \Set{X} \mapsto \Set{Y}$ is a binary relation on $\Set{X} \times \Set{Y}$ with the constraint that the first element in the set of ordered pairs is \emph{unique}.
+\end{definition}
+Such a map is also known as a \emph{partial function}.
+
+
+
+Consider discrete partial maps of type $\Set{X} \pfun \Set{Y}$.
+Any function $\Fun{f}$ of this type may be \emph{lifted} to the type $\Set{X} \mapsto \Maybe{\Set{Y}}$ where elements not in $\Dod(\Fun{f})$ map to a special value denoted by \Nothing that is not a member of $\Set{Y}$.
+
+
+
+
+Given a map, by convention, in an ordered pair $(x, y)$, the first element $x$ is denoted a \emph{key} and the second element $y$ is denoted the \emph{value} associated with that (unique) key. The value $y$ associated with key $x$ may be denoted by
+\begin{equation}
+\Fun{f}(x)\,.
+\end{equation}
+The set of keys in the map is denoted by $\Dom(\Fun{f}) \subseteq \Set{X}$ and the set of values is denoted by $\Codom(\Fun{f}) \subseteq \Set{Y}$. Given these definitions, a map $\Fun{f}$ is given by the set of ordered key-value pairs
+\begin{equation}
+\Fun{f} \colon \Set{X} \mapsto \Set{Y} = \left\{
+\left(x, \Fun{f}(x)\right) \in \Set{X} \times \Set{Y} \colon x \in \Dom(\Fun{f})
+\right\}\,.
+\end{equation}
+
+A map $\Fun{f} \colon \Set{X} \mapsto \Set{Y}$ may represent \emph{many}-to-\emph{one} relationships, where many keys may be related to the same value. Consequently, denoting a particular key by its associated value is not generally possible.
+
+A \emph{table} is a convenient way to represent a map, where each key $x \in \Dom(\Fun{f})$ is associated with $\Fun{f}(x) \in \Codom(\Fun{f})$. The column for the keys consists of \emph{unique} values from $\Set{X}$ and column for the values consists of (possibly repeated) values from $\Set{Y}$.
+\begin{example}
+	Suppose we have a map $\Fun{f} \colon \{1,3,7\} \mapsto \{2,7\}$ defined by the set of ordered key-value pairs
+	\begin{equation}
+	\left\{(3,2),(1,5),(7,2)\right\}\,.
+	\end{equation}
+	We see that $\Dom(\Fun{f}) = \{3,1,7\}$, $\Codom(\Fun{f}) = \{2,5\}$, $\Fun{f}(3) = 2$, $\Fun{f}(1) = 4$, and $\Fun{f}(7) = 2$. Notice that both $3$ and $7$ map to $2$. Elements may be repeated in the \nth{2} index of ordered pairs, but elements in the \nth{1} index must be unique.
+	
+	\Cref{tbl:tabfunc} also depicts $\Fun{f}$ where the \emph{keys} column must consist of unique elements from $\Set{Z}$ and the \emph{values} column must consist of (possibly repeated) elements from $\Set{Z}$.
+	\begin{table}[h]
+		\centering
+		\caption{A table representing map $\Fun{f} \colon \Set{Z} \mapsto \Set{Z}$.}
+		\label{tbl:tabfunc}
+		\begin{tabular}{@{} l l @{}} 
+			\toprule
+			domain & range\\
+			\midrule
+			$3$ & $2$\\
+			$1$ & $5$\\
+			$7$ & $2$\\
+			\bottomrule
+		\end{tabular}
+	\end{table}
+\end{example}
+
+\subsection{Rate-distortion}
+\label{sec:error}
+Suppose we have the discrete metric space $(\Maybe{\Set{Y}}, \Fun{d})$ where $\Fun{d} \colon \Maybe{\Set{Y}} \times \Maybe{\Set{Y}} \mapsto \RealSet_{\geq 0}$.
+If we have a distribution $\RV{X}$ with a sample space $\Set{X}$ then the \emph{expected} distance with respect to $\Fun{f}$ and $\Fun{g}$ is given by
+\begin{equation}
+\Expect{\Fun{d}(\Fun{f},\Fun{g})}[\RV{X}] = \sum_{x \in \Set{X}} \Fun{p}_{\RV{X}}(x) \Fun{d}(\Fun{f}(x),\Fun{g}(x))\,.
+\end{equation}
+If $\Fun{p}_{\RV{X}}$ is uniformly distributed, then $\Expect{\Fun{d}(\Fun{f},\Fun{g})}[\RV{X}]$ is the \emph{average} distance $\Fun{\bar{d}}(\Fun{f},\Fun{g})$ over all values.\footnote{One way of defining a related discrete metric space $(\Maybe{\Set{Y}}^{\Set{X}}, \Fun{d})$ where $\Fun{d} \colon (\Set{X} \mapsto \Maybe{\Set{Y}}) \times (\Set{X} \mapsto \Maybe{\Set{Y}}) \mapsto \RealSet_{\geq 0}$ is given by letting $\Fun{d}(\Fun{f},\Fun{g}) \coloneqq \Card{\Set{X}} \Fun{\bar{d}}(\Fun{f},\Fun{g})$.}
+
+Suppose we have an objective map $\Fun{f} \colon \Set{X} \mapsto \Maybe{\Set{Y}}$ and an approximation of $\Fun{f}$ denoted by $\Fun{\AT{f}} \colon \Set{X} \mapsto \Maybe{\Set{Y}}$.
+Then, we call $\Fun{d}$ on the metric space $(\Maybe{\Set{Y}},\Fun{d})$ a \emph{loss} function where the expected loss of the approximate function $\Fun{g}$ of the objective function $\Fun{f}$ is given by
+\begin{equation}
+\Fun{\ell}_{\RV{X}}(\Fun{g} \Given \Fun{f}) = \Expect{\Fun{d}(\Fun{f},\Fun{g})}[\RV{X}]\,.
+\end{equation}
+
+By the axioms of probability, if it is given that the random variable $\RV{X} \in \FancySet{A}$ where $\FancySet{A}$ is a subset of sample space $\Set{X}$, then the conditional loss, denoted by $\Fun{\ell}_{\RV{X} \Given \FancySet{A}}$, is given by
+\begin{equation}
+\Fun{\ell}_{\RV{X} \Given \FancySet{A}}(\Fun{g} \Given \Fun{f}) = \Expect{\Fun{d}(\Fun{f},\Fun{g})}[\RV{X} \Given \FancySet{A}]
+\end{equation}
+where $\Fun{p}_{\RV{X} \Given \FancySet{A}}$ is normalized over $\FancySet{A}$.
+
+Suppose the domain $\PlainSet{X}$ may be partitioned into $n$ disjoint sets $\PlainSet{X}[1],\ldots,\PlainSet{X}[n]$.
+The expected loss may be rewritten as
+\begin{equation}
+\label{eq:disj_loss}
+\Fun{\ell}_{\RV{X} \Given \FancySet{K}}(g \Given f) =
+\sum_{i=1}^{n} \Fun{\ell}_{\RV{X} \Given \SetIntersection[\FancySet{K}][\PlainSet{X}[i]]}(g \Given f)\,.
+\end{equation}
+
+Ideally, an approximation $\Fun{g}$ of $\Fun{f}$ is selected or chosen such that $\Fun{\ell}_{\RV{X} \Given \FancySet{A}}(\Fun{g} \Given \Fun{f})$ is minimized over some subset $\FancySet{A} \subseteq \PlainSet{X}$ of interest.
+However, the expected loss may not obtain $0$ due to \emph{rate-distortion}, incomplete knowledge, noise, and memory or computing constraints.
+% === End of sections/approxmaps.tex ===
+
+% === Content from sections/approx_maps.tex ===
+\providecommand{\mainx}{..}
+\section{Random approximate maps}
+The set of functions of type $\Set{X} \mapsto \Set{Y}$ has cardinality $\Card{\Set{Y}}^{\Card{\Set{X}}}$.
+We may also denote functions of this type by $\Set{Y}^{\Set{X}}$.
+Given a function $\Fun{f} \colon \Set{X} \mapsto \Set{Y}$, a randomly chosen function $\Fun{g} \colon \Set{X} \mapsto \Set{Y}$ equals $\Fun{f}$ when applied to $x \in \Set{X}$ with probability $\frac{1}{\Card{\Set{Y}}}$ and therefore $\Fun{g} = \Fun{f}$ with probability $\Card{\Set{Y}}^{-\Card{\Set{X}}}$.
+%More generally, the number of elements in the domain $\Set{X}$ where $\Fun{g}$ and $\Fun{f}$ match is a binomially distributed random variable.
+
+We generalize this result and consider \emph{random approximate maps}.
+
+\begin{definition}
+The Iverson bracket, denoted by $\llbracket \, \rrbracket \colon \{\True,\False\} \mapsto \BitSet$, maps a predicate to $1$ if true and otherwise $0$.
+\end{definition}
+For example, $\llbracket a<b \rrbracket = 1$ if $a<b$ is \True.
+
+Let $\RV{Y}_{x} \coloneqq \llbracket\Fun{f}(x)=\APFun{f}(x)\rrbracket$ be a Boolean random variable.
+The probability that for all $x$ in $\Set{X}$, $\RV{Y}_{x} = 1$ is given by
+\begin{equation}
+	\Prob{\cap_{x \in \Set{X}} \RV{Y}_{x}=1}\,.
+\end{equation}
+If we assume independence,
+\begin{equation}
+	\Prob{\cap_{x \in \Set{X}} \RV{Y}_{x}=1} = \prod_{x \in \Set{X}} \Prob{\RV{Y}_{x}=1}\,.
+\end{equation}
+Since $\RV{Y}_{x}$ for each $x \in \Set{X}$ denote independent Boolean random variables, they are \emph{Bernoulli} distributed.
+
+\begin{definition}
+TODO: talk about independence.
+The \emph{order} of a random approximate map corresponds to the minimum number of partitions in which every element of a given partition is identically and independently Bernoulli distributed random variables.
+We model $\Fun{f} \colon \Set{X} \mapsto \Maybe{\Set{Y}}$ by a \emph{random} approximate function denoted by $\Fun{\AT{f}}$.
+That is, $\Fun{\AT{f}}$ is a random function.
+\end{definition}
+
+We denote a $k$-th order random approximate map of $\Fun{f}$ by $\Fun{f}[k][\pm]$ or, if we know and wish to emphasize the partitions, $\Fun{f}[\Set{X}[1],\ldots,\Set{X}[k]][\pm]$ or the Bernoulli probabilities corresponding to each partition, $\Fun{f}[p_1,\ldots,\p_k][\pm]$.
+
+
+
+Since each partition consists of some number of Bernoulli distributed random variables, that means each partition has a \emph{binomially distributed} number of $1$'s.
+
+
+
+%\begin{remark}
+%	NOTE: Is a first-order model plausible? Suppose we have variable length codes? If we condition on $\PlainSet{N}$ for instance, then $\Fun{\ell}_{\RV{X} %\Given \PlainSet{N}}(\Fun{f}, \APFun{f}[\fprate][\fnrate]) = \fprate$, but $\Prob{\APFun{f}[\fprate][\fnrate](\RV{X}) \neq \Nothing \Given \RV{X} \in %\PlainSet{N}} = \fprate$ does seem to be a Bernoulli trial $\berdist(\fprate)$.
+%\end{remark}
+
+
+
+In the random approximate map model, we assume that $\RV{X}$ is uniformly distributed.
+
+
+\subsection{Approximate set-indicator function}
+We may view a set $\Set{A}$ with respect to its \emph{indicator} function $\SetIndicator{\Set{A}} \colon \Set{X} \mapsto \BitSet$.
+
+The set indicator function partitions $\Set{X}$ into two parts, $\PlainSet{P} \coloneqq \SetBuilder{x \in \Set{X}}{\SetIndicator{\Set{A}}(x) = 1}$ and $\PlainSet{N} \coloneqq \SetBuilder{x \in \Set{X}}{\SetIndicator{\Set{A}}(x) = 0}$.
+
+
+
+%One in particular is defined as $\Fun{d}(a,a) = 1$ for any $a$ and otherwise $0$, in which case $\Fun{\ell}_{\RV{X} \Given \FancySet{A}}(\Fun{g} \Given \Fun{f})$ is the probability that $\Fun{f}(\RV{X}) \neq \Fun{g}(\RV{X})$ given that $\RV{X} \in \FancySet{A}$.
+%Conditioning on different subsets of $\Set{X}$ yields different \emph{binary performance measures}.
+
+\begin{definition}
+\label{def:fpr}
+The \emph{false positive rate}, denoted by $\hat{\fprate}$, is defined as the expectation $\Fun{\ell}_{\RV{X} \Given \PlainSet{N}}(\Fun{g} \Given \Fun{f})$ and the \emph{true negative rate}, denoted by $\hat{\tnrate}$, is defined as the probability $1-\hat{\fprate}$.
+\end{definition}
+
+\begin{definition}
+	\label{def:fnr}
+	The \emph{false negative rate}, denoted by $\hat{\fnrate}$, is defined as the expectation $\Fun{\ell}_{\RV{X} \Given \PlainSet{P}}(\Fun{g} \Given \Fun{f})$ and the \emph{true positive rate}, denoted by $\hat{\tprate}$, is defined as the probability $1-\hat{\tprate}$.
+\end{definition}
+
+\begin{remark}
+	If $\PlainSet{P}$ is a priori known, we can ignore elements not in the domain of definition of $\Fun{f}$ and thus discard $\hat{\fprate}$.
+\end{remark}
+
+
+By \cref{eq:disj_loss,def:fpr,def:fnr}, the expected loss over the entire domain is given by
+\begin{equation}
+\Fun{\ell}_{\RV{X}}(\Fun{g} \Given \Fun{f}) = \Fun{\ell}_{\RV{X} \Given \PlainSet{N}}(\Fun{g} \Given \Fun{f}) \Fun{p}_{\RV{X}}(\PlainSet{N}) + \Fun{\ell}_{\RV{X} \Given \PlainSet{P}}(\Fun{g} \Given \Fun{f}) \Fun{p}_{\RV{X}}(\PlainSet{P}) = \hat{\fprate} (1-\Fun{p}_{\RV{X}}(\PlainSet{P})) + \hat{\fnrate} \Fun{p}_{\RV{X}}(\PlainSet{P})\,.
+\end{equation}
+
+
+
+
+The false negative rate is given by $\fnrate = \Fun{\ell}_{\RV{X} \Given \PlainSet{P}}(\Fun{f}, \Fun{\AT{f}})$.
+
+The false positive rate is given by $\fprate = \Fun{\ell}_{\RV{X} \Given \PlainSet{N}}(\Fun{f}, \Fun{\AT{f}})$.
+
+Each element in $\PlainSet{N}$ is a false positive with probability $\fprate$.
+That is, it is a Bernoulli trial with $p = \fprate$.
+If a false positive occurs, then it randomly chooses a \emph{representation} in the prefix-free codes for $\Set{Y}$ or an undefined code, which we map to \Nothing.
+
+If the values in $\Set{Y}$ are uniquely represented, then it randomly (uniformly) chooses a value in $\Set{Y}$.
+
+It may hash to an undefined code.
+Two possibilities to consider:
+\begin{enumerate}
+	\item The hash to undefined code that is not a prefix of any other code.
+	\item If the codes are variable-length, it may hash to a prefix of one or more codes.
+\end{enumerate}
+
+If the values in $\Set{Y}$ are uniquely represented, then it randomly (uniformly) chooses a value in $\Set{Y}$.
+
+
+
+
+
+
+
+
+\subsection{Probability model}
+
+TODO 3:
+
+
+\COMMENT{
+\begin{example}
+	Suppose we have two functions, $\Fun{f} \colon \{a,b,c\} \mapsto \{0,1,2\}$ and $\Fun{g} \colon \{0,1,2\} \mapsto \{\triangle,\mathlg{\diamond},\square\}$ defined respectively as
+	\begin{multicols}{2}
+	\noindent
+	\begin{equation}
+		\Fun{f}(x) \coloneqq
+		\begin{cases}
+		1	&	x = a\,,\\
+		2	&	x = b\,,\\
+		0	&	x = c\,.		
+		\end{cases}
+	\end{equation}
+	\begin{equation}
+		\Fun{g}(y) \coloneqq
+		\begin{cases}
+		\triangle			&	y = 0\,,\\
+		\mathlg{\diamond}	&	y = 1\,,\\
+		\square				&	y = 2\,.
+		\end{cases}
+	\end{equation}
+	\end{multicols}
+	
+	We approximate $\Fun{f}$ with $\Fun{f}[\PAT{\{a,b\}}] \colon \{a,b,c\} \mapsto \{0,1,2\}$ and $\Fun{g}$ with $\Fun{g}[\PAT{\{0\}}] \colon \{0,1,2\} \mapsto \{\triangle,\mathlg{\diamond},\square\}$ respectively with the probability mass functions defined as
+	\begin{multicols}{2}
+		\noindent
+		\begin{equation}
+			\Fun{f}[\PAT{\{a,b\}}](x) =
+			\begin{cases}
+			0													&	x = a\,,\\
+			2													&	x = b\,,\\
+			\RV{Y} \sim \Fun{p}[\RV{Y} \Given x \notin \{a,b\}]	&	x = c\,.
+			\end{cases}
+		\end{equation}
+		\begin{equation}
+			\Fun{p}(x \Given x \in \{a,b\}) =
+			\begin{cases}
+			0	&	7/8\,,\\
+			1	&	1/16\,,\\
+			2	&	1/16
+			\end{cases}
+		\end{equation}
+	\end{multicols}
+
+	\begin{multicols}{2}
+		\noindent
+		\begin{equation}
+		\Fun{p}(x \Given x \in \{a,b\}) =
+		\begin{cases}
+		0	&	7/8\,,\\
+		1	&	1/16\,,\\
+		2	&	1/16
+		\end{cases}
+		\end{equation}
+		\begin{equation}
+		\Fun{p}(x \Given x \in \{0\}) =
+		\begin{cases}
+		\triangle			&	1/2\,,\\
+		\mathlg{\diamond}	&	1/3\,,\\
+		\square				&	1/6\,.
+		\end{cases}
+		\end{equation}
+	\end{multicols}
+
+	
+	The composition $\Fun{f} \circ \Fun{g} \colon \{a,b,c\} \mapsto \{\triangle,\mathlg{\diamond},\square\}$ and its probability mass are respectively given by
+	\begin{equation}
+	(\Fun{f} \circ \Fun{g})(x) \coloneqq
+	\begin{cases}
+	\mathlg{\diamond}	&	x = a\,,\\
+	\square				&	x = b\,,\\
+	\triangle			&	x = c\,.
+	\end{cases}
+	\end{equation}
+	
+\end{example}
+}
+
+
+
+
+
+
+
+
+
+General first-order random approximate map model is given by the following definition.
+\begin{definition}
+A function $\Fun{f}[\PAT{\Set{A}}] \colon \Set{X} \mapsto \Set{Y}$, $\Set{A} \subseteq \Set{X}$, is a \emph{first-order} random approximate map of $\Fun{f} \colon \Set{X} \mapsto \Set{Y}$ if the following conditions are satisfied:
+\begin{equation}
+\Fun{f}[\AT{\Set{A}}](x) \coloneqq
+	\begin{cases}
+		\RV{Y^{+}}		&	x \notin \Set{A}\,,\\
+		\RV{Y_{-}}		&	x \in \Set{A}\,.
+	\end{cases}
+\end{equation}
+where $\RV{Y^{+}}$ is a random variable with a support that is a subset of $\Set{Y}$ (including being equal to $\Set{Y}$).
+\end{definition}
+
+If we have a first-order rate-distorted map, then $\RV{Y^{+}}$ has a probability mass function that is given by
+\begin{equation}
+	\Fun{p}_{\RV{Y^{+}}}(y) = \sum_{b \in \Encode_{\Set{Y}}(y)} 2^{-\BL(b)}\,,
+\end{equation}
+where $\Encode_{\Set{Y}}$ is a prefix-free encoder for values in $\Set{Y}$.
+
+An optimal encoder may be found by computing the frequency of each element in $\Set{Y}$ when we apply $\Fun{f}$ to every element in $\Set{A}$ or $\Set{X}$\footnote{The latter may be chosen if we care about the approximation error over $\SetDiff[\Set{X}][\Set{A}]$.} and generating a Huffman code for it.
+
+However, since encoding the Huffman code may require a relatively large amount of memory, especially if the image of $\Fun{f}$ is large, this approach may not be practical.
+Alternatively, there are many well-known algorithms to generate prefix codes for specific distributions, or families of distributions.
+Universal codes may be appropriate when the image of $\Fun{f}$ is very large.
+If all else fails, there is always the uniform distribution.
+
+\begin{example}
+The first-order positive random approximate set $\PASet{A}[\fprate]$ is a first-order random approximate map of $\SetIndicator{\Set{A}} \colon \Set{X} \mapsto \BitSet$ where, conditioning on $\Set{A}$, $\sum_{b \in \Encode_{\BitSet}(1)} 2^{-\BL(b)} = \fprate$ and $\sum_{b \in \Encode_{\BitSet}(0)} 2^{-\BL(b)} = 1-\fprate$.
+\end{example}
+
+
+
+If there are constraints, such as the space of bijective functions $\Set{X} \mapsto \Set{X}$, then there are $\Card{\Set{X}}!$ such functions and the probability that, given a bijective function $\Fun{f}$, a randomly chosen bijective function $\Fun{g}$ is equal to $\Fun{f}$ with probability $\frac{1}{\Card{\Set{X}}!}$.
+
+
+
+
+TODO -1:
+
+The distance function $\Fun{d}(a,a) = 0$ and otherwise $1$ combined with $\Fun{\ell}$ counts the proportion of values mapped correctly.
+
+TODO 0:
+
+The \emph{zero-th} order approximation? Maybe we say that its uniformly distributed, i.e., just a random variable with a sample space $\Set{Y}$.
+
+What is first order then? Partition into $k$ subsets, and elements in partition $j$ are identically distributed.
+
+What is second order? Partition into $k$ subsets, and when we condition on a subset ...
+
+TODO .5: 
+Is 1st order actually 4th order model? Partions $\Set{X}$ into $\Set{A}$ and $\SetComplement[\Set{A}]$. Then, it partitions $\SetComplement[\Set{A}]$ into $\{y^*\}$ and $\SetComplement{\Set{A}} - \{y^*\}$ and it partitions $\Set{A}$ given $x \in \Set{A}$ into $\{\Fun{f}(x)\}$ and $\Set{Y} - \{\Fun{f}(x)\}$. That makes 4 partitions, each element in which has a different conditional probability.
+
+We shouldn't overcomplicate though. Maybe just say these are random approximate maps, sometimes difficult to quantify distributions, but in some cases we can provide a well-understood model, e.g., the set-indicator function has a first-order model that's straight-forward. Even higher-order models are somewhat understandable. Boolean algebra types in general, including $\{0,1\}$, all have this easily understood first-order model?
+
+
+
+TODO 1:
+
+Revised first-order model: $\Fun{f}_{\AT{A}} \colon \Set{X} \mapsto \Set{Y}$ has the property that if $x \in \Set{A}$ then $\RV{Y} = \Fun{f}_{\AT{\Set{A}}}(x)$ realizes $\Fun{f}(x)$ with probability $1-r$ and is uniformly distributed over sample space $\Set{Y} - \{\Fun{f}(x)\}$ otherwise, i.e., realizes any value in $\Set{Y} - \{\Fun{f}(x)\}$ with probability $r / (\Card{\Set{Y}}-1)$.
+
+For each $x \notin \Set{A}$, $\RV{Y} = \Fun{f}_{\AT{\Set{A}}}(x)$ is independently and identically distributed where it realizes some default value $y^*$ with probability $1-\fprate$ and is uniformly distributed over $\Set{Y} - \{y^*\}$ otherwise.
+
+TODO 1.5:
+
+Don't necessarily mention rate distortion except in passing, and then talk about, say, SHM as generating errors due to rate distortion.
+
+
+TODO 2:
+
+Given a function $\Fun{f} \colon X \mapsto Y$, $\Fun{f}[\AT{Q}[\fprate][\fnrate]][q] \colon X \mapsto Y_q$ approximately models $\Fun{f} \restriction_{Q} \colon X \mapsto Y$ where elements not in $Q \subseteq X$ are mapped by $\Fun{f} \restriction_{\AT{Q}}$ to $Y$ with probability $\fprate$ and to some \emph{default} value $q$ with probability $1-\fprate$.
+
+The \emph{first-order random approximate set}, $\ASet{A}[\fprate][\fnrate]$, may be modeled by the approximate map of the characteristic function, $\Fun{f}[\ASet{A}[\fprate][\fnrate]][0] \colon \Set{U} \mapsto \BitSet$.
+
+If we wish to speak of the \emph{type}, we may move the notation to the arrow, i.e., $X \amapsto{\fprate}{\fnrate} Y$.
+
+The default value may be disjoint from $Y$, e.g., the sum type $Y + q$.
+
+If we do not know the rates, or they are unimportant, we may instead denote it by $\Fun{f}[\AT{Q}] \colon X \mapsto Y$.
+
+
+$\Fun{f} \colon X \mapsto Y$, $\Fun{f}[\AT{Q}[\fprate][\fnrate]] \colon X \mapsto Y$
+
+We say that is of type 
+$\Fun{f} \colon X \mapsto Y$, $\Fun{f}[\AT{Q}[\fprate][\fnrate]] \colon X \mapsto Y$
+
+
+Additionally, elements in $Q$ are not mapped by $\Fun{f}_{\restriction_{\AT{Q}}}$.
+
+
+
+TODO: revisit false negative and false positive rate. False positive rate should probably just be about what the approximate map is conditioned on, i.e., if f : X -> Y and we build amap(f,A) then we have fA : A -> m(Y). If fA(x) != Nothing when x not in A, then that is a false positive. Simplify this result. Now we can focus more on false negatives. A false negative is when fA(x) != f(x) when x in A. In other words, we want to look at the restriction of the original function f to A -> m(Y) (partial) and compare it to fA.
+
+Now, for the approx boolean, fA : bool -> bool (or m(bool)), we typically let A = {0,1}. So, in that case, there are no "negatives" and so no false positives, there is only a rate distortion on the positives. Only two positives, 0 and 1. If fA(false) maps to Nothing, that's a false negative... but shouldn't really happen in this case the function is so simple. Now we must also talk about the mabye monad though... because a approx(bool) is {0,1,nothing} with some prob. distribution over the elements, P[fA(true) = nothing] is false negative rate. P[fA(true) != nothing] is 1-fnr. Rate distortion on positives that don't map to Nothing are a different matter. Now we're talking about
+% === End of sections/approx_maps.tex ===
+
+% === Content from sections/composition.tex ===
+\providecommand{\mainx}{..}
+\section{Higher-order random approximate maps}
+Typically, a data structure models a \emph{first-order} random approximate map where the approximation error is due to \emph{rate-distortion}.
+Then, through algebraic operations on first-order maps, such as composition, \emph{higher-order} approximate maps are the natural result.
+
+We discuss some of these higher-order models in this section.
+
+
+\subsection{Algebra of relations}
+
+\subsection{Algebra of sets}
+The \emph{set-complement}, \emph{set-intersection}, and \emph{set-union} operators have set-indicator functions defined respectively as
+\begin{align}
+	\SetIndicator{\SetComplement[\Set{A}]} 				&\coloneqq 1-\SetIndicator{\Set{A}}(x)\,,\\
+	\SetIndicator{\Set{A} \SetIntersection \Set{B}}(x) 	&\coloneqq \SetIndicator{\Set{A}}(x) \SetIndicator{\Set{B}}(x)\,,\\
+	\SetIndicator{\Set{A} \SetUnion \Set{B}}(x) 		&\coloneqq \SetIndicator{\Set{A}}(x) + \SetIndicator{\Set{B}}(x) - \SetIndicator{\Set{A}}(x) \SetIndicator{\Set{B}}(x)\,.
+\end{align}
+
+
+\subsection{Composition}
+\label{sec:comp_map}
+Composition of first-order approximate maps yields (potentially) a higher-order approximate map where elements in the negative set are not identically distributed.
+
+The higher the order of the approximation, the greater the number of different distributions.
+
+The positive set is more difficult to quantify since an algorithm may try to generate maps that yield minimal error.
+
+If the ...
+
+
+
+
+Compose should return a function that is the composition of a list of functions of arbitrary length. Each function is called on the return value of the function that follows. You can think of compose as moving right to left through its arguments.
+
+Let $\APFun{f}[\fprate_1][\fnrate_1] \colon \Set{X} \mapsto \Set{Y}$ be an approximate map with a false positive rate $\fprate_1$ and false negative rate $\fnrate_1$ and let $\APFun{g}[\fprate_2][\fnrate_2] \colon \Set{Y} \mapsto \Set{Z}$ be an approximate map with a false positive rate $\fprate_2$ and false negative rate $\fnrate_2$.
+
+Then, the composition $\APFun{g} \circ \APFun{f} \colon \Set{X} \mapsto \Set{Z}$ is an approximate map.
+
+\begin{assumption}
+When composing $\APFun{f}$ with $\APFun{g}$, if $x \in \Dom(\Fun{f})$, then $\Fun{f}(x) \in \Dom\!\left(\Fun{g}\right)$. Otherwise, the composition is undefined.
+\end{assumption}
+Let $\RV{X}$ denote a randomly chosen element from $\Set{X}$. Under the assumptions of our model, what is the probability that $\RV{X}$ results in undefined behavior when used as the input in the composition $\APFun{f}[\fprate][\fnrate] \circ \APFun{g}[\fprate][\fnrate]$?
+
+
+$\ATL{\mapsto}$
+
+$\ATL{\pfun}[\fprate]$
+
+$\ATL{\mapsto}[\fprate][\fnrate]$
+
+
+$\ATOverUnder{\AT{\ATL{\Set{A}}[\fprate_1][\fnrate_2]}[\fprate_2][\fnrate_2]}[\fprate_3][\fnrate_3]$
+
+$\ATOverUnder{\Set{A}}[\fprate][\fnrate]$
+
+
+$\ATL{\Set{A}}[\fprate][\fnrate] \times \ATL{\Set{A}}[\fprate][\fnrate]$
+
+
+$\ATL{\Set{A}}$
+
+${}^{\pm} \! \Set{A}$
+
+
+
+Suppose $\fnrate_1 = \fnrate_2 = 0$. If it is given that $\RV{X} \in \Dom(\Fun{f})$, the probability of a false positive is zero. Otherwise, a false positive occurs if:
+\begin{enumerate}
+    \item $\RV{X} \in \Dom(\APFun{f}[\fprate][\fnrate])$ and $\APFun{f}[\fprate][\fnrate](\RV{X})$ maps to a value $\RV{Y} \in \Dom(\APFun{g}[\fprate][\fnrate])$.
+\end{enumerate}
+
+
+
+Suppose we have an approximate map where the keys are from the tuple of $n$ elements given by the type
+\begin{equation}
+    \Set{X} = \Set{X}_1 \times \cdots \times \Set{X}_n
+\end{equation}
+and the values are from the tuple of $m$ elements given by the type
+\begin{equation}
+    \Set{Y} = \Set{Y}_1 \times \cdots \times \Set{Y}_m\,.
+\end{equation}
+
+\begin{example}
+Let the keys be of the type
+\begin{equation}
+    \Set{X} = \{1,2\} \times \{a,b\}
+\end{equation}
+and the values be of the type
+\begin{equation}
+    \Set{Y} = \{c,d\} \times \{1,2\}\,.
+\end{equation}
+Since these are small sets, for may enumerate the universe of keys and values.
+The universe of keys is given by
+\begin{equation}
+    (1,a),(1,b),(2,a),(2,b)
+\end{equation}
+and the universe of values is given by
+\begin{equation}
+    (c,1),(c,2),(d,1),(d,2)\,.
+\end{equation}
+\end{example}
+
+
+Then, the map $\Fun{f} \colon \Set{X} \mapsto \Set{Y}$ maps tuples of the form $(x_1,\ldots,x_n), x_j \in \Set{X}_j$ to values of  $(y_1,\ldots,y_m),y_j \in \Set{Y}_j$.
+
+Currying is a way of constructing functions that allows partial application of a function’s arguments.
+
+
+\begin{example}
+Let the approximate map $\Fun{f} \colon \Set{Z} \times \Set{Z} \mapsto \Set{Q} \times \Set{Z}$ be defined by the rule
+\begin{equation}
+    \Fun{f}(x_1,x_2) = \left(\frac{x_2}{2},x_1\right)
+\end{equation}
+for $(x_1,x_2) \in \{(1,1),(2,2),(3,4)\}$.
+The set of ordered pairs defining $\Fun{f}$ is thus given by
+\begin{equation}
+    \left\{
+        \left((1,1),\left(\frac{1}{2},1\right)\right),
+        \left((2,2),\left(1,2\right)\right),
+        \left((3,4),\left(\frac{3}{2},4\right)\right)
+    \right\}\,.
+\end{equation}
+\end{example}
+
+Define composition of functions. Then, talk about how a composition of functions with approximate domains result in composition of functions with approximate domains. Talk about how the false positive rate increases. Relate this to an error measure?
+
+
+One kind of composition is fuzzy hedge functions?
+% === End of sections/composition.tex ===
+
+% Confusion matrix analysis
+\input{sections/confusion_matrix_functions}
+
+% === Content from sections/special_functions.tex ===
+\providecommand{\mainx}{..}
+\section{Predicate functions}
+\label{sec:pred}
+
+
+
+\subsection{Indicator functions (unary predicate functions)}
+The indicator function of a set $\Set{A}$ over a universal set $\Set{U}$ is denoted by $\SetIndicator{\Set{A}} \colon \Set{X} \mapsto \BitSet$.
+A \emph{first-order} random approximate set of $\Set{A}$ with a false positive rate $\fprate$ and false negative rate $\fnrate$ is denoted by $\ASet{A}[\fprate][\fnrate]$, which may be modeled by a \emph{first-order} random approximate map $\APFun{\SetIndicator{\Set{A}}}[\fprate][\fnrate] \colon \Set{X} \mapsto \BitSet$.
+More generally, functions of type $\Set{X} \ATOverUnder{\mapsto}[\fprate][\text{\raisebox{3pt}{$\fnrate$}}] \BitSet$ model first-order random approximate subsets of the universal set $\Set{X}$.
+This may also be indicated by $\AT{\RV{R}}[\fprate][\fnrate]$ given that $\RV{R}$ may realize any element in $\PS{\Set{X}}$.
+
+
+\subsection{Relations as $n$-ary predicates}
+
+A $k$-ary predicate function is a $k$-ary \emph{relation}. For the $k$-ary predicate on $k$ oblivious types, we may use either \emph{approximate relations} or perfect relations. However, a perfect relation for oblivious types requires a bit length that is a function of the total possible number of $k$-relations on the types whereas the approximate relation on oblivious types only requires a bit length that is a function of the the number of relations in the exact relation.
+Except for very small types, the approximate relation is the only practical option.
+
+TODO: mention how the oblivious relation can be also oblivious to the \emph{arity} of the relation.
+Could be a unitary relation, could be a $k$-ary relation where $k$ is arbitrary large. This is good for preventing random ``searches'' over tuples from effectively determining actual relations.
+
+TODO: need to flesh out the oblivious relation (approximate relation) paper.
+Then, a $k$-ary predicate is a $k$-ary relation. It's not necessarily a function, it's only asking if a given $k$ tuples are \emph{related}. For instance, an ordered set answers questions like $a \leq b$ if $(a,b)$ is in the binary relation.
+
+A $k$-ary predicate satisfying the \emph{regular function} concept, $\Fun{f} \colon T_1 \times \cdots \times T_k \mapsto \Bool$, maps $k$-tuples of type $(T_1,\ldots,T_k)$ to \True or \False.
+
+
+
+
+Higher-order may result from many sources.
+
+Suppose we have two binary predicates $\Fun{f} \colon \Set{X} \times \Set{Y} \mapsto \BitSet$ and $\Fun{g} \colon \Set{Y} \times \Set{Z} \mapsto \BitSet$.
+To model a $k$-ary predicate, we might chain the tests, e.g., a $3$-ary predicate is approximated by $\Fun{w} \colon \Set{X} \times \Set{Y} \times \Set{Z} \mapsto \BitSet$ with a definition
+\begin{equation}
+	\Fun{w}(x,y,z) \coloneqq \Fun{f}(x,y) \land \Fun{g}(y,z)\,.
+\end{equation}
+
+\begin{theorem}
+\label{thm:fpr}
+The false positive rate of a composed approximate predicate is bounded by the sum of the individual false positive rates.
+\end{theorem}
+
+\begin{theorem}
+\label{thm:fnr}
+The false negative rate of a composed approximate predicate depends on the logical composition of the individual predicates.
+\end{theorem}
+
+\Cref{thm:fpr,thm:fnr} is the \emph{ideal probabilistic model} for $k$-ary predicates over \emph{oblivious types}.
+If some subsets of $[T_1] \times \cdots \times [T_k]$ are more likely to have false positives, and therefore some subsets are less likely to have false positives (and likewise for false negatives), then for instance, determining the probability that a particular tuple is a false positive or a true positive may be done with greater probability than given by our model assumptions.
+
+\subsubsection{Total orders}
+Less-than predicates
+% === End of sections/special_functions.tex ===
+
+% === Content from sections/disc_fun.tex ===
+\providecommand{\mainx}{..}
+\section{Discrete partial functions}
+
+\subsection{$0$-ary functions (constants)}
+The special case of the $0$-ary predicate is a \emph{constant} $\True$ or $\False$.
+This may be useful in some cases, notably \emph{cipher} value types.
+To put it simply, if we have a constant function $\Fun{f} \colon \Set{1} \mapsto \Set{X}$, then $\Fun{f}(1) \coloneqq y$ and $\APFun{f}(1)$ is equal to $y$ with probability $1-\fnrate$ and some other value with probability $\fnrate$.
+
+Basically, approximate constants.
+In \emph{algebraic data types}, the approximate constant is fundamental.
+We may compose such things to generate other types, e.g., the Boolean type $\BitSet$ is just $\APFun{f}(1) + \APFun{g}(1)$, yielding an approximate Boolean type.
+% === End of sections/disc_fun.tex ===
+
+%\subfile{sections/adt}
+% === Content from sections/singular_hash_map.tex ===
+\providecommand{\mainx}{..}
+\section{A first-order rate-distorted map}
+We present a \emph{theoretical} data type, denoted the \emph{entropy map} that have several key properties:
+\begin{enumerate}
+\item Perfect model of the \emph{first-order} random approximate map.
+\item Bit-length of in-place encoding is a random variable $\RV{L}$ that is expected to obtain the theoretical lower-bound.
+\item In-place encoding has maximum conditional entropy (when conditioning on a few parameters like expected false positive rate).
+\end{enumerate}
+Note that we know a priori what the distribution of the random number of trials $\RV{N}$ needed to produce a result that satisfies the rate-distortion constraints where a parameterized Goulumb code is expected to compress the representation.
+However, this representation is not \emph{in-place} and is thus only useful as a \emph{serialization} format.
+
+We consider sets in which the universe of elements is given by the \emph{countably infinite} set of all bit strings.
+\begin{definition}
+The countably infinite set of all bit strings is denoted by
+\begin{equation}
+    \BitSet^* = \left\{b \colon b \in \left\{0,1\right\}^*\right\}\,,
+\end{equation}
+where $*$ denotes all non-negative integers.
+\end{definition}
+A \emph{finite} subset of $\BitSet^*$ is given by the following definition.
+\begin{definition}
+The \emph{finite set} of all bit strings of length $n$ is denoted by
+\begin{equation}
+    \BitSet^n = \left\{b \colon b \in \left\{0,1\right\}^n\right\}
+\end{equation}
+with a cardinality given by
+\begin{equation}
+    \Card{\BitSet^n} = 2^n\,.
+\end{equation}
+\end{definition}
+
+A \emph{hash function} is related to countable sets $\BitSet^*$ and $\BitSet^n$ and is given by the following definition.
+\begin{definition}
+A \emph{hash function} of type $\BitSet^* \mapsto \BitSet^n$ maps (hashes) bit strings of arbitrary-length to bit strings of fixed-length $n$.
+\end{definition}
+
+The random oracle is given by the following definition.
+\begin{definition}
+\label{def:randomoracle}
+A random oracle $\hash \colon \BitSet^* \mapsto \BitSet^{\infty}$ is a theoretical \emph{hash function} whose output is uniformly distributed over its codomain.
+\end{definition}
+
+The bit length of objects is given by the following definition.
+\begin{definition}
+The bit length of an object $x$ is denoted by
+\begin{equation}
+    \BL(x)\,.
+\end{equation}
+\end{definition}
+For example, the bit length of an object $x \in \BitSet^n$ is $\BL(x) = n$.
+
+The set of rationals in $[0,1]$ is denoted by $\FancySet{P}$ and the set of power-of-two probabilities is denoted by
+\begin{equation}
+	\FancySet{R} \coloneqq \SetBuilder{2^{-k} \in \RatSet}{k \in \IntSet_{\geq 0}} \subset \FancySet{P}\,.
+\end{equation}
+
+
+
+Suppose we a prefix-free encoder-decoder for values of type $\Set{Y}$ denoted respectively by $\Encode_{\Set{Y}} \colon \Set{Y} \mapsto \BitSet^*$ and $\Decode_{\Set{Y}} \colon \BitSet^* \mapsto \Maybe{\Set{Y}}$.
+
+If we are given a (possibly infinite) sequence of bits $b_1 b_2 \ldots b_k b_{k+1} \ldots$ and $b_1 b_2 \ldots b_k$ is a (prefix-free) code for some $y$ in $\Set{Y}$, then $\Decode_{\Set{Y}}(b_1 b_2 \ldots b_k b_{k+1} \ldots)$ maps to $y$.
+Inversely, $\Encode_{\Set{Y}}(y)$ maps to $b_1 b_2 \ldots b_k$.
+
+The singular hash map models a \emph{first-order} random approximate map where the approximation error is due to \emph{rate-distortion}.
+\emph{Rate-distortion} is a result of two different parameter choices:
+\begin{enumerate}
+	\item\label{itm1} Distortion due to \emph{insufficient} bits.
+	\item\label{itm1_dup1} Distortion due to accepting any false negative rate less than some lower-bound.
+	\item Distortion due to specifying a false positive rate, which causes elements not in the set to be mapped to be mapped to some uncertain value that is a function of the prefix-free encoder-decoder. If codes assume a uniform distribution, then randomly choose a $Y$.
+\end{enumerate}
+
+In the singular hash map, \cref{itm1} is dueo to either a larger \emph{false positive rate} $\fprate = 2^{-k}$ by increasing $k$ or restricting the search to a maximum finite number trials (and choosing the trial that resulted in the minimum loss according to some distance function).
+
+In either case, the end result is an expected smaller encoding length, but in the first case we are directly motivated by a rate limit in the form of an upper-bound on the bit length and in the second case we are satisfied with greater approximation error but impose no upper-bound.
+
+In the metric space $(\Set{X}, \Fun{d})$, if $\Fun{d}$ is defined as $\Fun{d}(a,a) = 1$ and otherwise $\Fun{d}(a,b) = 0$, $a \neq b$, we get the 
+
+The probability of success given a rate-distortion $\fnrate$ on positives and $\fprate$ on negatives is given by
+\begin{equation}
+	\Fun{p}(\fprate,\fnrate) = \binom{m}{(1-\fnrate)m} \fprate^{m(1-\fnrate)} (1-\fprate)^{m \fnrate}\,.
+\end{equation}
+
+Each trial is geometrically distributed, $\RV{T} \sim \geodist(\Fun{p}(\fprate,\fnrate))$.
+
+
+
+The expected number of trials is $\Expect{\RV{T}} = \frac{1}{\Fun{p}(\fprate,\fnrate)}$.
+The expected code size is $\Expect{\log_2 \RV{T}}$, which is non-linear and problematic but may be approximated with
+\begin{equation}
+	-\Fun{H}_b(\fnrate) - \fnrate \log_2 (1-\fprate) - (1-\fnrate) \log_2 \fprate
+\end{equation}
+bits per element where $\Fun{H}_b(p) \coloneqq (1-p)\log_2(1-p) + p \log_2 p$ is the binary entropy function.
+
+This result is not the result of computing $\Expect{\log_2 \RV{T}}$, nor the expectation of its Taylor approximation.
+It is simply $\log_2 \Expect{\RV{T}}$.
+
+If $\fnrate$ and $\fprate$ are near $0$, then this simplifies to $\fnrate \log_2 \fnrate - $
+
+If we let $\fnrate \coloneqq 0$, the above simplifies to $\log_2 \fprate$, which is the lower-bound for \emph{first-order} random positive approximate sets over countably infinite universes with a false positive rate $\fprate$.
+
+
+NB
+---
+
+Talk about NB distribution.
+
+If we are satisfied with false negatives, we are no longer requiring all $m$ to succeed.
+
+Negative binomial: given $n$ trials, what is the probability $k$ succeeds? If $k=m$, we are back to the previous solution with $\fnr = 0$.
+
+The expected false negative rate is just not due to one trial, but an expectation
+\begin{equation}
+	\sum_{k=0}^{m} \Prob{\RV{T} = k} 
+\end{equation}
+
+If $\RV{T}$ realizes $\fnr$ that means after $n$ trials, the best was $\fnr$.
+
+
+---
+
+
+
+%We consider a family of \emph{approximate maps} which are given by the output of the random oracle applied to the input $x \in \Dom(\Fun{f})$ concatenated %with a bit string $b \in \BitSet^*$ such that all $x \in \Dom(\Fun{f})$ map to the same hash.
+%The function is given by the following definition.
+
+
+\subsection{Maybe monad}
+Suppose the encoder-decoder has the pair $\Encode_{\Set{X}} \colon \Set{X} \mapsto \PS{\BitSet^*}$ and $\Decode_{\Set{X}} \colon \BitSet^* \pfun \Set{X}$.
+
+We consider a specialization of the algorithm that, given a function $\Fun{f} \colon \Set{X} \mapsto \Set{Y}$ generates rate-distorted maps $\APFun{f}[\fprate][\fnrate] \colon \Set{X} \mapsto \Maybe{\Set{Y}}$.
+The encoder-decoder only applies to elements of $\Set{X}$ which test as positive, at which point the elements are mapped to values as previously.
+
+In other words, and assuming no rate-distortion, it maps values in the domain of definition of $\Fun{f}\!\!\restriction_{\Set{A}}$ to \emph{nothing} with probability $\fnrate$ and otherwise maps it correctly and it maps values not in its domain of definition to \emph{nothing} with probability $\fprate$ and value $y$ with probability
+\begin{equation}
+	\Fun{p}_{\RV{Y}}(y) \coloneqq \!\!\!\!\! \sum_{z \in \Encode_{\Set{Y}}(y)} \!\!\!\!\! 2^{-\BL(z)}\,.
+\end{equation}
+
+The function $\GenerateSeeds \colon (\Set{X} \mapsto \Maybe{\Set{Y})} \times \PS{\Set{X}} \times \FancySet{R} \mapsto \PS{\BitSet^* \times \FancySet{P}}$ is defined as
+\begin{equation}
+	\GenerateSeeds(\Fun{f}, \Set{A}, \fprate) \coloneqq \PlainSet{T}
+	\end{equation}
+where
+\begin{equation}
+\begin{split}
+	m_a						&\coloneqq \Card{\Set{A}}\,,\\
+	k						&\coloneqq -\log_2 \fprate\,,\\
+	\Fun{h}(x \Given n,k)	&\coloneqq \trunc(\hash(x' \cat n'),k)\,,\\	
+	\Match(x \Given n,k)	&\coloneqq \Fun{h}(x \Given n,k)\,,\\
+	\PlainSet{H} 			&\coloneqq \SetBuilder{\Match(x \Given n,k) \in \BitSet^{k}}{x \in \Set{X}}\,.
+\end{split}
+\end{equation}
+
+
+
+
+%
+%\begin{definition}
+%	The \emph{data type} for the \emph{random approximate map} under consideration, denoted the \emph{singular hash map}, is defined as $\SHS \coloneqq \BitSet^* \times \NatSet$ with a value constructor $\MakeSHM \colon (\Set{X} \pfun \Set{Y}) \times \PS{\Set{X}} \times [0,1] \times [0,1] \mapsto \SHS$ defined as
+%	\begin{equation}
+%	\MakeSHM(\Fun{f}, \Set{A}, \fprate, \fprate) \coloneqq \Tuple{\text{tuple here}}
+%	\end{equation}
+%	where
+%	\begin{equation}
+%	\begin{split}
+%	m				&\coloneqq \Card{\Set{X}}\,,\\
+%	N 				&\coloneqq \lceil m / r \rceil\,,\\
+%	k				&\coloneqq \lceil\log_2 N\rceil\,,\\
+%	\Fun{c}(x,n)	&\coloneqq \trunc(\hash(x' \cat n'),k)' \mod N\,,\\	
+%	\beta(x,n) 		&\coloneqq \trunc(\hash(x' \cat n'),k)' \mod N\,,\\
+%	\Set{Y}[n] 		&\coloneqq \SetBuilder{\beta(x,n) \in \{0,\ldots,N-1\}}{x \in \Set{X}}\,,\\
+%	n 				& \coloneqq \min{\SetBuilder{ j \in \NatSet }{ \Set{Y}[j] \in \PS{\NatSet} \land \Card{\Set{Y}[j]} = m}}\,.
+%	\end{split}
+%	\end{equation}
+%\end{definition}
+%
+%
+%
+\begin{algorithm}
+	\caption{Implementation of \protect\MakeSingularHashMap over a universal set $\Set{X}$}
+	\label{alg:makeset}
+	\label{alg:shmap}
+	\DontPrintSemicolon
+	\SetKwProg{func}{function}{}{}
+	\KwIn
+	{
+		$\Set{A}$ is a subset of a universal set $\Set{X}$.
+		$\fprate$ is the false positive rate.
+		$t$ is the maximum number of trials.
+	}
+	\KwOut
+	{
+		$\ASet{A}[\fprate]$, a rate-distorted approximate set of $\Set{A}$, .
+	}
+	\func{\MakeSingularHashMap{$\Set{A}$, $\fprate$, $t$}}
+	{
+		$\Set{A}_{\BitSet^*} \coloneqq \SetBuilder{\Encode_{\Set{X}}(a) \in \BitSet^*}{a \in \Set{A}}$\;
+		\For{$n \gets 0$ \KwTo $t$}
+		{
+			\For{$j \gets 1$ \KwTo $2^n$}
+			{
+				$\found \gets \True$\;
+%				\tcp{To increase \emph{entropy} we try bit strings of length 
+%					$n$ in random order.}
+				$b_n \gets $ a bit string randomly drawn from $\BitSet^n$ without replacement\;
+				$h_k \gets \Nothing$\;
+				\For{$x \in \Set{A}_{\BitSet^*}$}
+				{
+					\If{$h_k = \Nothing$}
+					{
+						$h_k \gets \trunc(\hash(x \cat b_n), k)$\;\label{line:selfterm}
+					}
+					\ElseIf{$h_k \neq \trunc(\hash(x \cat b_n), k)$} 
+					{
+						$\found \gets \False$\;
+					}
+				}
+				\If{\found}
+				{
+					\Return $\Tuple{h_k, b_n}$\;
+				}
+			}
+		}
+	}
+\end{algorithm}
+
+
+\begin{algorithm}
+	\caption{Implementation of \protect\MakeSingularHashMap over a universal set $\Set{X}$}
+	\label{alg:makeset_dup1}
+	\DontPrintSemicolon
+	\SetKwProg{func}{function}{}{}
+	\KwIn
+	{
+		$\Set{A}$ is a subset of a universal set $\Set{X}$.
+		$\fprate$ is the false positive rate.
+		$t$ is the maximum number of trials.
+	}
+	\KwOut
+	{
+		$\ASet{A}[\fprate]$, a rate-distorted approximate set of $\Set{A}$, .
+	}
+	\func{\MakeSingularHashMap{$\Set{A}$, $\fprate$, $t$}}
+	{
+		$\Set{A}_{\BitSet^*} \coloneqq \SetBuilder{\Encode_{\Set{X}}(a) \in \BitSet^*}{a \in \Set{A}}$\;
+		\For{$i \gets 0$ \KwTo $t$}
+		{
+			$\found \gets \True$\;
+%			\tcp{To maximize \emph{entropy} we try bit strings in random order.}
+			$b \gets $ a bit string randomly drawn from $\BitSet^{\leq t}$ without replacement\;
+			$h_k \gets \Nothing$\;
+			\For{$x \in \Set{A}_{\BitSet^*}$}
+			{
+				\If{$h_k = \Nothing$}
+				{
+					$h_k \gets \trunc(\hash(x \cat b), k)$\;
+				}
+				\ElseIf{$h_k \neq \trunc(\hash(x \cat b), k)$} 
+				{
+					$\found \gets \False$\;
+				}
+			}
+			\If{\found}
+			{
+				\Return $\Tuple{h_k, b_n}$\;
+			}
+		}
+	}
+\end{algorithm}
+
+
+
+
+
+\begin{algorithm}
+	\caption{Implementation of \protect\MakeSingularHashMap over a universal set $\Set{X}$}
+	\label{alg:makeset_dup2}
+	\DontPrintSemicolon
+	\SetKwProg{func}{function}{}{}
+	\KwIn
+	{
+		$\Set{A}$ is a subset of a universal set $\Set{X}$.
+		$\fprate$ is the false positive rate.
+		$t$ is the maximum number of trials.
+	}
+	\KwOut
+	{
+		$\ASet{A}[\fprate]$, a rate-distorted approximate set of $\Set{A}$, .
+	}
+	\func{\MakeSingularHashMap{$\Set{A}$, $\fprate$, $t$}}
+	{
+		$\Set{A}_{\BitSet^*} \coloneqq \SetBuilder{\Encode_{\Set{X}}(a) \in \BitSet^*}{a \in \Set{A}}$\;
+		\For{$n \gets 0$ \KwTo $t$}
+		{
+			$\PlainSet{H} \gets \EmptySet$\;
+			\For{$b \in \Set{A}_{\BitSet^*}$}
+			{
+				$\PlainSet{H} \gets \PlainSet{H} \SetUnion \{\trunc(\hash(b \cat n'), k)\}$\;
+			}
+		}
+	}
+\end{algorithm}
+
+
+
+\begin{figure}
+    \centering
+    %\input{img/fig_shmap.tex}
+    \caption{\emph{Singular Hash Map}}
+    \label{fig:shmap}
+\end{figure}
+
+
+
+In \Cref{alg:shmap} on \Cref{line:selfterm}, the value $v_i$ has a \emph{self-terminating} encoding. Thus, we need only check that the bit string that encodes $v_i$ is equal to a hash of the key (concatenated with another $1$ and another bit string $b$).
+
+
+The space required for the \emph{singular hash map} found by \Cref{alg:shmap} is of the order of the length $n$ of the bit string $b$. Therefore, for space efficiency, the algorithm exhaustively searches for a bit string in the order of increasing size $n$.
+
+\subsection{Theoretical analysis}
+The \emph{singular hash set} proves that the keys in $\APFun{f}$ are an \emph{approximate set} of the keys in $\Fun{f}$.
+
+\begin{theorem}
+The probability that a particular bit string $b \in \BitSet^*$ successfully codes the \emph{singular hash map} is given by
+\begin{equation}
+    p(m,\fprate,\mu) = \frac{\fprate^{m-1}}{2^{m \mu}}\,.
+\end{equation}
+\end{theorem}
+\begin{proof}
+In \cref{alg:shmap}, for a particular bit string $b_n$, the joint probability that every key in $\Fun{f}$ collides and for each key $k$ in $\Fun{f}$, the concatenation of $1$ and $k$ has a hash in which the first $\BL(v)$ bits collide with mapped value $v$ is given by the following reasoning.
+
+Suppose we have a set $\Fun{f} \coloneqq \{(k_1,v_1),\ldots,(k_m,v_m)\}$ and $k_1$ hashes to $y = \hash(k_1) \mod t$, where $\hash \colon \BitSet^* \mapsto \BitSet^N$ is a random hash function that uniformly distributes over its domain of $2^N$ possibilities and $N < \max{\BL(v_1),\ldots,\BL(v_m)}$.
+
+The probability that $\hash(1 \cat k_1) \mod \BL(v_1) = v_1$ is given by
+\begin{equation}
+    \frac{1}{2^{\BL(v_1)}}\,.
+\end{equation}
+Since $y$ is a particular element in $\BitSet^k$, the probability that $k_j, j \neq 1$, hashes to $y$ is given by
+\begin{equation}
+    \frac{1}{2^k}\,.
+\end{equation}
+The probability that $1 \cat k_j, j \neq 1$ hashes to $v_j$ is given by
+\begin{equation}
+    \frac{1}{2^{\BL(v_j)}}\,.
+\end{equation}
+Since $\hash$ is a random hash function, every one of these probabilities are independent, and thus the joint probability is just the product given by
+\begin{align}
+    p &= \frac{1}{2^{k(m-1)}} \prod_{j=1}^{m} \frac{1}{2^{\BL(v_j)}}\\
+      &= \fprate^{m-1} \frac{1}{2^{\sum_{j=1}^{m} \BL(v_j)}}\,.
+\end{align}
+The average bit length per key is given by
+\begin{equation}
+    \mu = \frac{1}{m} \sum_{j=1}^{m} \BL(v_j)
+\end{equation}
+and thus the probability $p$ may be parameterized as
+\begin{equation}
+    p = \frac{\fprate^{m-1}}{2^{m \mu}}\,.
+\end{equation}
+\end{proof}
+
+\begin{definition}
+\label{def:mapping}
+In the singular hash map construction algorithm, the $n$-th trial uniquely maps to a bit string of length $m = \lfloor \log_2 n \rfloor$, establishing a correspondence between trial number and bit string length.
+\end{definition}
+
+\begin{theorem}
+Given \emph{false positive} and \emph{false negative} domain error rates given by $\fprate$ and $\fnrate$ respectively, and a mean bit length $\mu$ of encodings of elements in the image of $\APFun{f}$, the \emph{expected} bit length of the Singular Hash Map asymptotically obtains a space complexity with a lower-bound given by
+\begin{equation}
+    -(1 - \fnrate) \log_2 \fprate + (1 - \fnrate) \mu \; \si{bits \per element}\,,
+\end{equation}
+which occurs when the encodings have uniformly distributed bit lengths, and an upper-bound given by
+\begin{equation}
+    -(1 - \fnrate) \log_2 \fprate + \mu \; \si{bits \per element}\,,
+\end{equation}
+which occurs when the encodings have degenerate bit lengths. The greater the entropy of the bit lengths, the smaller the expected bit length given a mean of $\mu$. 
+\end{theorem}
+\begin{proof}
+The space required for the singular hash set found by \Cref{alg:makeset} is of the order of the length $n$ of the bit string $b_n$.
+Therefore, for space efficiency, the algorithm exhaustively searches for a bit string in the order of increasing size $n$.
+
+We are interested in the first case when a success occurs, which is a geometric distribution with probability of success $p$ as given by
+\begin{equation}
+    \RV{Q} \sim \geodist\!\left(p = \frac{\fprate^{m-1}}{2^{m \mu}}\right)\,.
+\end{equation}
+The expected number of trials for the geometric distribution is given by
+\begin{equation}
+\label{eq:exp_trials}
+    \Expect{\RV{Q}} = \frac{2^{m \mu}}{\fprate^{m-1}}\,.
+\end{equation}
+By \Cref{def:mapping}, the $n$-th trial uniquely maps to a bit string of length $m = \lfloor \log_2 n \rfloor$.
+Thus, the expected bit length is given approximately by
+\begin{equation}
+    \Expect{\log_2 \RV{Q}} = \log_2 \frac{2^{m \mu}}{\fprate^{m-1}}\; \si{bits}\,.
+\end{equation}
+Dividing by $m$ and simplifying results in
+\begin{equation}
+    -\frac{m-1}{m} \log_2 \fprate + \mu\; \si{bits \per element}\,.
+\end{equation}
+Asymptotically, as $m \to \infty$, the bits per element goes to
+\begin{equation}
+    -\log_2 \fprate + \mu\,.
+\end{equation}
+\end{proof}
+
+The smaller the bit lengths generated by the encoder, the smaller the \emph{Singular Hash Map}.
+However, optimal encoders \emph{reveal} information about the values in the \emph{Singular Hash Map}, which goes against the principle of the \emph{obvlivious function}.
+For instance, if each input $x$ mapped to a list of numbers, then an optimal encoder will generate codes that minimize the length of the list, say a Huffman code.
+However, by analyzing the Huffman codes produced by the encoder, we may infer the distribution of the lists.
+Thus, for the sake of maintaining an \emph{oblivious} state, the encoder should generate codes as though the values were \emph{uniformly} distributed.
+
+\subsection{Entropy}
+% === End of sections/singular_hash_map.tex ===
+
+%\subfile{sections/random_algebraic}
+%\subfile{sections/notes}
+%\subfile{sections/rank_ordered_search}
+%\subfile{sections/appendix}
+
+% Conclusion
+\input{sections/conclusion}
+
+%\printglossary
+\bibliography{references}
+\end{document}

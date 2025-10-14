@@ -1,0 +1,104 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+
+\begin{document}
+\section{Confusion matrix analysis and rank properties}
+\label{sec:confusion_matrix}
+
+The fundamental structure of Bernoulli approximations is captured by their confusion matrices, which determine the theoretical limits of inference and recovery.
+
+\subsection{Confusion matrix structure for finite universes}
+
+For a finite universe $\Set{U}$ with $|U| = n$, the complete confusion matrix for Bernoulli sets has dimension $2^n \times 2^n$, representing transitions between all possible subsets.
+
+\begin{definition}[Confusion Matrix]
+The confusion matrix $\mathbf{C}$ for a Bernoulli set approximation has entries:
+\begin{equation}
+C_{ij} = \Prob{\text{observe } \Set{T}_j \mid \text{latent } \Set{S}_i}
+\end{equation}
+where $\Set{S}_i, \Set{T}_j \in \mathcal{P}(\Set{U})$ are subsets indexed by $i,j \in \{0, 1, \ldots, 2^n-1\}$.
+\end{definition}
+
+\subsection{Rank and inferability}
+
+The rank of the confusion matrix determines fundamental recoverability properties.
+
+\begin{theorem}[Rank-Inferability Correspondence]
+\label{thm:rank_inference}
+For a confusion matrix $\mathbf{C}$ of rank $r$:
+\begin{itemize}
+\item If $r = 2^n$, perfect Bayesian inference is possible
+\item If $r < 2^n$, there exist $2^n - r$ linearly dependent rows creating ambiguity sets
+\item If $r = 1$, no inference is possible (maximum entropy case)
+\end{itemize}
+\end{theorem}
+
+\begin{proof}
+When $\text{rank}(\mathbf{C}) = 2^n$, the matrix is invertible, allowing unique recovery of the latent distribution from observations. When rank is deficient, the null space dimension $2^n - r$ corresponds to the number of indistinguishable latent configurations.
+\end{proof}
+
+\subsection{Structural patterns in Bloom filters}
+
+Bloom filters exhibit highly structured confusion matrices with surprising rank properties.
+
+\begin{theorem}[Bloom Filter Rank Structure]
+\label{thm:bloom_rank}
+A Bloom filter for universe $\Set{U}$ has a confusion matrix with:
+\begin{itemize}
+\item \textbf{Sparsity}: $C_{ij} = 0$ when $\Set{T}_j \not\subseteq \Set{S}_i$ (no false negatives)
+\item \textbf{Block diagonal dominance}: High probability mass on diagonal blocks
+\item \textbf{Effective rank} $\approx 2^{|S|}$ for typical parameter settings
+\end{itemize}
+\end{theorem}
+
+This high rank means Bloom filters actually \emph{enhance} inferability compared to random confusion matrices, contrary to intuition that approximations always degrade information.
+
+\begin{example}[Small Universe Analysis]
+For $\Set{U} = \{a, b, c\}$ with Bloom filter false positive rate $\epsilon$:
+\begin{equation}
+\mathbf{C} = \begin{pmatrix}
+1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+\epsilon & 1-\epsilon & 0 & 0 & 0 & 0 & 0 & 0 \\
+\epsilon & 0 & 1-\epsilon & 0 & 0 & 0 & 0 & 0 \\
+\epsilon^2 & \epsilon(1-\epsilon) & \epsilon(1-\epsilon) & (1-\epsilon)^2 & 0 & 0 & 0 & 0 \\
+\vdots & \vdots & \vdots & \vdots & \ddots & \vdots & \vdots & \vdots
+\end{pmatrix}
+\end{equation}
+The rank remains close to 8 for $\epsilon \in (0, 1)$, preserving subset relationships.
+\end{example}
+
+\subsection{Information-theoretic characterization}
+
+The confusion matrix structure determines information flow between latent and observed sets.
+
+\begin{definition}[Conditional Entropy]
+The conditional entropy of latent sets given observations:
+\begin{equation}
+H(\text{latent} \mid \text{observed}) = -\sum_{i,j} P(\Set{S}_i, \Set{T}_j) \log \frac{P(\Set{S}_i, \Set{T}_j)}{P(\Set{T}_j)}
+\end{equation}
+\end{definition}
+
+\begin{theorem}[Information Preservation]
+\label{thm:info_preserve}
+For a Bernoulli set approximation with confusion matrix $\mathbf{C}$:
+\begin{equation}
+I(\text{latent}; \text{observed}) = H(\text{latent}) - H(\text{latent} \mid \text{observed}) = H(\text{latent}) - \log(\text{nullity}(\mathbf{C}))
+\end{equation}
+where nullity is the dimension of the null space.
+\end{theorem}
+
+\subsection{Rank deficiency patterns}
+
+Certain parameter configurations create rank-deficient matrices with predictable structure.
+
+\begin{theorem}[Doubly Stochastic Degeneracy]
+When false positive rate $\fprate$ and false negative rate $\fnrate$ satisfy $\fprate + \fnrate = 1$, the confusion matrix becomes doubly stochastic with rank deficiency, making the approximation non-invertible.
+\end{theorem}
+
+\begin{proof}
+When $\fprate + \fnrate = 1$, each row and column sums to 1, creating linear dependencies. The matrix eigenvalues include repeated 1s, reducing effective rank.
+\end{proof}
+
+These structural insights reveal that the quality of Bernoulli approximations depends not just on error rates but on the deeper algebraic properties of their confusion matrices.
+
+\end{document}

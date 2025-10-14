@@ -1,0 +1,102 @@
+\section{Confusion matrices for function spaces}
+\label{sec:confusion_matrix_functions}
+
+The Bernoulli map framework quantifies approximation errors through confusion matrices over function spaces, revealing fundamental limits on function recovery and inference.
+
+\subsection{Function space confusion matrices}
+
+For functions $\Fun{f}: \Set{X} \to \Set{Y}$, the complete confusion matrix has dimension $|\Set{Y}|^{|\Set{X}|} \times |\Set{Y}|^{|\Set{X}|}$.
+
+\begin{definition}[Function Confusion Matrix]
+The confusion matrix $\mathbf{Q}$ for Bernoulli map approximations has entries:
+\begin{equation}
+Q_{ij} = \Prob{\text{observe } \Fun{p}_j \mid \text{latent } \Fun{p}_i}
+\end{equation}
+where $\Fun{p}_i, \Fun{p}_j : \Set{X} \to \Set{Y}$ are functions indexed by $i,j \in \{1, \ldots, |\Set{Y}|^{|\Set{X}|}\}$.
+\end{definition}
+
+\begin{example}[Boolean Functions]
+For $\Fun{f}: \Bool \to \Bool$, there are exactly 4 functions:
+\begin{itemize}
+\item $\Fun{p}_1$: constant false ($\Fun{p}_1(x) = \False$ for all $x$)
+\item $\Fun{p}_2$: identity ($\Fun{p}_2(x) = x$)
+\item $\Fun{p}_3$: negation ($\Fun{p}_3(x) = \neg x$)
+\item $\Fun{p}_4$: constant true ($\Fun{p}_4(x) = \True$ for all $x$)
+\end{itemize}
+The $4 \times 4$ confusion matrix fully characterizes all possible approximations.
+\end{example}
+
+\subsection{Order and entropy}
+
+The order of a Bernoulli map corresponds to the degrees of freedom in its confusion matrix.
+
+\begin{definition}[Bernoulli Map Order]
+A Bernoulli map has order $k$ if its confusion matrix has $k$ independent parameters. The maximum order is $n(n-1)$ where $n = |\Set{Y}|^{|\Set{X}|}$.
+\end{definition}
+
+\begin{theorem}[Entropy Characterization]
+The entropy of a Bernoulli map approximation is:
+\begin{equation}
+H(\text{Bernoulli}[\Set{X} \to \Set{Y}]) = -\sum_{i,j} Q_{ij} \log Q_{ij}
+\end{equation}
+with conditional entropy given the latent function $\Fun{p}_i$:
+\begin{equation}
+H(\text{Bernoulli}[\Set{X} \to \Set{Y}] \mid \Fun{p}_i) = -\sum_{j} Q_{ij} \log Q_{ij}
+\end{equation}
+\end{theorem}
+
+\subsection{Structural patterns in practice}
+
+Real-world Bernoulli maps exhibit specific confusion matrix structures:
+
+\begin{theorem}[Diagonal Dominance]
+For most practical approximations with error rate $\epsilon < 0.5$:
+\begin{equation}
+Q_{ii} \geq 1 - |\Set{X}| \cdot \epsilon
+\end{equation}
+creating diagonal dominance that preserves function identity with high probability.
+\end{theorem}
+
+\begin{theorem}[Sparsity from Independence]
+When errors are independent across domain elements:
+\begin{equation}
+Q_{ij} = \prod_{x \in \Set{X}} \Prob{\AFun{p}_i(x) = \Fun{p}_j(x)}
+\end{equation}
+Most off-diagonal entries become exponentially small in $|\Set{X}|$.
+\end{theorem}
+
+\subsection{Examples of natural Bernoulli maps}
+
+\subsubsection{Set-indicator functions}
+The indicator function $\mathbbm{1}_A: \Set{X} \to \Bool$ becomes a Bernoulli map through structures like Bloom filters:
+\begin{equation}
+\Prob{\text{Bernoulli}[\mathbbm{1}_A](x) = \True \mid x \notin A} = \fprate
+\end{equation}
+The confusion matrix has special structure: transitions preserve subset relationships.
+
+\subsubsection{Primality testing}
+The Miller-Rabin test creates a Bernoulli approximation of $\text{is\_prime}: \mathbb{N} \to \Bool$ with:
+\begin{itemize}
+\item False positive rate: $\leq 1/4^k$ for $k$ rounds
+\item False negative rate: 0 (always correct for primes)
+\item Confusion matrix: highly asymmetric with zero entries
+\end{itemize}
+
+\subsubsection{Lossy compression}
+A lossy codec $\Fun{c}: \Set{X} \to \Set{X}$ has confusion matrix determined by rate-distortion:
+\begin{equation}
+Q_{ij} = \Prob{\Fun{c}(\Fun{p}_i) = \Fun{p}_j} = \exp(-\lambda \cdot d(\Fun{p}_i, \Fun{p}_j))
+\end{equation}
+where $d$ is a distortion metric and $\lambda$ controls the rate-distortion tradeoff.
+
+\subsection{Composition and higher-order effects}
+
+\begin{theorem}[Composition Order Increase]
+If $\AFun{f}: \Set{X} \to \Set{Y}$ has order $k_1$ and $\AFun{g}: \Set{Y} \to \Set{Z}$ has order $k_2$, then $\AFun{g} \circ \AFun{f}$ has order at most $k_1 \cdot k_2 \cdot |\Set{Y}|$.
+\end{theorem}
+
+\begin{proof}
+The composition's confusion matrix is the product of individual confusion matrices, with intermediate marginalization over $\Set{Y}$.
+\end{proof}
+
+These structural insights demonstrate that Bernoulli maps provide a unified framework for understanding diverse approximation schemes through their confusion matrix properties.

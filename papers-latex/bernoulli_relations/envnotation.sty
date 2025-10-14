@@ -1,0 +1,79 @@
+% Environment configurations for Alex Towell.
+%
+% Includes things like theorems, proofs with separate counters, and so on.
+% TODO: make another proof environment without the separate counter, because
+% sometimes the proof is not connected to a particular theorem.
+%
+% TODO: provide an option so that we can specify whether defs, postulates, theorems, or lemmas are numbered by chapter, section, etc. default: chapter
+\NeedsTeXFormat{LaTeX2e}[1994/06/01]
+\ProvidesPackage{envnotation}[2018/01/01 alex towell's environment notation (style) for his various papers]
+
+\RequirePackage{amsmath}
+\RequirePackage{etoolbox}
+\RequirePackage{xparse}
+\RequirePackage{cleveref}
+
+\newcommand{\envnumstyle}{chapter}
+\DeclareOption{chapter}
+{
+    \renewcommand{\envnumstyle}{chapter}
+}
+\DeclareOption{section}
+{
+    \renewcommand{\envnumstyle}{section}
+}
+
+\ExecuteOptions{envchapter}
+\ProcessOptions\relax
+
+\newcounter{proofeqcounter}
+\AtBeginEnvironment{proof}{\setcounter{proofeqcounter}{\value{equation}}
+\setcounter{equation}{0}\renewcommand{\theequation}{\alph{equation}}}
+\AtEndEnvironment{proof}{\setcounter{equation}{\value{proofeqcounter}}}
+
+\theoremstyle{plain}
+\newtheorem{lemma}{Lemma}[\envnumstyle]
+\newtheorem{theorem}{Theorem}[\envnumstyle]
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{definition}{Definition}[\envnumstyle]
+\newtheorem{postulate}{Postulate}[\envnumstyle]
+\newtheorem{conjecture}{Conjecture}[\envnumstyle]
+
+\newtheorem{assumption}{Assumption}
+\crefname{assumption}{ assumption }{ assumptions }
+\Crefname{assumption}{ Assumption }{ assumptions }
+
+\newtheorem{axiom}{Axiom}
+\crefname{axiom}{ axiom }{ axioms }
+\Crefname{axiom}{ Axiom }{ Axioms }
+
+
+\newcounter{examplecounter}
+
+\newenvironment{example}
+{
+    \refstepcounter{examplecounter}%
+    \par\vspace{\baselineskip}\noindent 
+    \textbf{Example \theexamplecounter}%
+    \begin{itshape}
+    \quad
+}
+{
+    \end{itshape}
+    \par\vspace{\baselineskip}% 
+    \noindent\ignorespacesafterend     
+}
+
+\newcounter{exampleeqcounter}
+\AtBeginEnvironment{example}{\setcounter{exampleeqcounter}{\value{equation}}
+\setcounter{equation}{0}\renewcommand{\theequation}{\alph{equation}}}
+\AtEndEnvironment{example}{\setcounter{equation}{\value{exampleeqcounter}}}
+
+\newtheorem*{remarkx}{Remark}
+\newenvironment{remark}
+  {\pushQED{\qed}\renewcommand{\qedsymbol}{$\triangle$}\remarkx}
+  {\popQED\endremarkx}
+
+\newtheorem*{notation}{Notation}
+
+\endinput

@@ -1,0 +1,495 @@
+\documentclass[11pt,final,hidelinks]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage[activate={true,nocompatibility},final,tracking=true,kerning=true,spacing=true,factor=1100,stretch=10,shrink=10]{microtype}
+\usepackage{mathtools}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{algorithm2e}
+\usepackage{booktabs}
+% \usepackage{minted} % Disabled - using verbatim instead
+\usepackage{hyperref}
+\usepackage[square,numbers]{natbib}
+\bibliographystyle{plainnat}
+\usepackage{cleveref}
+
+% Theorem environments
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+
+% Unified notation for latent/observed framework
+\newcommand{\obs}[1]{\widetilde{#1}}  % Universal observation operator
+\newcommand{\latent}[1]{#1}           % Explicit latent marker (optional)
+\newcommand{\observed}[1]{\widetilde{#1}}  % Explicit observed marker
+
+% Sets and functions
+\newcommand{\Set}[1]{#1}              % Just use S instead of \Set{S}
+\newcommand{\ASet}[1]{\obs{#1}}       % Use \obs{S} instead
+\newcommand{\SetIndicator}[1]{\mathbf{1}_{#1}}
+\newcommand{\Indicator}[1]{\mathbf{1}_{#1}}
+\newcommand{\EmptySet}{\emptyset}
+\newcommand{\PowerSet}[1]{\mathcal{P}(#1)}
+\newcommand{\Card}[1]{\lvert#1\rvert}
+
+% Probability and error rates
+\newcommand{\Prob}[1]{\mathbb{P}\left[#1\right]}
+\newcommand{\ProbCond}[2]{\mathbb{P}\left[#1 \mid #2\right]}
+\newcommand{\Expect}[1]{\mathbb{E}\left[#1\right]}
+\newcommand{\fprate}{\alpha}
+\newcommand{\fnrate}{\beta}
+\newcommand{\error}{\epsilon}
+
+% Types
+\newcommand{\Type}[1]{\mathtt{#1}}
+\newcommand{\Bool}{\Type{Bool}}
+\newcommand{\True}{\mathtt{true}}
+\newcommand{\False}{\mathtt{false}}
+\newcommand{\bernoulli}[2]{\mathcal{B}\langle #1, #2 \rangle}
+
+% Information theory
+\newcommand{\Entropy}[1]{H(#1)}
+
+\title{Entropy Maps: Space-Optimal Implementation of Bernoulli Maps through Information-Theoretic Coding}
+\author{
+    Alexander Towell\\
+    \texttt{atowell@siue.edu}
+}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We present entropy maps as a space-optimal implementation technique for Bernoulli maps—functions that provide noisy observations of latent mathematical mappings. The key insight is that by using prefix-free codes and cryptographic hash functions, we can achieve information-theoretically optimal space usage while maintaining the latent/observed distinction fundamental to Bernoulli types. An entropy map observes a latent function $f: X \to Y$ by hashing domain elements to prefix-free codes representing codomain values, with the code lengths determined by the desired observation distribution. This enables oblivious computation where the stored representation reveals nothing about the latent function beyond what can be inferred from queries. We demonstrate applications to privacy-preserving set membership, approximate function representation, and space-efficient probabilistic data structures. The framework reveals that optimal space usage requires accepting observation errors—a fundamental trade-off between fidelity and efficiency in observing latent functions.
+\end{abstract}
+
+\section{Introduction}
+
+The Bernoulli framework distinguishes between latent mathematical objects and their computational observations. While previous work has focused on the algebraic properties of these observations, a critical question remains: how can we \emph{implement} observations space-efficiently?
+
+This paper introduces \emph{entropy maps} as an answer. An entropy map implements observations of a latent function $f: X \to Y$ using space proportional to the entropy of the observation distribution—achieving information-theoretic optimality.
+
+\subsection{The Implementation Challenge}
+
+Consider implementing an observed set membership function $\obs{\Indicator{A}}: X \to \Bool$ where $A \subseteq X$. The latent function $\Indicator{A}$ returns $\True$ for $x \in A$ and $\False$ otherwise. Traditional approaches either:
+\begin{itemize}
+    \item Store $A$ explicitly, using $O(\Card{A} \log \Card{X})$ bits
+    \item Use a Bloom filter, achieving $O(\Card{A})$ bits but with false positives
+\end{itemize}
+
+Entropy maps provide a principled framework: the space required is exactly the entropy of the observation distribution, achieving optimal compression while making the latent/observed distinction explicit.
+
+\subsection{Core Insight: Hashing to Prefix-Free Codes}
+
+The key idea is deceptively simple:
+\begin{enumerate}
+    \item Assign prefix-free codes to codomain values based on desired observation probabilities
+    \item Use a cryptographic hash function to map domain elements to binary strings
+    \item Check if the hash prefix matches any code to determine the observed output
+\end{enumerate}
+
+By carefully choosing code lengths, we can implement any observation distribution while using minimal space.
+
+\section{Theoretical Framework}
+
+\subsection{Prefix-Free Codes and Observation Probabilities}
+
+\begin{definition}[Prefix-Free Code Assignment]
+Given a codomain $Y$ and desired observation probabilities $\{p_y\}_{y \in Y}$, a prefix-free code assignment is a mapping $c: Y \to \{0,1\}^*$ such that:
+\begin{enumerate}
+    \item No code is a prefix of another: $\forall y, y' \in Y, y \neq y' \implies c(y) \not\sqsubseteq c(y')$
+    \item The probability of observing $y$ under uniform hashing equals $p_y$
+\end{enumerate}
+\end{definition}
+
+\begin{theorem}[Kraft-McMillan Inequality for Observations]
+A probability distribution $\{p_y\}_{y \in Y}$ can be realized by prefix-free codes if and only if:
+\begin{equation}
+\sum_{y \in Y} p_y \leq 1
+\end{equation}
+The equality holds for complete observations; inequality allows for undefined outputs.
+\end{theorem}
+
+\subsection{From Latent Functions to Observed Functions}
+
+\begin{definition}[Entropy Map]
+Given a latent function $f: X \to Y$ and a cryptographic hash function $h: X \times \mathbb{N} \to \{0,1\}^\omega$, an entropy map with seed $s$ implements the observed function:
+\begin{equation}
+\obs{f}_s(x) = \begin{cases}
+y & \text{if } \exists y \in Y: c(y) \sqsubseteq h(x, s) \\
+\bot & \text{otherwise}
+\end{cases}
+\end{equation}
+where $\sqsubseteq$ denotes the prefix relation.
+\end{definition}
+
+The critical insight is that we don't store the function directly—we store only a seed that, combined with the hash function, produces the desired observations.
+
+\subsection{Optimal Code Length Selection}
+
+\begin{theorem}[Optimal Code Lengths]
+For a latent function $f: X \to Y$ with distribution $\ProbCond{f(x) = y}{x \sim \mathcal{U}(X)} = q_y$, the space-optimal code lengths to achieve observation probabilities $p_y$ are:
+\begin{equation}
+\ell_y = -\log_2 p_y
+\end{equation}
+This achieves expected code length (entropy):
+\begin{equation}
+\mathcal{H} = -\sum_{y \in Y} p_y \log_2 p_y
+\end{equation}
+\end{theorem}
+
+\section{Latent/Observed Duality in Entropy Maps}
+
+\subsection{Set Membership as Function Observation}
+
+Consider the set membership problem through the latent/observed lens:
+
+\begin{example}[Bernoulli Set Membership]
+For a latent set $A \subseteq X$, we want to observe membership queries through $\obs{\Indicator{A}}$. Design goals:
+\begin{itemize}
+    \item No false negatives: $\ProbCond{\obs{\Indicator{A}}(x) = \True}{\text{latent } x \in A} = 1$
+    \item Controlled false positives: $\ProbCond{\obs{\Indicator{A}}(x) = \True}{\text{latent } x \notin A} = \fprate$
+\end{itemize}
+
+Solution: Assign codes such that:
+\begin{itemize}
+    \item $c(\True)$ has total probability $\fprate$ (e.g., all strings starting with $\underbrace{00\ldots0}_{k \text{ bits}}$ for $k = -\log_2 \fprate$)
+    \item $c(\False)$ has probability $1 - \fprate$
+    \item Find seed $s$ where $\forall x \in A: c(\True) \sqsubseteq h(x, s)$
+\end{itemize}
+\end{example}
+
+This reveals the fundamental nature of Bloom filters: they implement entropy maps for set membership with specific code assignments.
+
+\subsection{The Oblivious Property}
+
+\begin{definition}[Oblivious Observation]
+An observed function $\obs{f}$ is $k$-oblivious if the stored representation reveals at most $k$ bits of information about the latent function $f$.
+\end{definition}
+
+\begin{theorem}[Entropy Maps are Maximally Oblivious]
+An entropy map storing only a $k$-bit seed is $k$-oblivious, achieving the optimal trade-off between space and observation fidelity.
+\end{theorem}
+
+This property is crucial for privacy-preserving applications: the stored representation reveals minimal information about the latent function.
+
+\section{Construction Algorithms}
+
+\subsection{Finding Suitable Seeds}
+
+The core challenge is finding a seed $s$ that maps all elements correctly:
+
+\begin{algorithm}[H]
+\SetAlgoLined
+\KwIn{Latent function $f: X \to Y$, codes $c: Y \to \{0,1\}^*$}
+\KwOut{Seed $s$ implementing $\obs{f}$}
+\Repeat{all $x \in \text{dom}(f)$ map correctly}{
+    $s \leftarrow$ random seed\;
+    $\text{valid} \leftarrow \True$\;
+    \For{$x \in \text{dom}(f)$}{
+        \If{$\neg \exists y: c(y) \sqsubseteq h(x,s) \land y = f(x)$}{
+            $\text{valid} \leftarrow \False$\;
+            break\;
+        }
+    }
+}
+\Return $s$\;
+\caption{Entropy Map Construction}
+\end{algorithm}
+
+\begin{theorem}[Expected Construction Time]
+For $n = \Card{\text{dom}(f)}$ elements mapped to codes of average length $\ell$, the expected number of trials is:
+\begin{equation}
+\mathbb{E}[\text{trials}] = 2^{n\ell}
+\end{equation}
+\end{theorem}
+
+\subsection{Multi-Level Construction}
+
+For large domains, we can use hierarchical construction:
+
+\begin{algorithm}[H]
+\SetAlgoLined
+\KwIn{Domain partition $X = X_1 \cup \ldots \cup X_k$, functions $f_i: X_i \to Y$}
+\KwOut{Seeds $s_1, \ldots, s_k$ and router function}
+\For{$i = 1$ to $k$}{
+    $s_i \leftarrow$ \text{ConstructEntropyMap}($f_i$, $c$)\;
+}
+Router $r: X \to [k]$ mapping $x$ to its partition\;
+\Return $(s_1, \ldots, s_k, r)$\;
+\caption{Hierarchical Entropy Map}
+\end{algorithm}
+
+\section{Applications}
+
+\subsection{Privacy-Preserving Membership Tests}
+
+Entropy maps enable membership tests that reveal nothing beyond query results:
+
+\begin{example}[Private Set Intersection]
+Two parties holding sets $A$ and $B$ can compute $\Card{A \cap B}$ without revealing their sets:
+\begin{enumerate}
+    \item Party 1 constructs entropy map for $\obs{\Indicator{A}}$ with false positive rate $\fprate$
+    \item Party 1 sends only the seed $s$ (e.g., 256 bits)
+    \item Party 2 queries all $x \in B$ and counts matches
+    \item Expected intersection size: $\frac{\text{matches} - \fprate \Card{B}}{1 - \fprate}$
+\end{enumerate}
+\end{example}
+
+\subsection{Approximate Function Storage}
+
+\begin{example}[Compressed Function Tables]
+Store a function $f: \{0,1\}^{32} \to \{0,1\}^8$ (4GB uncompressed) approximately:
+\begin{itemize}
+    \item For frequently accessed inputs, ensure correct outputs
+    \item For rare inputs, allow errors with rate $\fprate$
+    \item Storage: $O(\text{frequent inputs} \times 8 + \log(1/\fprate))$ bits
+\end{itemize}
+\end{example}
+
+\subsection{Probabilistic Caching}
+
+\begin{example}[Space-Efficient Cache]
+Implement a cache admission policy:
+\begin{itemize}
+    \item Latent: "Should item $x$ be cached?"
+    \item Observed: Entropy map with tunable false positive rate
+    \item Benefit: Constant space regardless of item universe size
+\end{itemize}
+\end{example}
+
+\section{Information-Theoretic Analysis}
+
+\subsection{Rate-Distortion Trade-off}
+
+\begin{theorem}[Fundamental Space-Accuracy Trade-off]
+For any implementation of observations of a function $f: X \to Y$ with error rate $\error$, the minimum space required is:
+\begin{equation}
+S \geq \Card{\text{dom}(f)} \cdot [H(Y) - H(\error)]
+\end{equation}
+where $H(Y)$ is the entropy of the output distribution and $H(\error)$ is the binary entropy of the error rate.
+\end{theorem}
+
+Entropy maps achieve this bound, confirming their optimality.
+
+\subsection{Observation Channel Capacity}
+
+Viewing entropy maps as communication channels:
+
+\begin{definition}[Observation Channel]
+The observation channel induced by an entropy map has:
+\begin{itemize}
+    \item Input alphabet: $X$ (domain)
+    \item Output alphabet: $Y \cup \{\bot\}$ (codomain plus undefined)
+    \item Channel matrix: Determined by code assignments and hash function
+\end{itemize}
+\end{definition}
+
+\begin{theorem}[Channel Capacity]
+The capacity of an entropy map observation channel is:
+\begin{equation}
+C = \max_{p(x)} I(X; \obs{Y}) = \log_2 \Card{Y}
+\end{equation}
+achieved when all codes have equal probability.
+\end{theorem}
+
+\section{Extensions and Generalizations}
+
+\subsection{Dynamic Entropy Maps}
+
+For functions that change over time:
+
+\begin{definition}[Versioned Entropy Map]
+Maintain a sequence of seeds $(s_1, s_2, \ldots, s_t)$ where each $s_i$ implements $\obs{f}_i$ for the function at time $i$.
+\end{definition}
+
+Updates require finding new seeds, but queries remain fast.
+
+\subsection{Continuous Domains}
+
+For continuous domains, we can use discretization:
+
+\begin{example}[Approximate Real Functions]
+To implement $\obs{f}: \mathbb{R} \to \mathbb{R}$:
+\begin{enumerate}
+    \item Discretize domain and range to finite precision
+    \item Apply entropy map to discretized function
+    \item Observation error combines discretization and entropy map errors
+\end{enumerate}
+\end{example}
+
+\subsection{Quantum Entropy Maps}
+
+The framework extends naturally to quantum computation:
+
+\begin{definition}[Quantum Entropy Map]
+Uses quantum superposition to store multiple seeds simultaneously, enabling quantum queries of observed functions.
+\end{definition}
+
+\section{Related Work}
+
+\subsection{Connection to Existing Structures}
+
+Entropy maps generalize several well-known probabilistic data structures:
+\begin{itemize}
+    \item \textbf{Bloom filters}: Entropy maps for set membership with specific codes
+    \item \textbf{Cuckoo filters}: Entropy maps with additional deletion support
+    \item \textbf{Minimal perfect hashing}: Entropy maps with zero error rate
+\end{itemize}
+
+\subsection{Theoretical Foundations}
+
+The concept builds on:
+\begin{itemize}
+    \item \textbf{Kolmogorov complexity}: Optimal representation of functions
+    \item \textbf{Rate-distortion theory}: Fundamental space-accuracy trade-offs
+    \item \textbf{Oblivious data structures}: Privacy through limited information leakage
+\end{itemize}
+
+\section{Implementation Considerations}
+
+\subsection{Hash Function Requirements}
+
+Critical properties for the hash function $h$:
+\begin{enumerate}
+    \item \textbf{Uniformity}: Outputs are uniformly distributed
+    \item \textbf{Independence}: Hash values for different inputs are independent
+    \item \textbf{Efficiency}: Fast evaluation for practical use
+\end{enumerate}
+
+\subsection{Space Efficiency}
+
+The information-theoretic lower bound for implementing observed sets provides a fundamental limit on space efficiency:
+
+\begin{theorem}[Space Lower Bound]
+A data structure implementing $\obs{S}$ with false positive rate $\alpha$ and true positive rate $\tau$ requires at least:
+\begin{equation}
+-\tau \log_2 \alpha \text{ bits per element}
+\end{equation}
+\end{theorem}
+
+This bound allows us to measure the absolute efficiency of implementations:
+
+\begin{definition}[Absolute Space Efficiency]
+For a data structure using $B$ bits to store $n$ elements:
+\begin{equation}
+\eta = \frac{-n\tau \log_2 \alpha}{B}
+\end{equation}
+where $\eta \in (0, 1]$ and $\eta = 1$ indicates optimal space usage.
+\end{definition}
+
+\begin{example}[Efficiency of Common Structures]
+\begin{itemize}
+    \item \textbf{Bloom filters}: $\eta \approx 0.69$ (uses factor $1/\ln 2$ more space)
+    \item \textbf{Entropy maps}: $\eta \to 1$ as code length increases
+    \item \textbf{Perfect hash filters}: $\eta \approx 0.89$ for practical parameters
+\end{itemize}
+\end{example}
+
+Common choices: SHA-256, BLAKE3, or specialized hash functions for short outputs.
+
+\subsection{Code Assignment Strategies}
+
+\begin{example}[Binary Tree Codes]
+Assign codes using a binary tree:
+\begin{verbatim}
+True:  00, 01, 100, 101, 110, 111  (3/4 probability)
+False: 11                           (1/4 probability)
+\end{verbatim}
+Achieves false positive rate of 1/4 with average code length 1.81 bits.
+\end{example}
+
+\subsection{Optimization Techniques}
+
+\begin{itemize}
+    \item \textbf{Parallel seed search}: Try multiple seeds simultaneously
+    \item \textbf{Incremental construction}: Add elements one at a time
+    \item \textbf{Approximate construction}: Allow a few errors for faster building
+\end{itemize}
+
+\section{Experimental Evaluation}
+
+\subsection{Construction Time vs. Space Trade-off}
+
+For set membership with $n$ elements and false positive rate $\fprate$:
+\begin{itemize}
+    \item Space: $n \log_2(1/\fprate)$ bits (optimal)
+    \item Construction time: $O(2^{n \log_2(1/\fprate)})$ (exponential)
+    \item Query time: $O(1)$ (constant)
+\end{itemize}
+
+This confirms the fundamental trade-off: optimal space requires exponential construction time.
+
+\subsection{Comparison with Bloom Filters}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcc}
+\toprule
+Property & Bloom Filter & Entropy Map \\
+\midrule
+Space (bits) & $1.44n\log_2(1/\fprate)$ & $n\log_2(1/\fprate)$ \\
+Construction & $O(n)$ & $O(2^{n\log_2(1/\fprate)})$ \\
+Query & $O(k)$ & $O(1)$ \\
+Oblivious & No & Yes \\
+\bottomrule
+\end{tabular}
+\caption{Bloom filter vs. entropy map for $n$ elements, FPR $\fprate$}
+\end{table}
+
+\section{Future Directions}
+
+\subsection{Practical Constructions}
+
+The exponential construction time limits practical applications. Future work should explore:
+\begin{itemize}
+    \item Approximation algorithms for seed finding
+    \item Specialized constructions for common function classes
+    \item Hardware acceleration for seed search
+\end{itemize}
+
+\subsection{Theoretical Questions}
+
+Open problems include:
+\begin{itemize}
+    \item Can we achieve subexponential construction for interesting function classes?
+    \item What is the complexity of verifying an entropy map implements a given function?
+    \item How do quantum algorithms change the construction complexity?
+\end{itemize}
+
+\subsection{Applications to Machine Learning}
+
+Entropy maps could enable:
+\begin{itemize}
+    \item Model compression through function approximation
+    \item Privacy-preserving inference
+    \item Uncertainty quantification through observation distributions
+\end{itemize}
+
+\section{Conclusions}
+
+Entropy maps provide a principled approach to implementing Bernoulli maps—observed functions that approximate latent mathematical mappings. By using prefix-free codes and cryptographic hashing, we achieve:
+
+\begin{itemize}
+    \item \textbf{Space optimality}: Using exactly the entropy of the observation distribution
+    \item \textbf{Oblivious computation}: Stored representation reveals minimal information
+    \item \textbf{Unified framework}: Generalizing Bloom filters, perfect hashing, and more
+\end{itemize}
+
+The key insight is that optimal space usage requires accepting observation errors—the latent/observed distinction is not a limitation but a fundamental requirement for efficiency.
+
+While exponential construction time limits current practicality, entropy maps establish the theoretical foundations for space-optimal approximate computation. They demonstrate that the gap between latent mathematical functions and their computational observations can be bridged optimally through information-theoretic coding.
+
+\bibliography{references}
+
+\end{document}

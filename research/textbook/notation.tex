@@ -1,0 +1,182 @@
+% Unified notation for Bernoulli types - Latent/Observed Framework
+% ===================================================================
+% This file emphasizes the fundamental distinction between latent (true)
+% values and their observations throughout the textbook.
+
+% CORE PRINCIPLE: Latent values need no decoration; observed values use tilde
+
+% ========== OBSERVATION NOTATION ==========
+
+% The universal observation operator
+\newcommand{\obs}[1]{\widetilde{#1}}
+
+% Explicit markers (for clarity in definitions)
+\newcommand{\latent}[1]{#1}
+\newcommand{\observed}[1]{\widetilde{#1}}
+
+% ========== TYPE NOTATION ==========
+
+% Basic types
+\newcommand{\Type}[1]{\mathtt{#1}}
+\newcommand{\Bool}{\Type{Bool}}
+\newcommand{\Nat}{\mathbb{N}}
+\newcommand{\Real}{\mathbb{R}}
+\newcommand{\Unit}{\Type{Unit}}
+\newcommand{\Void}{\Type{Void}}
+\newcommand{\Maybe}[1]{\Type{Maybe}[#1]}
+
+% Boolean values
+\newcommand{\True}{\mathtt{true}}
+\newcommand{\False}{\mathtt{false}}
+
+% ========== BERNOULLI TYPES ==========
+
+% Bernoulli type constructor: observations of type T with order n error model
+\newcommand{\bernoulli}[2]{\mathcal{B}\langle #1, #2 \rangle}
+\newcommand{\Bernoulli}[2]{\mathcal{B}\langle #1, #2 \rangle}
+
+% Common Bernoulli types
+\newcommand{\BernoulliBool}{\bernoulli{\Bool}{}}
+\newcommand{\BernoulliSet}[1]{\bernoulli{\mathcal{P}(#1)}{}}
+\newcommand{\BernoulliMap}[2]{\bernoulli{#1 \to #2}{}}
+
+% ========== SET NOTATION ==========
+
+% Sets: no decoration for latent sets
+% Example: S is a latent set, \obs{S} is an observed/approximate set
+
+% Power set
+\newcommand{\PS}[1]{\mathcal{P}(#1)}
+\newcommand{\PowerSet}[1]{\mathcal{P}(#1)}
+\newcommand{\EmptySet}{\emptyset}
+
+% Set operations (standard LaTeX)
+% Use \cup, \cap, \setminus directly
+\newcommand{\SetComplement}[1]{\overline{#1}}
+\newcommand{\Complement}[1]{\overline{#1}}
+\newcommand{\SetIndicator}[1]{\mathbf{1}_{#1}}
+\newcommand{\Indicator}[1]{\mathbf{1}_{#1}}
+
+% ========== FUNCTION NOTATION ==========
+
+% Functions: no decoration for latent functions
+% Example: f is a latent function, \obs{f} is an observed/approximate function
+
+% Function symbols
+% \newcommand{\mapsto}{\rightarrow} % Already defined in LaTeX
+\newcommand{\pfun}{\rightharpoonup}  % Partial function
+\newcommand{\compose}{\circ}
+
+% Function properties
+\newcommand{\Dom}{\mathsf{dom}}
+\newcommand{\Cod}{\mathsf{cod}}
+\newcommand{\Range}{\mathsf{range}}
+\newcommand{\Image}{\mathsf{img}}
+
+% ========== PROBABILITY NOTATION ==========
+
+% Basic probability
+\newcommand{\Prob}[1]{\mathbb{P}\left[#1\right]}
+\newcommand{\ProbCond}[2]{\mathbb{P}\left[#1 \mid #2\right]}
+\newcommand{\Expect}[1]{\mathbb{E}\left[#1\right]}
+\newcommand{\ExpectCond}[2]{\mathbb{E}\left[#1 \mid #2\right]}
+\newcommand{\Var}[1]{\mathrm{Var}\left[#1\right]}
+\newcommand{\Cov}[2]{\mathrm{Cov}\left[#1, #2\right]}
+
+% Channel notation: observed | latent
+\newcommand{\Channel}[2]{\ProbCond{\text{observe } #1}{\text{latent } #2}}
+
+% ========== ERROR RATES ==========
+
+\newcommand{\fprate}{\alpha}      % False positive rate
+\newcommand{\fnrate}{\beta}       % False negative rate
+\newcommand{\error}{\epsilon}     % Generic error rate
+\newcommand{\errorrate}{\epsilon}
+
+% Performance metrics
+\newcommand{\FPR}{\mathsf{FPR}}
+\newcommand{\FNR}{\mathsf{FNR}}
+\newcommand{\TPR}{\mathsf{TPR}}
+\newcommand{\TNR}{\mathsf{TNR}}
+\newcommand{\PPV}{\mathsf{PPV}}  % Positive predictive value
+\newcommand{\NPV}{\mathsf{NPV}}  % Negative predictive value
+
+% ========== INFORMATION THEORY ==========
+
+\newcommand{\Entropy}[1]{H(#1)}
+\newcommand{\MutualInfo}[2]{I(#1; #2)}
+\newcommand{\KL}[2]{D_{\mathrm{KL}}(#1 \| #2)}
+
+% ========== COMPLEXITY ==========
+
+\newcommand{\BigO}[1]{O(#1)}
+\newcommand{\BigOmega}[1]{\Omega(#1)}
+\newcommand{\BigTheta}[1]{\Theta(#1)}
+\newcommand{\littleo}[1]{o(#1)}
+\newcommand{\littleomega}[1]{\omega(#1)}
+\newcommand{\softO}[1]{\tilde{O}(#1)}
+
+% ========== COMMON FUNCTIONS ==========
+
+\newcommand{\Card}[1]{\lvert#1\rvert}  % Cardinality
+\newcommand{\Floor}[1]{\lfloor #1 \rfloor}
+\newcommand{\Ceil}[1]{\lceil #1 \rceil}
+\newcommand{\Norm}[1]{\|#1\|}
+
+% ========== LOGIC OPERATIONS ==========
+
+% Use standard LaTeX: \land, \lor, \neg
+\newcommand{\AND}{\wedge}
+\newcommand{\OR}{\vee}
+\newcommand{\NOT}{\neg}
+\newcommand{\XOR}{\oplus}
+\newcommand{\IMPLIES}{\Rightarrow}
+\newcommand{\IFF}{\Leftrightarrow}
+
+% ========== SPECIAL SYMBOLS ==========
+
+\newcommand{\Given}{\mid}
+\newcommand{\Ind}{\perp\!\!\!\perp}  % Independence
+
+% ========== CODE FORMATTING ==========
+
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\codecomment}[1]{\textit{\small // #1}}
+
+% ========== ALGORITHM NOTATION ==========
+
+\newcommand{\Assignment}{\leftarrow}
+\newcommand{\Random}{\stackrel{\$}{\leftarrow}}
+% \newcommand{\Repeat}{\text{repeat}} % Already defined by algorithm2e
+% \newcommand{\Until}{\text{until}} % Already defined by algorithm2e
+\newcommand{\Return}{\text{return}}
+
+% ========== COMMON ABBREVIATIONS ==========
+
+\newcommand{\iid}{\text{i.i.d.}}
+\newcommand{\wrt}{\text{w.r.t.}}
+\newcommand{\st}{\text{s.t.}}
+\newcommand{\ie}{\textit{i.e.}}
+\newcommand{\eg}{\textit{e.g.}}
+\newcommand{\cf}{\textit{cf.}}
+\newcommand{\viz}{\textit{viz.}}
+
+% ========== MATRIX NOTATION ==========
+
+\newcommand{\Matrix}[1]{\mathbf{#1}}
+\newcommand{\Vector}[1]{\mathbf{#1}}
+\newcommand{\Transpose}{^\top}
+
+% ========== DEPRECATED NOTATION ==========
+% These are kept for backward compatibility but should be phased out:
+
+\newcommand{\Set}[1]{#1}  % Just use S instead of \Set{S}
+\newcommand{\ASet}[1]{\obs{#1}}  % Use \obs{S} instead
+\newcommand{\Fun}[1]{\mathsf{#1}}  % Just use f
+\newcommand{\AFun}[1]{\obs{\mathsf{#1}}}  % Use \obs{f}
+
+% ========== COMPARISON OPERATORS ==========
+
+\newcommand{\equals}{==}
+\newcommand{\notequals}{!=}
+\newcommand{\assign}{=}

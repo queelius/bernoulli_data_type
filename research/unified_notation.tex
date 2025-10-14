@@ -1,0 +1,117 @@
+% Unified Notation for Bernoulli Types Research
+% =============================================
+%
+% This file provides consistent notation across all papers based on the
+% latent/observed framework that is central to Bernoulli types.
+%
+% Core Principle: Distinguish between latent (true) and observed (noisy) values
+
+% ========== GENERAL NOTATION ==========
+
+% Latent values (no special decoration - these are the "true" values)
+% - x, y, z for elements
+% - S, T, U for sets  
+% - f, g, h for functions
+
+% Observed values (use tilde to indicate observation/approximation)
+% - \obs{x}, \obs{y}, \obs{z} for observed elements
+% - \obs{S}, \obs{T}, \obs{U} for observed sets
+% - \obs{f}, \obs{g}, \obs{h} for observed functions
+
+\newcommand{\obs}[1]{\widetilde{#1}}  % Universal observation operator
+
+% Alternative: Use \latent and \observed for clarity in definitions
+\newcommand{\latent}[1]{#1}
+\newcommand{\observed}[1]{\widetilde{#1}}
+
+% ========== BERNOULLI TYPES ==========
+
+% Bernoulli type constructor: B^n(T) or B_n(T)
+\newcommand{\Bernoulli}[2]{\mathcal{B}^{#2}(#1)}  % \Bernoulli{T}{n}
+\newcommand{\BernoulliSub}[2]{\mathcal{B}_{#2}(#1)}  % Alternative subscript notation
+
+% Common instances
+\newcommand{\BernoulliBool}[1]{\Bernoulli{\mathbb{B}}{#1}}  % Bernoulli Boolean
+\newcommand{\BernoulliSet}[1]{\Bernoulli{\mathcal{P}(#1)}{2}}  % Bernoulli power set
+
+% ========== ERROR RATES ==========
+
+\newcommand{\fprate}{\alpha}  % False positive rate
+\newcommand{\fnrate}{\beta}   % False negative rate
+\newcommand{\errorrate}{\epsilon}  % Generic error rate
+
+% Error rate notation for specific structures
+\newcommand{\withError}[3]{#1_{#2,#3}}  % e.g., \withError{S}{\fprate}{\fnrate}
+
+% ========== PROBABILITY AND EXPECTATION ==========
+
+\newcommand{\Prob}[1]{\mathbb{P}\left[#1\right]}
+\newcommand{\ProbCond}[2]{\mathbb{P}\left[#1 \mid #2\right]}  % Conditional probability
+\newcommand{\Expect}[1]{\mathbb{E}\left[#1\right]}
+\newcommand{\Var}[1]{\mathrm{Var}\left[#1\right]}
+
+% ========== SET NOTATION ==========
+
+% Basic sets
+\newcommand{\Universe}{\mathcal{U}}  % Universal set
+\newcommand{\PowerSet}[1]{\mathcal{P}(#1)}  % Power set
+\newcommand{\EmptySet}{\emptyset}
+
+% Set operations (no special commands needed, use standard LaTeX)
+% \cup for union
+% \cap for intersection  
+% \setminus for difference
+% \triangle for symmetric difference
+
+% Set complement
+\newcommand{\Complement}[1]{\overline{#1}}
+
+% Cardinality
+\newcommand{\Card}[1]{\lvert#1\rvert}
+
+% Membership indicator
+\newcommand{\Indicator}[1]{\mathbf{1}_{#1}}
+
+% ========== BOOLEAN VALUES ==========
+
+\newcommand{\Bool}{\mathbb{B}}
+\newcommand{\True}{\mathtt{true}}
+\newcommand{\False}{\mathtt{false}}
+
+% ========== CHANNEL/CONFUSION MATRIX ==========
+
+% Channel notation: observed | latent
+\newcommand{\Channel}[2]{\Prob{\text{observe } #1 \mid \text{latent } #2}}
+
+% Confusion matrix entry
+\newcommand{\Confusion}[2]{q_{#1,#2}}  % q_ij = P(observe j | latent i)
+
+% ========== FUNCTION NOTATION ==========
+
+% Function composition (use standard \circ)
+% Approximate/observed function application
+\newcommand{\ApproxApply}[2]{\obs{#1}(#2)}  % \ApproxApply{f}{x}
+
+% ========== USAGE EXAMPLES ==========
+
+% Example 1: Bernoulli Boolean
+% Latent: x \in \Bool
+% Observed: \obs{x} \in \Bernoulli{\Bool}{2}
+% Relationship: \Channel{\obs{x} = \True}{x = \False} = \fprate
+
+% Example 2: Bernoulli Set  
+% Latent: S \subseteq U
+% Observed: \obs{S} observes S with rates (\fprate, \fnrate)
+% Query: \Channel{x \in \obs{S}}{x \notin S} = \fprate
+
+% Example 3: Composition
+% Latent: f \circ g
+% Observed: \obs{f} \circ \obs{g}
+% Error: \errorrate_{\obs{f} \circ \obs{g}} = \errorrate_f + \errorrate_g - \errorrate_f \errorrate_g
+
+% ========== DEPRECATED NOTATION ==========
+% The following should be replaced:
+% \ASet{S} → \obs{S}
+% \PASet{S} → \obs{S}^+ or \withError{S}{\fprate}{0}  
+% \NASet{S} → \obs{S}^- or \withError{S}{0}{\fnrate}
+% \Set{S} → S (no decoration needed for latent)

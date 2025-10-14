@@ -1,0 +1,69 @@
+%
+%
+%
+\NeedsTeXFormat{LaTeX2e}[1994/06/01]
+\ProvidesPackage{algorithmnotation}[2018/01/01 alex towell's algorithm notation for his various papers]
+
+\RequirePackage{algorithm2e}
+
+\RestyleAlgo{ruled}
+\LinesNumbered
+
+
+% values of types
+\SetKw{True}{true}
+\SetKw{False}{false}
+\SetKwData{Null}{null}
+
+% types
+\SetKwData{Bool}{Bool}
+\SetKwData{Void}{Void}
+\SetKwData{Unit}{Unit}
+\SetKwData{List}{List}
+
+% keywords
+\SetKw{Break}{break}
+
+
+
+\SetKwFunction{NotFn}{not}
+\SetKwFunction{TrueFn}{true}
+\SetKwFunction{FalseFn}{false}
+\SetKwFunction{NegateFn}{negate}
+\SetKwFunction{AndFn}{and}
+\SetKwFunction{OrFn}{or}
+\SetKwFunction{XorFn}{xor}
+\SetKwFunction{NorFn}{nor}
+
+\SetKwFunction{AbsoluteEfficiency}{E}
+\SetKwFunction{RE}{RE}
+\SetKwFunction{Find}{find}
+\SetKwFunction{Ref}{ref}
+\SetKwFunction{Left}{left}
+\SetKwFunction{Right}{right}
+\SetKwFunction{Head}{head}
+\SetKwFunction{Tail}{tail}
+\SetKwFunction{IdFun}{id}
+\newcommand{\hash}{\Fun{h}}
+%\SetKwFunction{hash}{h}
+\SetKwFunction{ph}{ph}
+\SetKwFunction{bf}{BF}
+%\SetKwFunction{ro}{$\hash^*$}
+\SetKwFunction{BL}{$\ell$}
+
+\SetKwInOut{Params}{params}
+\SetKwInOut{KwIn}{input}
+\SetKwInOut{KwOut}{output}
+
+
+\newcommand{\Maybe}[1]{\FuncSty{m}\!\left({#1}\right)}
+
+\SetKwData{found}{found}
+
+\newlength\alglen
+\newcommand\alginput[1]{%
+  \settowidth\alglen{\KwIn{}}%
+  \setlength\hangindent{\alglen}%
+  \hspace*{\alglen}#1\\}
+
+\endinput

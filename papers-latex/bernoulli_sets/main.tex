@@ -1,0 +1,119 @@
+\documentclass[10pt,final,hidelinks]{article}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[activate={true,nocompatibility},final,tracking=true,kerning=true,
+    spacing=true,factor=1100,stretch=10,shrink=10]{microtype}
+\microtypecontext{spacing=nonfrench}
+\usepackage[margin=.5in]{geometry}
+\usepackage{graphicx}
+\graphicspath{{img/}} 
+\usepackage[noend]{algorithm2e}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{mathtools}
+\usepackage{subfiles}
+\usepackage{enumitem}
+\usepackage{commath}
+\usepackage{appendix}
+\renewcommand\appendixtocname{Appendices}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+%\usepackage[intoc,english]{nomencl}
+%\makenomenclature
+\usepackage{pgfplots}
+\usepackage{tabu} 
+\usepackage{tikz}
+\usepackage{tikzscale}
+\usepackage[square,numbers]{natbib}
+\bibliographystyle{plain}
+\usepackage{siunitx}
+\numberwithin{equation}{section}
+\usepackage{hyperref}
+\usepackage{cleveref}
+
+\pgfplotsset{compat=newest}
+
+\newcommand{\COMMENT}[1]{}
+
+\usepackage{functionnotation}
+\usepackage{algorithmnotation}
+\usepackage{matrixnotation}
+\usepackage[fancy]{setnotation}
+\usepackage[fancy]{relationnotation}
+\usepackage{approxsetnotation}
+\usepackage{approxrelationnotation}
+\usepackage[section]{envnotation}
+
+\hypersetup{
+    pdftitle={Bernoulli sets and their corresponding random binary classification measures.},
+    pdfauthor={Alexander Towell},               % author
+    pdfsubject={computer science},              % subject of the %document
+    pdfkeywords={
+        probabilistic data structure,
+        abstract data type,
+        approximate set,
+        bloom filter,
+        perfect hash function,
+        perfect hash filter},                   % keywords
+    colorlinks=true,                            % false: boxed links;
+    linkcolor=magenta,
+    citecolor=green,                            % color of links to 
+    filecolor=blue,                             % color of file links
+    urlcolor=green                              % color of external
+}
+
+\title
+{
+    Bernoulli sets: Probabilistic set approximations with controlled error rates\\
+    \large Theory, algebra, and applications to information retrieval
+}
+\author
+{
+    Alexander Towell\\
+    \texttt{atowell@siue.edu}
+}
+\date{}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+We present a comprehensive theory of Bernoulli sets---probabilistic approximations of classical sets with controlled false positive and false negative rates.
+We establish the mathematical foundations including the probability spaces, confusion matrix structures, and information-theoretic properties that govern these approximations.
+We derive the error propagation laws for Boolean algebra operations (union, intersection, complement) and characterize the resulting higher-order approximations.
+We analyze the distribution of binary classification measures (precision, recall) when Bernoulli sets are used in practice.
+Finally, we demonstrate a concrete application to Boolean search in information retrieval systems, showing how Bernoulli sets enable space-efficient indexing with quantifiable accuracy guarantees and natural privacy properties.
+Our framework unifies existing probabilistic data structures like Bloom filters within a rigorous mathematical foundation while revealing new insights about rank, inferability, and composition.
+\end{abstract}
+
+%\microtypesetup{protrusion=false}
+\tableofcontents
+%\microtypesetup{protrusion=true}
+%\listoftables
+%\listoffigures
+
+%\include{nom}
+%\printnomenclature
+
+\subfile{sections/intro}
+\subfile{sections/algebra_of_sets}
+%\subfile{sections/aset_model}
+\subfile{sections/bernoulli_model}
+\subfile{sections/confusion_matrix_analysis}
+\subfile{sections/first_order_model}
+\subfile{sections/second_order_pos_neg_model}
+\subfile{sections/derived_distributions}
+\subfile{sections/derived_distributions_higher_order}
+\subfile{sections/relational}
+\subfile{sections/interval}
+\subfile{sections/aset_adt}
+\subfile{sections/application_boolean_search}
+\subfile{sections/appendix}
+
+\bibliography{references}
+
+\end{document}

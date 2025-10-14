@@ -1,0 +1,225 @@
+%   \BitString      B^* denotes arbitrary length bit strings
+%   \BitString[n]   B^n denotes bit strings of size n
+%   \BitSet         set B denotes {0,1}
+
+\NeedsTeXFormat{LaTeX2e}[1994/06/01]
+\ProvidesPackage{setnotation}[2018/01/01 alex towell's set notation (style) for his various papers]
+
+\RequirePackage{xparse}
+\RequirePackage{bm}
+\RequirePackage{bbm}
+\RequirePackage{amssymb}
+\RequirePackage{mathtools}
+%\RequirePackage{alexmisc}
+%\RequirePackage{setnotation}  % Removed circular dependency
+\RequirePackage{algorithm2e}
+
+\newcommand{\blackboardsetstyle}[1]{\mathbbm{#1}}
+\newcommand{\blackboardsetsubstyle}[1]{\pmb{#1}}
+\newcommand{\blackboardsetsupstyle}[1]{\pmb{#1}}
+
+\newcommand{\boldsetstyle}[1]{\pmb{\mathsf{#1}}}
+\newcommand{\boldsetsubstyle}[1]{\pmb{#1}}
+\newcommand{\boldsetsupstyle}[1]{\pmb{#1}}
+
+\newcommand{\fancysetstyle}[1]{\mathcal{#1}}
+\newcommand{\fancysetsubstyle}[1]{#1}
+\newcommand{\fancysetsupstyle}[1]{#1}
+
+\newcommand{\plainsetstyle}[1]{\mathsf{#1}}
+\newcommand{\plainsetsubstyle}[1]{\mathsf{#1}}
+\newcommand{\plainsetsupstyle}[1]{\mathsf{#1}}
+
+\newcommand{\setstyle}[1]{\plainsetstyle{#1}}
+\newcommand{\setsubstyle}[1]{\plainsetsubstyle{#1}}
+\newcommand{\setsupstyle}[1]{\plainsetsupstyle{#1}}
+
+\DeclareOption{blackboard}
+{
+    \renewcommand{\setstyle}[1]{\blackboardsetstyle{#1}}
+    \renewcommand{\setsubstyle}[1]{\blackboardsetsubstyle{#1}}
+    \renewcommand{\setsupstyle}[1]{\blackboardsetsupstyle{#1}}
+}
+\DeclareOption{bold}
+{
+    \renewcommand{\setstyle}[1]{\boldsetstyle{#1}}
+    \renewcommand{\setsubstyle}[1]{\boldsetsubstyle{#1}}
+    \renewcommand{\setsupstyle}[1]{\boldsetsupstyle{#1}}
+}
+\DeclareOption{fancy}
+{
+    \renewcommand{\setstyle}[1]{\fancysetstyle{#1}}
+    \renewcommand{\setsubstyle}[1]{\fancysetsubstyle{#1}}
+    \renewcommand{\setsupstyle}[1]{\fancysetsupstyle{#1}}
+}
+\DeclareOption{plain}
+{
+    \renewcommand{\setstyle}[1]{\plainsetstyle{#1}}
+    \renewcommand{\setsubstyle}[1]{\plainsetsubstyle{#1}}
+    \renewcommand{\setsupstyle}[1]{\plainsetsupstyle{#1}}
+}
+
+\ExecuteOptions{plain}
+\ProcessOptions\relax
+
+\NewDocumentCommand{\Set}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {\setstyle{#1}}
+            {\setstyle{#1}_{\setsubstyle{#2}}}
+    }
+    {\setstyle{#1}_{\setsubstyle{#2}}^{\setsupstyle{#3}}}
+}
+
+\NewDocumentCommand{\FancySet}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {\fancysetstyle{#1}}
+            {\fancysetstyle{#1}_{\fancysetsubstyle{#2}}}
+    }
+    {\fancysetstyle{#1}_{\fancysetsubstyle{#2}}^{\fancysetsupstyle{#3}}}
+}
+
+\NewDocumentCommand{\BlackboardSet}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {\blackboardsetstyle{#1}}
+            {\blackboardsetstyle{#1}_{\blackboardsetsubstyle{#2}}}
+    }
+    {\blackboardsetstyle{#1}_{\blackboardsetsubstyle{#2}}^{\blackboardsetsupstyle{#3}}}
+}
+
+\NewDocumentCommand{\PlainSet}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {\plainsetstyle{#1}}
+            {\plainsetstyle{#1}_{\plainsetsubstyle{#2}}}
+    }
+    {\plainsetstyle{#1}_{\plainsetsubstyle{#2}}^{\plainsetsupstyle{#3}}}
+}
+
+\NewDocumentCommand{\BoldSet}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {\boldsetstyle{#1}}
+            {\boldsetstyle{#1}_{\boldsetsubstyle{#2}}}
+    }
+    {\boldsetstyle{#1}_{\boldsetsubstyle{#2}}^{\boldsetsupstyle{#3}}}
+}
+
+% various set-theoretic operations
+\NewDocumentCommand{\SetContains}{oo}{%
+    \IfNoValueTF{#1}
+        {
+        \IfNoValueTF{#2}
+            {\in}
+            {\in #2}
+        }
+        {
+        \IfNoValueTF{#2}
+            {#1 \in}
+            {#1 \in #2}
+        }
+}
+
+\NewDocumentCommand{\SetNotContains}{oo}{%
+    \IfNoValueTF{#1}
+        {
+        \IfNoValueTF{#2}
+            {\notin}
+            {\notin #2}
+        }
+        {
+        \IfNoValueTF{#2}
+            {#1 \notin}
+            {#1 \notin #2}
+        }
+}
+
+\NewDocumentCommand{\SetUnion}{oo}{%
+    \IfNoValueTF{#1}
+        {
+        \IfNoValueTF{#2}
+            {\cup}
+            {\cup #2}
+        }
+        {
+        \IfNoValueTF{#2}
+            {#1 \cup}
+            {#1 \cup #2}
+        }
+}
+
+\NewDocumentCommand{\SetComplement}{o}{%
+    \IfNoValueTF{#1}
+        {\overline{\phantom{\Set{S}}}}
+        {\overline{#1}}
+}
+
+\NewDocumentCommand{\SetIntersection}{oo}{%
+    \IfNoValueTF{#1}
+        {
+        \IfNoValueTF{#2}
+            {\cap}
+            {\cap #2}
+        }
+        {
+        \IfNoValueTF{#2}
+            {#1 \cap}
+            {#1 \cap #2}
+        }
+}
+\SetKwFunction{IntervalSpan}{span}
+
+\NewDocumentCommand{\SetDiff}{oo}{%
+    \IfNoValueTF{#1}
+        {
+        \IfNoValueTF{#2}
+            {\smallsetminus}
+            {\smallsetminus #2}
+        }
+        {
+        \IfNoValueTF{#2}
+            {#1 \smallsetminus}
+            {#1 \smallsetminus #2}
+        }
+}
+
+
+\newcommand{\SetIndicator}[1]{\BlackboardSet{1}_{#1}}
+\DeclarePairedDelimiter\Card{\lvert}{\rvert}
+
+\DeclarePairedDelimiterX\Pair[2]{\langle}{\rangle}{#1\,,#2}
+
+\newcommand{\EmptySet}{\varnothing}
+\newcommand{\PowerSet}{\operatorname{\mathcal{P}}}
+\newcommand{\PS}[1]{2^{#1}}
+\newcommand{\SubsetK}[2]{\left[{#1}\right]^{#2}}
+
+\newcommand{\BitSet}{\FancySet{B}}
+\newcommand{\BitStringSet}{\BitSet[][*]}
+\newcommand{\RealSet}{\BlackboardSet{R}}
+\newcommand{\NatSet}{\BlackboardSet{N}}
+\newcommand{\IntSet}{\BlackboardSet{Z}}
+\newcommand{\RatSet}{\BlackboardSet{Q}}
+\newcommand{\ComplexSet}{\BlackboardSet{C}}
+
+\DeclarePairedDelimiterX\SetBuilder[2]{\{}{\}}{\,#1 \;\delimsize\vert\; #2\,}
+
+\DeclarePairedDelimiterX\Interval[1]{[}{]}{#1}
+
+\NewDocumentCommand{\SetInterval}{mo}{%
+    \IfNoValueTF{#2}
+        {\Interval{#1}}
+        {\Interval{\underline{#1},\overline{#1}}}
+}
+
+
+\SetKwFunction{IntervalSpan}{span}
+
+\endinput

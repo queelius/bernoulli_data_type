@@ -1,0 +1,75 @@
+\NeedsTeXFormat{LaTeX2e}[1994/06/01]
+\ProvidesPackage{probabilitynotation}[2018/01/01 alex towell's probability notation (style) for his various papers]
+
+\RequirePackage{xparse}
+\RequirePackage{bm}
+\RequirePackage{bbm}
+\RequirePackage{amssymb}
+\RequirePackage{mathtools}
+%\RequirePackage{alexmisc}
+\RequirePackage{functionnotation}
+\RequirePackage{algorithm2e}
+
+\newcommand{\RV}[1]{\mathrm{#1}}
+
+\newcommand{\ProbFn}{\mathrm{P}}
+
+\newcommand{\Pdf}{\operatorname{f}}
+
+\NewDocumentCommand{\Prob}{mo}{%
+    \Bracket{\ProbFn}{#1}[#2]
+}
+
+\NewDocumentCommand{\Expect}{mo}{%
+    \Bracket{\mathrm{E}}{#1}[#2]
+}
+
+\NewDocumentCommand{\Var}{mo}{%
+    \Bracket{\mathrm{V}}{#1}[#2]
+}
+
+\NewDocumentCommand{\PDF}{mo}{%
+    \FunctionFamily{\Pdf}{#1}[#2]
+}
+
+\NewDocumentCommand{\CDF}{mo}{%
+    \FunctionFamily{F}{#1}[#2]
+}
+
+\NewDocumentCommand{\RDF}{mo}{%
+    \FunctionFamily{R}{#1}[#2]
+}
+
+\NewDocumentCommand{\Entropy}{mo}{%
+    \FunctionFamily{\mathcal{H}}{#1}[#2]
+}
+
+\NewDocumentCommand{\Likelihood}{mo}{%
+    \FunctionFamily{\mathcal{L}}{#1}[#2]
+}
+
+%\DeclareMathOperator{\var}{\rm{Var}}
+\DeclareMathOperator{\bias}{bias}
+\DeclareMathOperator{\mse}{\mathrm{MSE}}
+
+
+\newcommand{\mvn}{\mathrm{MVN}}
+\newcommand{\unifdist}{\mathrm{UNIF}}
+\newcommand{\dudist}{\mathrm{DU}}
+\newcommand{\berdist}{\mathrm{BER}}
+\newcommand{\expdist}{\mathrm{EXP}}
+\newcommand{\geodist}{\mathrm{GEO}}
+\newcommand{\normdist}{\mathcal{N}}
+\newcommand{\bindist}{\mathrm{BIN}}
+\newcommand{\poidist}{\mathrm{POI}}
+\newcommand{\nbdist}{\mathrm{NB}}
+
+
+
+%\SetKwFunction{dudist}{DU}
+%\SetKwFunction{berdist}{BER}
+%\SetKwFunction{expdist}{EXP}
+%\SetKwFunction{geodist}{GEO}
+%\SetKwFunction{bindist}{BIN}
+
+\endinput

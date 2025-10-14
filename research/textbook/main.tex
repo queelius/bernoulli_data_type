@@ -1,0 +1,1479 @@
+\documentclass[11pt,twoside,openright]{book}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage[activate={true,nocompatibility},final,tracking=true,kerning=true,spacing=true,factor=1100,stretch=10,shrink=10]{microtype}
+\usepackage{mathtools}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{algorithm2e}
+\usepackage{minted}
+\usepackage{hyperref}
+\usepackage[square,numbers]{natbib}
+\bibliographystyle{plainnat}
+\usepackage{cleveref}
+\usepackage{makeidx}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes,automata}
+\usepackage{pgfplots}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{subcaption}
+\usepackage[titletoc]{appendix}
+\usepackage{epigraph}
+
+% Index
+\makeindex
+
+% Theorem environments
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[chapter]
+\newtheorem{example}[definition]{Example}
+\newtheorem{exercise}[definition]{Exercise}
+
+\theoremstyle{plain}
+\newtheorem{theorem}[definition]{Theorem}
+\newtheorem{lemma}[definition]{Lemma}
+\newtheorem{proposition}[definition]{Proposition}
+\newtheorem{corollary}[definition]{Corollary}
+
+\theoremstyle{remark}
+\newtheorem{remark}[definition]{Remark}
+\newtheorem{note}[definition]{Note}
+
+% Custom commands (unified notation)
+\input{notation}
+
+% Chapter style
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\thepage}
+\fancyhead[RE]{\textit{\nouppercase{\leftmark}}}
+\fancyhead[LO]{\textit{\nouppercase{\rightmark}}}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\title{Probabilistic Data Types: Theory and Practice\\
+\large A Textbook on Bernoulli Types and Approximate Computing}
+\author{Alexander Towell}
+\date{\today}
+
+\begin{document}
+
+\frontmatter
+
+\maketitle
+
+\clearpage
+\thispagestyle{empty}
+
+\vspace*{\fill}
+\begin{center}
+\textit{To those who embrace uncertainty as a feature, not a bug.}
+\end{center}
+\vspace*{\fill}
+
+\clearpage
+
+\tableofcontents
+\listoffigures
+\listoftables
+\listofalgorithms
+
+\chapter{Preface}
+
+The digital age promised us certainty—exact computation, perfect storage, flawless communication. Yet as our systems grow in scale and complexity, we increasingly rely on approximation. From Bloom filters in distributed databases to neural networks in artificial intelligence, approximate computation has become not just acceptable but essential.
+
+This book presents a unified theory of approximate computation through the lens of \emph{Bernoulli types}. Just as probability theory provides a foundation for reasoning about uncertainty in the physical world, Bernoulli types provide a foundation for reasoning about uncertainty in computation.
+
+\section*{Who This Book Is For}
+
+This book is intended for:
+\begin{itemize}
+    \item Graduate students in computer science seeking a theoretical foundation for probabilistic data structures
+    \item Software engineers building large-scale systems where approximation is necessary
+    \item Researchers exploring the intersection of type theory, probability, and computation
+    \item Anyone curious about the fundamental nature of approximate computation
+\end{itemize}
+
+\section*{Prerequisites}
+
+Readers should be comfortable with:
+\begin{itemize}
+    \item Undergraduate-level probability and statistics
+    \item Basic abstract algebra (groups, rings, Boolean algebras)
+    \item Programming in C++ or a similar systems language
+    \item Fundamental algorithms and data structures
+\end{itemize}
+
+\section*{How to Read This Book}
+
+The book is organized into five parts:
+\begin{enumerate}
+    \item \textbf{Foundations}: Mathematical background and core concepts
+    \item \textbf{Core Bernoulli Types}: Detailed study of specific types
+    \item \textbf{Advanced Topics}: Higher-order types and theoretical extensions
+    \item \textbf{Implementation}: Practical programming techniques
+    \item \textbf{Applications}: Real-world use cases
+\end{enumerate}
+
+Each chapter includes exercises ranging from straightforward to research-level. Solutions to selected exercises appear in Appendix C.
+
+\section*{Acknowledgments}
+
+This work builds on decades of research in probabilistic data structures, randomized algorithms, and type theory. I am particularly indebted to the pioneers who showed that approximation is not a compromise but a powerful tool.
+
+\mainmatter
+
+\part{Foundations}
+
+\chapter{Introduction to Approximate Computing}
+\label{ch:intro}
+
+\epigraph{The purpose of computing is insight, not numbers.}{Richard Hamming}
+
+\section{Why Exact Computation Isn't Always Necessary}
+
+In 1970, Burton Bloom faced a problem: checking whether a word might be hyphenated required accessing a large dictionary on slow storage. His solution—the Bloom filter—trades perfect accuracy for a 10x reduction in space. This trade-off exemplifies a broader principle: in many applications, a probably-correct answer now is better than a certainly-correct answer later.
+
+Consider these examples:
+\begin{itemize}
+    \item \textbf{Web Search}: Google doesn't find \emph{all} relevant pages, just enough good ones
+    \item \textbf{Network Routing}: Packets find \emph{a} path, not necessarily the optimal path
+    \item \textbf{Machine Learning}: Models achieve high accuracy, not perfect classification
+    \item \textbf{Distributed Systems}: Nodes agree eventually, not instantaneously
+\end{itemize}
+
+\subsection{The Cost of Certainty}
+
+Exact computation carries hidden costs:
+
+\begin{example}[Set Membership]
+Storing a set of $n$ elements from a universe of size $u$ requires:
+\begin{itemize}
+    \item \textbf{Exact}: $n \log u$ bits (information-theoretic minimum)
+    \item \textbf{Approximate}: $1.44n$ bits for 1\% false positive rate
+\end{itemize}
+For $n = 10^9$ and $u = 2^{64}$, this is 64 GB vs. 1.8 GB.
+\end{example}
+
+\subsection{Types of Approximation}
+
+Approximation in computing takes many forms:
+
+\begin{definition}[Approximation Taxonomy]
+\begin{enumerate}
+    \item \textbf{Value Approximation}: Result is close to true value (numerical methods)
+    \item \textbf{Set Approximation}: Result may include/exclude wrong elements (Bloom filters)
+    \item \textbf{Function Approximation}: Output sometimes differs from true function (hash functions)
+    \item \textbf{Time Approximation}: Result improves with more computation (anytime algorithms)
+\end{enumerate}
+\end{definition}
+
+\section{Historical Perspective}
+
+The history of approximate computing parallels the history of computing itself:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{ll}
+\toprule
+Year & Development \\
+\midrule
+1950s & Monte Carlo methods for nuclear physics \\
+1960s & Hashing with collisions accepted \\
+1970s & Bloom filters for space efficiency \\
+1980s & Randomized algorithms (primality testing) \\
+1990s & Sketching algorithms for streaming \\
+2000s & Machine learning embraces approximation \\
+2010s & Approximate computing hardware \\
+2020s & Differential privacy through noise \\
+\bottomrule
+\end{tabular}
+\caption{Timeline of Approximate Computing}
+\end{table}
+
+\section{Overview of the Bernoulli Framework}
+\label{sec:bernoulli-overview}
+
+The Bernoulli framework is built on a fundamental distinction:
+
+\begin{definition}[The Latent/Observed Paradigm]
+\begin{itemize}
+    \item \textbf{Latent values}: The true, mathematical values that exist in theory
+    \item \textbf{Observed values}: What we actually compute with—potentially noisy observations of latent values
+\end{itemize}
+\end{definition}
+
+This distinction appears everywhere in computing:
+\begin{itemize}
+    \item A sensor \emph{observes} the latent temperature through measurement noise
+    \item A hash function \emph{observes} the latent identity function through finite range
+    \item A neural network \emph{observes} latent patterns through learned weights
+    \item A Bloom filter \emph{observes} latent set membership through hash collisions
+\end{itemize}
+
+\begin{definition}[Informal Bernoulli Type]
+A Bernoulli type $\bernoulli{T}{n}$ represents \emph{observations} of values of type $T$, where the observation quality is characterized by an $n$-th order error model.
+\end{definition}
+
+Key insights:
+\begin{itemize}
+    \item Every computation is an observation of latent mathematical truth
+    \item Observation quality is a \emph{type-level} property
+    \item Error propagation describes how observation quality degrades through operations
+    \item Traditional types assume perfect observation (zero error)
+\end{itemize}
+
+\section{Running Example: Distributed Word Count}
+
+Throughout this book, we'll use a running example of counting word frequencies across a distributed corpus:
+
+\begin{minted}{python}
+# Traditional approach (exact but slow)
+def exact_word_count(documents):
+    counts = {}
+    for doc in documents:
+        for word in doc.split():
+            counts[word] = counts.get(word, 0) + 1
+    return counts
+
+# Bernoulli approach (approximate but scalable)
+def approximate_word_count(documents):
+    sketch = CountMinSketch(width=10000, depth=5)
+    for doc in documents:
+        for word in doc.split():
+            sketch.increment(word)
+    return sketch
+\end{minted}
+
+The approximate version:
+\begin{itemize}
+    \item Uses 50KB instead of potentially gigabytes
+    \item Processes documents in parallel without communication
+    \item Returns counts within 0.1\% of true value with 99.9\% probability
+\end{itemize}
+
+\section{Exercises}
+
+\begin{exercise}
+Calculate the space savings of a Bloom filter with 0.1\% false positive rate compared to a hash table for $n = 10^6$ elements.
+\end{exercise}
+
+\begin{exercise}
+Implement a simple Bloom filter and measure its false positive rate empirically.
+\end{exercise}
+
+\begin{exercise}[Research Level]
+Prove that any deterministic algorithm solving 3-SAT in polynomial time can be converted to a Bernoulli algorithm with exponentially small error rate.
+\end{exercise}
+
+\chapter{Probability Theory for Computer Scientists}
+\label{ch:probability}
+
+\section{Review of Probability Basics}
+
+We assume familiarity with basic probability but review key concepts through a computational lens.
+
+\subsection{Probability Spaces}
+
+\begin{definition}[Discrete Probability Space]
+A discrete probability space is a triple $(\Omega, \mathcal{F}, P)$ where:
+\begin{itemize}
+    \item $\Omega$ is a countable sample space
+    \item $\mathcal{F} = 2^\Omega$ is the event space
+    \item $P: \mathcal{F} \to [0,1]$ satisfies:
+    \begin{enumerate}
+        \item $P(\Omega) = 1$
+        \item $P(\bigcup_{i} A_i) = \sum_i P(A_i)$ for disjoint $A_i$
+    \end{enumerate}
+\end{itemize}
+\end{definition}
+
+\begin{example}[Bit Flip Channel]
+For a single bit transmission:
+\begin{itemize}
+    \item $\Omega = \{(0,0), (0,1), (1,0), (1,1)\}$ (sent, received)
+    \item $P((b, b)) = 1-p$ (correct transmission)
+    \item $P((b, 1-b)) = p$ (bit flip)
+\end{itemize}
+\end{example}
+
+\subsection{Random Variables}
+
+In computer science, random variables often represent algorithm outputs:
+
+\begin{definition}[Algorithmic Random Variable]
+For a randomized algorithm $A$ with input $x$, the output $A(x)$ is a random variable mapping from the algorithm's random bits to its output space.
+\end{definition}
+
+\section{Information Theory Essentials}
+
+Information theory quantifies the fundamental limits of approximation.
+
+\subsection{Entropy}
+
+\begin{definition}[Shannon Entropy]
+For a discrete random variable $X$ with distribution $p$:
+\begin{equation}
+H(X) = -\sum_{x} p(x) \log_2 p(x)
+\end{equation}
+\end{definition}
+
+\begin{theorem}[Source Coding Theorem]
+Any encoding of $X$ requires at least $H(X)$ bits on average.
+\end{theorem}
+
+This theorem immediately implies space lower bounds for Bernoulli types:
+
+\begin{corollary}
+A Bernoulli set with false positive rate $\alpha$ requires at least:
+\begin{equation}
+n \cdot H(\alpha) = -n[\alpha \log_2 \alpha + (1-\alpha) \log_2(1-\alpha)]
+\end{equation}
+bits of space.
+\end{corollary}
+
+\subsection{Mutual Information}
+
+\begin{definition}[Mutual Information]
+The mutual information between $X$ and $Y$ is:
+\begin{equation}
+I(X; Y) = H(X) - H(X|Y) = H(Y) - H(Y|X)
+\end{equation}
+\end{definition}
+
+This measures how much information a Bernoulli type preserves about the original:
+
+\begin{example}[Information Preservation]
+A Bernoulli map $\tilde{f}: X \to Y$ with error rate $\epsilon$ preserves:
+\begin{equation}
+I(f(X); \tilde{f}(X)) \geq H(Y)(1 - H(\epsilon))
+\end{equation}
+bits of information about the true output.
+\end{example}
+
+\section{Channel Models and Error Rates}
+
+Communication channels provide the mathematical foundation for Bernoulli types.
+
+\subsection{Binary Symmetric Channel}
+
+\begin{definition}[BSC]
+A binary symmetric channel with crossover probability $p$ satisfies:
+\begin{align}
+P(Y = 0 | X = 0) &= 1 - p \\
+P(Y = 1 | X = 0) &= p \\
+P(Y = 0 | X = 1) &= p \\
+P(Y = 1 | X = 1) &= 1 - p
+\end{align}
+\end{definition}
+
+This models first-order Bernoulli booleans perfectly.
+
+\subsection{Binary Asymmetric Channel}
+
+\begin{definition}[BAC]
+A binary asymmetric channel has different error rates:
+\begin{align}
+P(Y = 1 | X = 0) &= \alpha \quad \text{(false positive rate)} \\
+P(Y = 0 | X = 1) &= \beta \quad \text{(false negative rate)}
+\end{align}
+\end{definition}
+
+This models second-order Bernoulli types like Bloom filters ($\beta = 0$).
+
+\section{Binary Classification Measures}
+
+When Bernoulli types make predictions, we need classification metrics:
+
+\begin{definition}[Confusion Matrix]
+For binary classification:
+\begin{center}
+\begin{tabular}{l|cc}
+& Predicted Positive & Predicted Negative \\
+\hline
+Actual Positive & True Positive (TP) & False Negative (FN) \\
+Actual Negative & False Positive (FP) & True Negative (TN) \\
+\end{tabular}
+\end{center}
+\end{definition}
+
+\begin{definition}[Classification Metrics]
+\begin{align}
+\text{Precision} &= \frac{TP}{TP + FP} \\
+\text{Recall} &= \frac{TP}{TP + FN} \\
+\text{F1 Score} &= 2 \cdot \frac{\text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}} \\
+\text{Accuracy} &= \frac{TP + TN}{TP + TN + FP + FN}
+\end{align}
+\end{definition}
+
+\section{Concentration Inequalities}
+
+Concentration inequalities bound how much randomized algorithms deviate from their expectations:
+
+\begin{theorem}[Chernoff Bound]
+Let $X_1, \ldots, X_n$ be independent Bernoulli random variables with $P(X_i = 1) = p_i$. Let $X = \sum_i X_i$ and $\mu = E[X]$. Then for $\delta > 0$:
+\begin{equation}
+P(X \geq (1 + \delta)\mu) \leq e^{-\frac{\delta^2 \mu}{2 + \delta}}
+\end{equation}
+\end{theorem}
+
+\begin{example}[Bloom Filter Analysis]
+For a Bloom filter with $m$ bits, $n$ elements, and $k$ hash functions:
+\begin{itemize}
+    \item Expected false positive rate: $(1 - e^{-kn/m})^k$
+    \item Actual rate concentrates exponentially around expectation
+\end{itemize}
+\end{example}
+
+\section{Exercises}
+
+\begin{exercise}
+Prove that the entropy $H(p)$ is maximized when $p = 0.5$.
+\end{exercise}
+
+\begin{exercise}
+Calculate the channel capacity of a binary asymmetric channel.
+\end{exercise}
+
+\begin{exercise}
+Show that for a Bernoulli set with false positive rate $\alpha$ and false negative rate $\beta$, the expected Jaccard similarity with the true set is:
+\begin{equation}
+J = \frac{(1-\beta)}{(1-\beta) + \alpha + \beta}
+\end{equation}
+\end{exercise}
+
+\chapter{The Bernoulli Type System}
+\label{ch:type-system}
+
+\section{Formal Definition of Bernoulli Types}
+
+We now formalize the latent/observed paradigm introduced in Chapter 1.
+
+\begin{definition}[Bernoulli Type Constructor]
+The Bernoulli type constructor creates types for \emph{observed} values:
+\begin{equation}
+\mathcal{B}: \text{Type} \times \mathbb{N} \to \text{Type}
+\end{equation}
+where $\mathcal{B}\langle T, n \rangle$ (written $\bernoulli{T}{n}$) represents observations of latent values of type $T$, with observation quality characterized by an $n$-th order error model.
+\end{definition}
+
+\begin{definition}[Observation Semantics]
+A value $v : \bernoulli{T}{n}$ is an \emph{observation} of some latent value $x : T$. The relationship between latent and observed is characterized by:
+\begin{equation}
+\Prob{\text{observe } v = y | \text{latent } x} = P_{n,\sigma}(y|x)
+\end{equation}
+where $P_{n,\sigma}$ is the observation distribution determined by order $n$ and parameters $\sigma$.
+\end{definition}
+
+\begin{remark}
+Traditional types assume $P(y|x) = 1$ if $y = x$ and $0$ otherwise—perfect observation. Bernoulli types acknowledge that observation is imperfect.
+\end{remark}
+
+\subsection{Semantic Model}
+
+We model Bernoulli types using a monadic structure:
+
+\begin{definition}[Bernoulli Monad]
+The Bernoulli monad consists of:
+\begin{itemize}
+    \item Type constructor: $\bernoulli{-}{n}$
+    \item Return: $\eta_T: T \to \bernoulli{T}{0}$ (embed exact values)
+    \item Bind: For $f: T \to \bernoulli{U}{m}$,
+    \begin{equation}
+    \text{bind}: \bernoulli{T}{n} \to (T \to \bernoulli{U}{m}) \to \bernoulli{U}{\max(n,m)}
+    \end{equation}
+\end{itemize}
+\end{definition}
+
+\section{Orders of Approximation}
+
+The order parameter $n$ captures increasingly complex error models:
+
+\subsection{Order 0: Perfect Types}
+
+\begin{definition}[Zero-Order Bernoulli Type]
+$\bernoulli{T}{0} \cong T$ represents exact values with no errors.
+\end{definition}
+
+All traditional types are zero-order Bernoulli types.
+
+\subsection{Order 1: Symmetric Errors}
+
+\begin{definition}[First-Order Bernoulli Type]
+For $\bernoulli{T}{1}$ with error rate $\epsilon$:
+\begin{equation}
+P(\text{observe } t' | \text{true value } t) = \begin{cases}
+1 - \epsilon & \text{if } t' = t \\
+\frac{\epsilon}{|T| - 1} & \text{if } t' \neq t
+\end{cases}
+\end{equation}
+\end{definition}
+
+\begin{example}[Noisy Sensor]
+A temperature sensor with $\pm 1°C$ random error:
+\begin{minted}{cpp}
+bernoulli<double, 1> read_temperature() {
+    double true_temp = actual_temperature();
+    double noise = normal_distribution(0, 1.0);
+    return bernoulli<double, 1>(true_temp + noise);
+}
+\end{minted}
+\end{example}
+
+\subsection{Order 2: Asymmetric Errors}
+
+\begin{definition}[Second-Order Bernoulli Type]
+For Boolean-valued types, $\bernoulli{\text{Bool}}{2}$ has separate rates:
+\begin{align}
+P(\text{observe True} | \text{actual False}) &= \alpha \text{ (false positive)} \\
+P(\text{observe False} | \text{actual True}) &= \beta \text{ (false negative)}
+\end{align}
+\end{definition}
+
+This generalizes to other types by partitioning the value space.
+
+\subsection{Higher Orders}
+
+\begin{definition}[N-th Order Bernoulli Type]
+An $n$-th order Bernoulli type has up to $|T| \times (|T| - 1)$ independent error parameters, forming a stochastic matrix.
+\end{definition}
+
+\section{Type Constructors and Parameters}
+
+\subsection{Parameterized Types}
+
+Bernoulli types can be parameterized by error bounds:
+
+\begin{minted}{cpp}
+template<typename T, int Order, double... ErrorRates>
+class bernoulli {
+    static_assert(sizeof...(ErrorRates) == expected_params(Order));
+    // Implementation
+};
+
+// Usage
+using NoisyBool = bernoulli<bool, 2, 0.01, 0.02>;  // 1% FP, 2% FN
+using NoisyInt = bernoulli<int, 1, 0.001>;         // 0.1% symmetric error
+\end{minted}
+
+\subsection{Type Algebra}
+
+Bernoulli types form an algebra:
+
+\begin{theorem}[Bernoulli Type Algebra]
+Given Bernoulli types $A = \bernoulli{T}{n}$ and $B = \bernoulli{U}{m}$:
+\begin{align}
+A \times B &= \bernoulli{T \times U}{\max(n,m)} \\
+A + B &= \bernoulli{T + U}{\max(n,m)} \\
+A \to B &= \bernoulli{T \to U}{\max(n,m)+1}
+\end{align}
+\end{theorem}
+
+\section{Comparison with Traditional Type Systems}
+
+\subsection{Subtyping}
+
+Bernoulli types don't follow traditional subtyping:
+
+\begin{proposition}[No Subtyping]
+$\bernoulli{T}{n}$ is neither a subtype nor supertype of $T$.
+\end{proposition}
+
+Instead, we have conversions:
+\begin{minted}{cpp}
+// Lossy conversion (may fail)
+template<typename T, int N>
+optional<T> to_exact(const bernoulli<T, N>& b);
+
+// Lossless embedding
+template<typename T>
+bernoulli<T, 0> to_bernoulli(const T& value);
+\end{minted}
+
+\subsection{Type Safety}
+
+Bernoulli types maintain type safety while embracing uncertainty:
+
+\begin{example}[Type-Safe Uncertainty]
+\begin{minted}{cpp}
+bernoulli<int, 1> x(42);
+bernoulli<string, 1> s("hello");
+
+// Type error: different base types
+// auto result = x + s;  
+
+// OK: same base type
+bernoulli<int, 1> y(7);
+auto sum = x + y;  // bernoulli<int, 1>
+\end{minted}
+\end{example}
+
+\section{Type Inference for Bernoulli Types}
+
+Type inference becomes more complex when error rates must be inferred:
+
+\subsection{Constraint Generation}
+
+\begin{definition}[Error Constraint]
+An error constraint is a relation $\epsilon_1 \bowtie \epsilon_2$ where $\bowtie \in \{=, \leq, \geq\}$ and $\epsilon_i$ are error rate expressions.
+\end{definition}
+
+\begin{algorithm}[H]
+\SetAlgoLined
+\KwIn{Expression $e$}
+\KwOut{Type $\tau$, constraints $C$}
+\SetKwFunction{Infer}{Infer}
+\SetKwProg{Fn}{Function}{:}{}
+\Fn{\Infer{$e$}}{
+    \Switch{$e$}{
+        \Case{$x$}{
+            \Return $\Gamma(x), \emptyset$\;
+        }
+        \Case{$\lambda x. e'$}{
+            $\tau_x \leftarrow \text{fresh type variable}$\;
+            $\tau', C' \leftarrow \Infer(e'[\Gamma, x:\tau_x])$\;
+            \Return $\tau_x \to \tau', C'$\;
+        }
+        \Case{$e_1\ e_2$}{
+            $\tau_1, C_1 \leftarrow \Infer(e_1)$\;
+            $\tau_2, C_2 \leftarrow \Infer(e_2)$\;
+            $\tau_r \leftarrow \text{fresh type variable}$\;
+            $\epsilon \leftarrow \text{fresh error variable}$\;
+            \Return $\bernoulli{\tau_r}{\epsilon}, C_1 \cup C_2 \cup \{\tau_1 = \tau_2 \to \bernoulli{\tau_r}{\epsilon}\}$\;
+        }
+    }
+}
+\caption{Type Inference with Error Constraints}
+\end{algorithm}
+
+\subsection{Constraint Solving}
+
+Solving error constraints requires techniques from linear programming:
+
+\begin{theorem}[Error Constraint Decidability]
+The satisfiability of a system of linear error constraints is decidable in polynomial time.
+\end{theorem}
+
+\begin{proof}
+Error rates form a bounded convex polytope in $[0,1]^n$. Linear constraints define half-spaces, and their intersection can be computed using standard LP algorithms.
+\end{proof}
+
+\section{Gradual Typing for Uncertainty}
+
+We can integrate Bernoulli types with gradual typing to allow mixing of exact and approximate code:
+
+\begin{definition}[Gradual Bernoulli Types]
+The gradual type lattice includes:
+\begin{itemize}
+    \item $\star$ - unknown type (top)
+    \item $T$ - exact type
+    \item $\bernoulli{T}{?}$ - unknown error rate
+    \item $\bernoulli{T}{n}$ - known error rate
+\end{itemize}
+\end{definition}
+
+\subsection{Consistent Subtyping}
+
+\begin{definition}[Consistency Relation]
+Types $\tau_1$ and $\tau_2$ are consistent ($\tau_1 \sim \tau_2$) if:
+\begin{align}
+\star &\sim \tau \\
+\tau &\sim \star \\
+T &\sim T \\
+\bernoulli{T}{n} &\sim \bernoulli{T}{m} \text{ if } n \sim m \\
+\bernoulli{T}{?} &\sim \bernoulli{T}{n}
+\end{align}
+\end{definition}
+
+\section{Operational Semantics}
+
+The operational semantics of Bernoulli types requires probabilistic reductions:
+
+\begin{definition}[Probabilistic Small-Step Semantics]
+A configuration $\langle e, \sigma \rangle$ reduces to a distribution over configurations:
+\begin{equation}
+\langle e, \sigma \rangle \to \mu
+\end{equation}
+where $\mu$ is a probability measure over configurations.
+\end{definition}
+
+\begin{example}[Boolean Observation]
+\begin{align}
+\langle \text{observe}(\bernoulli{\True}{1}_\epsilon), \sigma \rangle \to \{&\\
+    &\langle \True, \sigma \rangle \mapsto 1-\epsilon,\\
+    &\langle \False, \sigma \rangle \mapsto \epsilon
+\}
+\end{align}
+\end{example}
+
+\section{Exercises}
+
+\begin{exercise}
+Prove that the Bernoulli type constructor preserves the monad laws:
+\begin{enumerate}
+    \item Left identity: $\text{return } a \text{ >>= } f = f(a)$
+    \item Right identity: $m \text{ >>= return} = m$
+    \item Associativity: $(m \text{ >>= } f) \text{ >>= } g = m \text{ >>= } (\lambda x. f(x) \text{ >>= } g)$
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}
+Design a type system where $\bernoulli{T}{n} <: \bernoulli{T}{m}$ when $n < m$ (more precise subtypes less precise).
+\end{exercise}
+
+\begin{exercise}
+Implement the type inference algorithm in your favorite programming language.
+\end{exercise}
+
+\begin{exercise}[Research Level]
+Extend Bernoulli types to dependent types where error rates can depend on values:
+\begin{equation}
+\Pi (x : T). \bernoulli{U(x)}{\epsilon(x)}
+\end{equation}
+\end{exercise}
+
+\part{Core Bernoulli Types}
+
+\chapter{Bernoulli Booleans}
+\label{ch:bernoulli-bool}
+
+\epigraph{In the beginning was the Bit, and the Bit was with Noise, and the Bit was Noise.}{Anonymous Information Theorist}
+
+\section{The Simplest Bernoulli Type}
+
+The Bernoulli boolean is the atomic unit of approximate computation. While a classical boolean has two values, $\{\True, \False\}$, a Bernoulli boolean represents a classical boolean observed through a noisy channel.
+
+\begin{definition}[Bernoulli Boolean]
+A Bernoulli boolean of order $n$ is a probability distribution over $\{\True, \False\}$ parameterized by an $n$-dimensional error model.
+\end{definition}
+
+This simple definition has profound implications. Every approximate computation can be decomposed into operations on Bernoulli booleans, making them the fundamental building blocks of our framework.
+
+\section{Symmetric vs. Asymmetric Errors}
+
+\subsection{First-Order: Binary Symmetric Channel}
+
+The simplest non-trivial Bernoulli boolean has symmetric errors:
+
+\begin{definition}[Symmetric Bernoulli Boolean]
+A symmetric Bernoulli boolean $\BernoulliBool_\epsilon$ with error rate $\epsilon$ satisfies:
+\begin{align}
+\Prob{\text{observe } \True | \text{actual } \True} &= 1 - \epsilon \\
+\Prob{\text{observe } \False | \text{actual } \False} &= 1 - \epsilon
+\end{align}
+\end{definition}
+
+\begin{example}[Noisy Communication]
+Consider transmitting bits over a noisy channel:
+\begin{minted}{cpp}
+bernoulli_bool<1> transmit(bool bit) {
+    // Physical channel adds noise
+    double noise = electromagnetic_interference();
+    double error_rate = 1.0 / (1.0 + signal_to_noise_ratio);
+    return bernoulli_bool<1>(bit, error_rate);
+}
+\end{minted}
+\end{example}
+
+\subsection{Second-Order: Binary Asymmetric Channel}
+
+Real-world systems often have asymmetric errors:
+
+\begin{definition}[Asymmetric Bernoulli Boolean]
+An asymmetric Bernoulli boolean $\BernoulliBool_{\alpha,\beta}$ has:
+\begin{align}
+\Prob{\text{observe } \True | \text{actual } \False} &= \alpha \text{ (false positive)} \\
+\Prob{\text{observe } \False | \text{actual } \True} &= \beta \text{ (false negative)}
+\end{align}
+\end{definition}
+
+\begin{example}[Medical Test]
+A COVID-19 rapid test:
+\begin{itemize}
+    \item Sensitivity (true positive rate): 95\% $\Rightarrow \beta = 0.05$
+    \item Specificity (true negative rate): 98\% $\Rightarrow \alpha = 0.02$
+\end{itemize}
+\end{example}
+
+\section{Bayesian Inference with Bernoulli Booleans}
+
+When we observe a Bernoulli boolean, what can we infer about the true value? Bayesian inference provides a principled framework.
+
+\subsection{Posterior Probability Calculation}
+
+\begin{theorem}[Bayesian Update for Bernoulli Booleans]
+Given an observation $\tilde{x} \sim \BernoulliBool_{\alpha,\beta}(x)$, the posterior probability is:
+\begin{equation}
+\Prob{x = \True | \tilde{x} = \True} = \frac{(1-\beta) \Prob{x = \True}}{(1-\beta) \Prob{x = \True} + \alpha \Prob{x = \False}}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+Apply Bayes' rule:
+\begin{align}
+\Prob{x = \True | \tilde{x} = \True} &= \frac{\Prob{\tilde{x} = \True | x = \True} \Prob{x = \True}}{\Prob{\tilde{x} = \True}} \\
+&= \frac{(1-\beta) \Prob{x = \True}}{(1-\beta) \Prob{x = \True} + \alpha \Prob{x = \False}}
+\end{align}
+\end{proof}
+
+\subsection{Maximum Entropy Prior}
+
+With no prior information, the maximum entropy principle suggests $\Prob{x = \True} = 0.5$:
+
+\begin{corollary}[Uniform Prior Update]
+Under maximum entropy prior:
+\begin{align}
+\Prob{x = \True | \tilde{x} = \True} &= \frac{1-\beta}{1-\beta + \alpha} \\
+\Prob{x = \False | \tilde{x} = \False} &= \frac{1-\alpha}{1-\alpha + \beta}
+\end{align}
+\end{corollary}
+
+\begin{example}[Medical Diagnosis]
+For a test with 95\% sensitivity and 98\% specificity:
+\begin{itemize}
+    \item Positive test: $\Prob{\text{infected} | \text{positive}} = \frac{0.95}{0.95 + 0.02} \approx 97.9\%$
+    \item Negative test: $\Prob{\text{healthy} | \text{negative}} = \frac{0.98}{0.98 + 0.05} \approx 95.1\%$
+\end{itemize}
+\end{example}
+
+\subsection{Multiple Observations}
+
+With multiple independent observations, evidence accumulates:
+
+\begin{theorem}[Sequential Bayesian Update]
+For $n$ i.i.d. observations $\tilde{x}_1, \ldots, \tilde{x}_n$ of $x$:
+\begin{equation}
+\Prob{x | \tilde{x}_1, \ldots, \tilde{x}_n} \propto \prod_{i=1}^n \Prob{\tilde{x}_i | x} \cdot \Prob{x}
+\end{equation}
+\end{theorem}
+
+\begin{algorithm}[H]
+\SetAlgoLined
+\KwIn{Observations $\tilde{x}_1, \ldots, \tilde{x}_n$, error rates $\alpha, \beta$}
+\KwOut{Posterior probability $p$}
+\SetKwFunction{BayesianInference}{BayesianInference}
+\SetKwProg{Fn}{Function}{:}{}
+\Fn{\BayesianInference{$\{\tilde{x}_i\}, \alpha, \beta$}}{
+    $\log\_odds \leftarrow 0$ \tcp{Log odds ratio}
+    \ForEach{observation $\tilde{x}_i$}{
+        \If{$\tilde{x}_i = \True$}{
+            $\log\_odds \leftarrow \log\_odds + \log\frac{1-\beta}{\alpha}$\;
+        }
+        \Else{
+            $\log\_odds \leftarrow \log\_odds + \log\frac{\beta}{1-\alpha}$\;
+        }
+    }
+    \Return $\frac{1}{1 + e^{-\log\_odds}}$ \tcp{Convert to probability}
+}
+\caption{Bayesian Inference for Bernoulli Booleans}
+\end{algorithm}
+
+\section{Logic Operations on Uncertain Values}
+
+When we can't trust individual bits, how do we compute with them?
+
+\subsection{Probabilistic AND}
+
+For independent Bernoulli booleans:
+
+\begin{theorem}[AND Error Propagation]
+Given $a \sim \BernoulliBool_{\epsilon_1}$ and $b \sim \BernoulliBool_{\epsilon_2}$:
+\begin{equation}
+\Prob{(a \wedge b) \neq (a_{\text{true}} \wedge b_{\text{true}})} = \epsilon_1 + \epsilon_2 - \epsilon_1\epsilon_2 - \delta
+\end{equation}
+where $\delta$ depends on the correlation between errors and true values.
+\end{theorem}
+
+\begin{proof}
+Consider all possible error scenarios:
+\begin{enumerate}
+    \item Both correct: probability $(1-\epsilon_1)(1-\epsilon_2)$
+    \item $a$ wrong, $b$ correct: probability $\epsilon_1(1-\epsilon_2)$
+    \item $a$ correct, $b$ wrong: probability $(1-\epsilon_1)\epsilon_2$
+    \item Both wrong: probability $\epsilon_1\epsilon_2$
+\end{enumerate}
+The result depends on how these errors affect the AND operation...
+[Detailed case analysis follows]
+\end{proof}
+
+\subsection{Probabilistic OR and NOT}
+
+\begin{proposition}[OR Error Rate]
+For symmetric errors:
+\begin{equation}
+\epsilon_{a \vee b} \approx \epsilon_a + \epsilon_b - \epsilon_a\epsilon_b
+\end{equation}
+\end{proposition}
+
+\begin{proposition}[NOT Error Rate]
+Negation preserves error structure:
+\begin{itemize}
+    \item Symmetric: $\epsilon_{\neg a} = \epsilon_a$
+    \item Asymmetric: $\alpha_{\neg a} = \beta_a, \beta_{\neg a} = \alpha_a$
+\end{itemize}
+\end{proposition}
+
+\subsection{Functions as Uncertainty Filters}
+
+Not all functions propagate uncertainty equally. Some functions can actually improve observation quality:\footnote{This insight emerged from considering how threshold functions like $x < 0.9$ can produce high-confidence Boolean observations even from uncertain real-valued inputs.}
+
+\begin{definition}[Uncertainty Filter Classification]
+Functions can be classified by how they transform observation uncertainty:
+\begin{itemize}
+    \item \textbf{Uncertainty reducers}: Functions that can produce more certain outputs from uncertain inputs
+    \item \textbf{Uncertainty amplifiers}: Functions where small input errors become large output errors
+    \item \textbf{Uncertainty preservers}: Functions that maintain relative error magnitude
+\end{itemize}
+\end{definition}
+
+\begin{example}[Threshold as Uncertainty Reducer]
+Consider $f(x) = (x < 0.9)$ applied to $\obs{x} \in \bernoulli{\Real}{1}$ with $x = 0.1 \pm 0.2$:
+\begin{itemize}
+    \item Latent: $x = 0.1$, so $f(x) = \True$
+    \item Observed: Despite uncertainty in $\obs{x}$, we observe $\obs{f(x)} = \True$ with high confidence
+    \item The threshold is far from the uncertain region, reducing output uncertainty
+\end{itemize}
+\end{example}
+
+\begin{example}[Division as Uncertainty Amplifier]
+The function $g(x) = 1/x$ near zero:
+\begin{itemize}
+    \item Input: $\obs{x} = 0.01 \pm 0.005$ (50\% relative error)
+    \item Output: $\obs{g(x)} \in [66.7, 200]$ (200\% relative error)
+    \item Small absolute errors become large when $x \approx 0$
+\end{itemize}
+\end{example}
+
+\begin{remark}[Design Implications]
+Understanding functions as uncertainty filters enables optimization:
+\begin{itemize}
+    \item Place uncertainty reducers after noisy measurements
+    \item Avoid uncertainty amplifiers in critical paths
+    \item Use uncertainty-aware function selection in compilers
+\end{itemize}
+\end{remark}
+
+\section{Applications in Fault-Tolerant Systems}
+
+\subsection{Triple Modular Redundancy}
+
+A classic fault-tolerance technique:
+
+\begin{minted}{cpp}
+template<typename T>
+bernoulli<T, 1> majority_vote(
+    const bernoulli<T, 1>& a,
+    const bernoulli<T, 1>& b, 
+    const bernoulli<T, 1>& c) {
+    
+    // Three voters with error rate e each
+    // Majority vote has error rate 3e² - 2e³
+    double e = a.error_rate();
+    double new_error = 3*e*e - 2*e*e*e;
+    
+    T result = (a.observe() + b.observe() + c.observe()) >= 2;
+    return bernoulli<T, 1>(result, new_error);
+}
+\end{minted}
+
+\begin{theorem}[TMR Error Reduction]
+For $\epsilon < 0.5$, triple modular redundancy reduces error rate from $\epsilon$ to $3\epsilon^2 - 2\epsilon^3 < \epsilon$.
+\end{theorem}
+
+\subsection{Byzantine Fault Tolerance}
+
+In distributed systems, nodes may fail arbitrarily:
+
+\begin{example}[Byzantine Generals]
+Each general has a Bernoulli boolean vote:
+\begin{itemize}
+    \item Loyal generals: $\epsilon = 0$ (no error)
+    \item Traitors: $\epsilon = 0.5$ (maximally unreliable)
+\end{itemize}
+Byzantine agreement requires $n > 3f$ where $f$ is the number of traitors.
+\end{example}
+
+\section{Three-Valued Logic and Beyond}
+
+When uncertainty is high, binary decisions become problematic:
+
+\begin{definition}[Kleene's Three-Valued Logic]
+Extend booleans with $\bot$ (unknown):
+\begin{center}
+\begin{tabular}{c|ccc}
+$\wedge$ & $\True$ & $\False$ & $\bot$ \\
+\hline
+$\True$ & $\True$ & $\False$ & $\bot$ \\
+$\False$ & $\False$ & $\False$ & $\False$ \\
+$\bot$ & $\bot$ & $\False$ & $\bot$ \\
+\end{tabular}
+\end{center}
+\end{definition}
+
+\begin{minted}{cpp}
+tribool from_bernoulli(const bernoulli_bool<1>& b, double threshold) {
+    if (b.error_rate() > threshold) {
+        return tribool::unknown;
+    }
+    return b.most_likely_value() ? tribool::true_val : tribool::false_val;
+}
+\end{minted}
+
+\section{Information Theory of Bernoulli Booleans}
+
+\subsection{Channel Capacity}
+
+\begin{theorem}[Capacity of Bernoulli Boolean Channel]
+The channel capacity of a symmetric Bernoulli boolean is:
+\begin{equation}
+C = 1 - H(\epsilon) = 1 + \epsilon\log_2\epsilon + (1-\epsilon)\log_2(1-\epsilon)
+\end{equation}
+bits per boolean.
+\end{theorem}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[scale=0.8]
+\begin{axis}[
+    xlabel={Error Rate $\epsilon$},
+    ylabel={Channel Capacity (bits)},
+    xmin=0, xmax=0.5,
+    ymin=0, ymax=1,
+    grid=major
+]
+\addplot[domain=0.001:0.499, samples=100, thick, blue] 
+    {1 + x*ln(x)/ln(2) + (1-x)*ln(1-x)/ln(2)};
+\end{axis}
+\end{tikzpicture}
+\caption{Channel capacity decreases with error rate}
+\end{figure}
+
+\subsection{Error Correction}
+
+We can add redundancy to combat errors:
+
+\begin{example}[Hamming(7,4) Code]
+Encode 4 data bits into 7 bits to correct single-bit errors:
+\begin{minted}{cpp}
+struct hamming_74 {
+    bernoulli_bool<1> data[4];
+    bernoulli_bool<1> parity[3];
+    
+    bool syndrome_decode() {
+        // Compute syndrome to locate error
+        int s = (parity[0] ^ data[0] ^ data[1] ^ data[3]) << 2 |
+                (parity[1] ^ data[0] ^ data[2] ^ data[3]) << 1 |
+                (parity[2] ^ data[1] ^ data[2] ^ data[3]);
+        
+        // Correct error if syndrome != 0
+        if (s > 0 && s <= 7) {
+            bits[s-1] = !bits[s-1];
+        }
+    }
+};
+\end{minted}
+\end{example}
+
+\section{Quantum Connections}
+
+Bernoulli booleans naturally model quantum measurements:
+
+\begin{example}[Qubit Measurement]
+A qubit $|\psi\rangle = \alpha|0\rangle + \beta|1\rangle$ yields:
+\begin{itemize}
+    \item $|0\rangle$ with probability $|\alpha|^2$
+    \item $|1\rangle$ with probability $|\beta|^2$
+\end{itemize}
+This is a Bernoulli boolean with $\epsilon = \min(|\alpha|^2, |\beta|^2)$.
+\end{example}
+
+\section{Exercises}
+
+\begin{exercise}
+Prove that for independent symmetric Bernoulli booleans, XOR has error rate:
+\begin{equation}
+\epsilon_{a \oplus b} = \epsilon_a + \epsilon_b - 2\epsilon_a\epsilon_b
+\end{equation}
+\end{exercise}
+
+\begin{exercise}
+Design a voting scheme that achieves error rate $O(\epsilon^k)$ using $2k-1$ voters.
+\end{exercise}
+
+\begin{exercise}
+Show that no error correction code can achieve capacity greater than the channel capacity.
+\end{exercise}
+
+\begin{exercise}[Programming]
+Implement a Bernoulli boolean library supporting:
+\begin{itemize}
+    \item All 16 binary boolean functions
+    \item Error propagation tracking
+    \item Conversion to/from multi-valued logics
+\end{itemize}
+\end{exercise}
+
+\begin{exercise}[Research Level]
+Develop a complete axiomatization of Bernoulli boolean algebra. Which classical boolean algebra axioms fail? Which new axioms are needed?
+\end{exercise}
+
+\chapter{Bernoulli Sets}
+\label{ch:bernoulli-sets}
+
+\epigraph{To filter is human, to Bloom divine.}{Paraphrasing Alexander Pope}
+
+\section{From Exact to Approximate Membership}
+
+Sets are fundamental to computer science, underlying everything from databases to type systems. Traditional set implementations—hash tables, balanced trees, bit vectors—provide exact membership queries but require space proportional to the set size. This chapter explores what happens when we relax exactness for efficiency.
+
+\begin{example}[Motivating Scenario]
+A web crawler needs to track visited URLs to avoid cycles. With billions of URLs:
+\begin{itemize}
+    \item Hash table: 100+ GB of memory
+    \item Bloom filter: 2 GB with 1\% false positive rate
+    \item Trade-off: 50× space savings for occasional re-crawling
+\end{itemize}
+\end{example}
+
+\section{The Bloom Filter: A Positive Bernoulli Set}
+
+The Bloom filter, introduced by Burton Bloom in 1970, is the canonical example of a Bernoulli set.
+
+\begin{definition}[Bloom Filter]
+A Bloom filter for a set $S$ is a probabilistic data structure supporting:
+\begin{itemize}
+    \item $\text{insert}(x)$: Add $x$ to the set
+    \item $\text{contains}(x)$: Test if $x \in S$ (may have false positives)
+\end{itemize}
+with the guarantee that $\text{contains}(x) = \False \Rightarrow x \notin S$.
+\end{definition}
+
+\subsection{Construction and Analysis}
+
+A Bloom filter uses:
+\begin{itemize}
+    \item Bit array $B[0..m-1]$ initialized to all zeros
+    \item $k$ independent hash functions $h_1, \ldots, h_k: U \to [0, m-1]$
+\end{itemize}
+
+\begin{algorithm}[H]
+\SetAlgoLined
+\SetKwFunction{Insert}{insert}
+\SetKwFunction{Contains}{contains}
+\SetKwProg{Fn}{Function}{:}{}
+
+\Fn{\Insert{$x$}}{
+    \For{$i = 1$ to $k$}{
+        $B[h_i(x)] \leftarrow 1$\;
+    }
+}
+
+\Fn{\Contains{$x$}}{
+    \For{$i = 1$ to $k$}{
+        \If{$B[h_i(x)] = 0$}{
+            \Return $\False$\;
+        }
+    }
+    \Return $\True$\;
+}
+\caption{Bloom Filter Operations}
+\end{algorithm}
+
+\begin{theorem}[Bloom Filter False Positive Rate]
+After inserting $n$ elements into a Bloom filter with $m$ bits and $k$ hash functions, the false positive probability is:
+\begin{equation}
+p \approx \left(1 - e^{-kn/m}\right)^k
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+The probability a specific bit remains 0 after $n$ insertions:
+\begin{equation}
+\left(1 - \frac{1}{m}\right)^{kn} \approx e^{-kn/m}
+\end{equation}
+
+For a false positive, all $k$ bits must be 1:
+\begin{equation}
+p = \left(1 - \left(1 - \frac{1}{m}\right)^{kn}\right)^k \approx \left(1 - e^{-kn/m}\right)^k
+\end{equation}
+\end{proof}
+
+\subsection{Optimal Parameters}
+
+\begin{theorem}[Optimal Number of Hash Functions]
+Given $m$ bits and $n$ elements, the optimal number of hash functions is:
+\begin{equation}
+k^* = \frac{m}{n} \ln 2 \approx 0.693 \frac{m}{n}
+\end{equation}
+\end{theorem}
+
+\begin{corollary}[Space-Optimal Bloom Filter]
+For a target false positive rate $p$, the required bits per element:
+\begin{equation}
+\frac{m}{n} = -\frac{\log_2 p}{\ln 2} \approx -1.44 \log_2 p
+\end{equation}
+\end{corollary}
+
+\section{General Bernoulli Sets}
+
+While Bloom filters only have false positives, general Bernoulli sets allow both false positives and false negatives.
+
+\begin{definition}[Bernoulli Set]
+A Bernoulli set $\tilde{S}$ approximating a set $S$ is characterized by:
+\begin{itemize}
+    \item False positive rate: $\alpha = P(x \in \tilde{S} | x \notin S)$
+    \item False negative rate: $\beta = P(x \notin \tilde{S} | x \in S)$
+\end{itemize}
+\end{definition}
+
+\subsection{Why Allow False Negatives?}
+
+False negatives enable:
+\begin{enumerate}
+    \item \textbf{Smaller representations}: Trading both error types for space
+    \item \textbf{Dynamic deletions}: Bloom filters don't support deletion
+    \item \textbf{Privacy}: Plausible deniability for set membership
+    \item \textbf{Load balancing}: Probabilistic load shedding
+\end{enumerate}
+
+\subsection{Implementation Strategies}
+
+\begin{example}[Deletion-Supporting Filter]
+Combine two Bloom filters:
+\begin{minted}{cpp}
+class DeletableBloomFilter {
+    BloomFilter inserted;   // Items definitely in set
+    BloomFilter deleted;    // Items definitely NOT in set
+    
+    void insert(const T& item) {
+        inserted.add(item);
+        deleted.remove(item);  // If supported
+    }
+    
+    void remove(const T& item) {
+        deleted.add(item);
+    }
+    
+    bool contains(const T& item) {
+        return inserted.contains(item) && 
+               !deleted.contains(item);
+    }
+};
+\end{minted}
+This creates false negatives when items are in both filters.
+\end{example}
+
+\section{Set-Theoretic Operations}
+
+Bernoulli sets form an approximate Boolean algebra.
+
+\subsection{Union}
+
+\begin{theorem}[Union Error Rates]
+For independent Bernoulli sets $\tilde{A}$ and $\tilde{B}$:
+\begin{align}
+\alpha_{\tilde{A} \cup \tilde{B}} &= \alpha_A \alpha_B \\
+\beta_{\tilde{A} \cup \tilde{B}} &= \begin{cases}
+\beta_A \beta_B & \text{if } x \in A \cap B \\
+\beta_A & \text{if } x \in A \setminus B \\
+\beta_B & \text{if } x \in B \setminus A
+\end{cases}
+\end{align}
+\end{theorem}
+
+\begin{proof}
+For false positives, $x \notin A \cup B$ means $x \notin A$ and $x \notin B$. For $x$ to appear in $\tilde{A} \cup \tilde{B}$, it must appear in either $\tilde{A}$ or $\tilde{B}$:
+\begin{align}
+P(x \in \tilde{A} \cup \tilde{B}) &= P(x \in \tilde{A} \vee x \in \tilde{B}) \\
+&= 1 - P(x \notin \tilde{A} \wedge x \notin \tilde{B}) \\
+&= 1 - (1 - \alpha_A)(1 - \alpha_B) \\
+&= \alpha_A + \alpha_B - \alpha_A \alpha_B
+\end{align}
+
+Wait, this contradicts our theorem statement. Let me reconsider...
+
+For $x \notin A \cup B$, we need $x \in \tilde{A} \cup \tilde{B}$, which happens when $x \in \tilde{A}$ or $x \in \tilde{B}$. But these aren't disjoint events. However, for Bloom filters (OR-ing bit vectors), we get:
+\begin{equation}
+P(x \in \tilde{A} \cup \tilde{B} | x \notin A \cup B) = P(\text{all bits set by } x \text{ are 1 in } \tilde{A} \text{ OR } \tilde{B})
+\end{equation}
+
+For independent Bloom filters with the same parameters, this gives approximately $\alpha_A \alpha_B$ when $\alpha_A, \alpha_B$ are small.
+\end{proof}
+
+\subsection{Intersection}
+
+\begin{theorem}[Intersection Error Rates]
+For independent Bernoulli sets:
+\begin{align}
+\alpha_{\tilde{A} \cap \tilde{B}} &= \alpha_A \alpha_B \text{ (when disjoint)} \\
+\beta_{\tilde{A} \cap \tilde{B}} &= 1 - (1 - \beta_A)(1 - \beta_B)
+\end{align}
+\end{theorem}
+
+\subsection{Complement}
+
+The complement operation has a beautiful property:
+
+\begin{theorem}[Complement Swaps Error Types]
+For a Bernoulli set $\tilde{S}$ with rates $(\alpha, \beta)$:
+\begin{equation}
+\overline{\tilde{S}} \text{ has rates } (\beta, \alpha)
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+For $x \in S$:
+\begin{equation}
+P(x \in \overline{\tilde{S}}) = P(x \notin \tilde{S}) = \beta
+\end{equation}
+So $x$ is a false positive for $\overline{\tilde{S}}$ with probability $\beta$.
+\end{proof}
+
+\section{Information-Theoretic Bounds}
+
+\subsection{Space Lower Bounds}
+
+\begin{theorem}[Information-Theoretic Lower Bound]
+Any data structure representing a Bernoulli set with $n$ elements from a universe of size $u$, with false positive rate $\alpha$ and false negative rate $\beta$, requires at least:
+\begin{equation}
+I = n[H(\beta) - \beta \log_2(n-1)] + (u-n)[H(\alpha) - \alpha \log_2(u-n-1)]
+\end{equation}
+bits, where $H(p) = -p \log_2 p - (1-p) \log_2(1-p)$ is the binary entropy.
+\end{theorem}
+
+\begin{proof}[Proof Sketch]
+Consider all possible query outcomes. For each element:
+\begin{itemize}
+    \item If $x \in S$: outcomes "yes" (prob $1-\beta$) or "no" (prob $\beta$)
+    \item If $x \notin S$: outcomes "yes" (prob $\alpha$) or "no" (prob $1-\alpha$)
+\end{itemize}
+The entropy of outcomes determines the information content.
+\end{proof}
+
+\subsection{Achieving Optimal Space}
+
+\begin{example}[Entropy-Coded Bernoulli Set]
+Using arithmetic coding:
+\begin{minted}{cpp}
+class EntropyCodedSet {
+    // Encode membership vector using arithmetic coding
+    vector<bool> membership;  // True if element i is in set
+    ArithmeticEncoder encoder;
+    
+    size_t encode() {
+        // Model: P(bit=1|in set) = 1-β, P(bit=1|not in set) = α
+        for (size_t i = 0; i < universe_size; i++) {
+            double p = is_in_true_set(i) ? 1 - beta : alpha;
+            encoder.encode_bit(membership[i], p);
+        }
+        return encoder.size();
+    }
+};
+\end{minted}
+\end{example}
+
+\section{Advanced Constructions}
+
+\subsection{Cuckoo Filters}
+
+An alternative to Bloom filters supporting deletion:
+
+\begin{itemize}
+    \item Store fingerprints instead of just bits
+    \item Use cuckoo hashing for space efficiency
+    \item Support delete operation
+    \item Better cache locality
+\end{itemize}
+
+\subsection{Learned Bloom Filters}
+
+Using machine learning to reduce false positive rates:
+
+\begin{example}[Neural Bloom Filter]
+\begin{minted}{python}
+class LearnedBloomFilter:
+    def __init__(self, classifier, backup_bloom):
+        self.classifier = classifier  # Neural network
+        self.backup = backup_bloom     # Standard Bloom filter
+        
+    def contains(self, x):
+        # First check learned model
+        score = self.classifier.predict(x)
+        
+        if score > 0.9:  # High confidence positive
+            return True
+        elif score < 0.1:  # High confidence negative
+            return False
+        else:  # Uncertain, check backup
+            return self.backup.contains(x)
+\end{minted}
+\end{example}
+
+\section{Exercises}
+
+\begin{exercise}
+Prove that for a Bloom filter with $m$ bits, $n$ elements, and optimal $k$, the false positive rate is approximately $(0.6185)^{m/n}$.
+\end{exercise}
+
+\begin{exercise}
+Design a data structure supporting approximate set membership with the following operations, all in $O(1)$ expected time:
+\begin{itemize}
+    \item insert(x)
+    \item delete(x)
+    \item contains(x)
+\end{itemize}
+What error rates can you achieve?
+\end{exercise}
+
+\begin{exercise}
+Show that the Jaccard similarity of two Bernoulli sets is:
+\begin{equation}
+J(\tilde{A}, \tilde{B}) = \frac{(1-\beta_A)(1-\beta_B)|A \cap B| + \alpha_A\alpha_B|U \setminus (A \cup B)|}{|A \cup B| + \text{error terms}}
+\end{equation}
+\end{exercise}
+
+\begin{exercise}[Programming]
+Implement a Count-Min sketch (a Bernoulli map for frequency estimation) and experimentally verify its error bounds.
+\end{exercise}
+
+\begin{exercise}[Research Level]
+Prove or disprove: For any Bernoulli set construction with false positive rate $\alpha$ and false negative rate $\beta$, there exists a construction with rates $(\alpha', \beta')$ where $\alpha' \beta' < \alpha \beta$ using the same space.
+\end{exercise}
+
+% Continue with more chapters...
+
+\appendix
+
+\chapter{Mathematical Background}
+
+\section{Measure Theory Basics}
+
+[Content on measure theory relevant to probability...]
+
+\section{Category Theory Primer}
+
+[Functors, monads, etc. as they relate to Bernoulli types...]
+
+\chapter{C++ Code Examples}
+
+[Complete implementations of key data structures...]
+
+\chapter{Solutions to Selected Exercises}
+
+[Solutions to exercises marked throughout the text...]
+
+\backmatter
+
+\bibliographystyle{plainnat}
+\bibliography{../papers/references}
+
+\printindex
+
+\end{document}
