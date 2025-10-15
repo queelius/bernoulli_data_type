@@ -61,5 +61,3 @@ nav:
   - Implementation:
       - Codecs: implementation/codec.md
       - Regular Types: implementation/regular-types.md
-  - API Reference:
-      - C++ API: api/html/index.html

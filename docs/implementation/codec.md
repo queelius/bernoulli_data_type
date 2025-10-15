@@ -42,7 +42,7 @@ The datums of a value type cannot exist without a computer (physical system) sto
 
 A concept is a named set of requirements. Object type `X` implements the `Codec` concept for an object type `Y` if the following requirements are satisfied:
 
-1. `X` is a [RegularType](./REGULAR_TYPE_CONCEPT.md) .
+1. `X` is a [RegularType](regular-types.md) .
 
 2. `X` must have a public member type `value_type`, the type of the coded values, i.e., `X::value_type`.
 

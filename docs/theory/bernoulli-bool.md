@@ -196,9 +196,7 @@ Therefore, the probability of no error is `3 * p^2 * (1-p) + p^3`. If `p = 0.5`
 (maximum ignorance), we get a no error rate of `0.5`, as intuitively expected.
 For `p = 1`, we get a no error rate of `1`, which is also intuitively expected.
 The no error rate of a single observation, of course, is just `p`.
-Let's plot these two no error rates together:
-
-![test](plot_maj_vote.png)
+Let's plot these two no error rates together (plot not yet available).
 
 We see a slight improvement in the no error rate when we have multiple noisy
 observations of the same latent variable. As the number of independent sources

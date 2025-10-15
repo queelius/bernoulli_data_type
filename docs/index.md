@@ -41,9 +41,6 @@ Explore practical aspects:
 - [**Codecs**](implementation/codec.md) - Encoding and decoding strategies
 - [**Regular Types**](implementation/regular-types.md) - Why Bernoulli types violate regularity
 
-### API Reference
-
-See the [C++ API Documentation](api/html/index.html) for implementation details (generated via Doxygen).
 
 ## Building the Project
 
