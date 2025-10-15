@@ -3,6 +3,7 @@
 # except do not ignore .gitignore. note: may omit if .gitignore is explicitly
 # tracked
 !/.gitignore
+!/.github
 
 /docs/site/
 /build* 
