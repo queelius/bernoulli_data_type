@@ -1,0 +1,97 @@
+\NeedsTeXFormat{LaTeX2e}[1994/06/01]
+\ProvidesPackage{approx_data_type_notation}[2018/01/01 alex towell's approximate data type notation for his various papers]
+\RequirePackage{algorithm2e}
+
+\newcommand{\tprate}{\tau}
+\newcommand{\fprate}{\varepsilon}
+\newcommand{\fnrate}{\omega}
+\newcommand{\tnrate}{\eta}
+\newcommand{\fprateob}{\hat{\fprate}}
+\newcommand{\fnrateob}{\hat{\fnrate}}
+\newcommand{\tprateob}{\hat{\tprate}}
+\newcommand{\tnrateob}{\hat{\tnrate}}
+
+% functor for random approximate data type
+\SetKwFunction{Approx}{a}
+
+
+\NewDocumentCommand{\ATOverUnder}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {\underset{\mathsmaller{-}}{\overset{\mathsmaller{+}}{#1}}}
+            {\underset{\mathsmaller{-}}{\overset{\mathsmaller{\mathsmaller{#2}}}{#1}}}
+    }
+    {\underset{\mathsmaller{#3}}{\overset{\mathsmaller{#2}}{#1}}}
+}
+
+\NewDocumentCommand{\ATL}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {{}^{+}_{-}\!#1}
+            {{}^{#2}_{-}\!#1}
+    }
+    {{}_{#2}^{#3}\!#1}
+}
+
+
+\NewDocumentCommand{\AT}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {{#1}^{\pm}}
+            {{#1}^{#2}}
+    }
+    {{#1}_{#2}^{#3}}
+}
+
+\NewDocumentCommand{\LongAT}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {\Approx\!\left(#1\right)}
+            {\Approx^{#2}\!\left(#1\right)}
+    }
+    {\Approx_{#2}^{#3}\!\left(#1\right)}
+}
+
+
+\NewDocumentCommand{\PAT}{mo}{%
+    \IfNoValueTF{#2}
+        {{#1}^{+}}
+        {{#1}^{+}_{#2}}
+}
+
+\NewDocumentCommand{\NAT}{mo}{%
+    \IfNoValueTF{#2}
+        {{#1}^{-}}
+        {{#1}^{-}_{#2}}
+}
+
+% approximate partial functions (from approximate relations)
+\NewDocumentCommand{\APFun}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {\PFun{\AT{#1}}}
+            {\PFun{\AT{#1}[#2][-]}}
+    }
+    {\PFun{\AT{#1}[#2][#3]}}
+}
+
+\NewDocumentCommand{\PAPFun}{mo}{%
+    \IfNoValueTF{#2}
+        {\APFun{#1}[][\fprate]}
+        {\APFun{#1}[#2][\fprate]}
+}
+
+\NewDocumentCommand{\NAPFun}{mo}{%
+    \IfNoValueTF{#2}
+        {\APFun{#1}[][\fnrate]}
+        {\APFun{#1}[#2][\fnrate]}
+}
+
+\SetKwData{Integer}{integer}
+
+\endinput

@@ -1,0 +1,146 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+\section{Composite approximate types}
+\label{sec:composite}
+
+The primitive types (\Void, \Unit, \Bool) admit trivial or well-understood approximation models.
+The power of the algebraic framework lies in how approximation composes through type constructors: product, sum, and exponential.
+
+\subsection{Product types and Kronecker factorization}
+\label{sec:product}
+
+A product type $\Set{A} \times \Set{B}$ is the Cartesian product: values are pairs $(a, b)$ with $a \in \Set{A}$ and $b \in \Set{B}$.
+The cardinality is $|\Set{A}| \cdot |\Set{B}|$.
+
+\begin{definition}[Approximate product type]
+An approximate product value $(\tilde{a}, \tilde{b}) \in \AT{(\Set{A} \times \Set{B})}$ is a pair where each component is independently approximated: $\tilde{a} \in \AT{\Set{A}}$ and $\tilde{b} \in \AT{\Set{B}}$, with errors at the two components mutually independent.
+\end{definition}
+
+Under the independence assumption, the joint confusion matrix of the pair factors as a Kronecker product:
+\begin{equation}
+\label{eq:product_kronecker}
+M_{\Set{A} \times \Set{B}} = M_{\Set{A}} \otimes M_{\Set{B}},
+\end{equation}
+where $M_{\Set{A}}$ is the $|\Set{A}| \times |\Set{A}|$ per-component confusion matrix and similarly for $M_{\Set{B}}$.
+
+\begin{theorem}[Parametric parsimony of product types]
+\label{thm:product_parsimony}
+Let $n$ denote the model order (number of partition blocks) and let $k = |\Set{A}| \cdot |\Set{B}|$ denote the cardinality of the product type.
+Without independence, an $n$-th order channel on the product type $\Set{A} \times \Set{B}$ has $n(k - 1)$ free parameters (each of the $n$ distinct rows of the $k \times k$ row-stochastic confusion matrix has $k - 1$ free entries).
+Under the Bernoulli independence assumption, the Kronecker factorization~\eqref{eq:product_kronecker} reduces the parameter count to $\mathrm{params}(\Set{A}) + \mathrm{params}(\Set{B})$, where $\mathrm{params}(\Set{T})$ denotes the number of free parameters in the per-component model for type $\Set{T}$.
+\end{theorem}
+\begin{proof}
+Each row of the joint confusion matrix is the outer product of the corresponding rows of $M_{\Set{A}}$ and $M_{\Set{B}}$.
+The row for input $(a, b)$ is determined by the row for $a$ in $M_{\Set{A}}$ and the row for $b$ in $M_{\Set{B}}$, contributing no additional free parameters beyond those in the two component matrices.
+\end{proof}
+
+\begin{corollary}[Correctness of product values]
+The probability that an approximate product value is fully correct is
+\begin{equation}
+\Prob{(\tilde{a}, \tilde{b}) = (a, b)} = \Prob{\tilde{a} = a} \cdot \Prob{\tilde{b} = b}.
+\end{equation}
+More generally, for a $k$-fold product $\Set{A}_1 \times \cdots \times \Set{A}_k$, the correctness probability is $\prod_{i=1}^{k} \Prob{\tilde{a}_i = a_i}$.
+\end{corollary}
+
+\begin{example}[Approximate pair of Booleans]
+\label{ex:bool_pair}
+For $\Bool \times \Bool$ with second-order models on each component (rates $\fprate_1, \fnrate_1$ and $\fprate_2, \fnrate_2$), the joint model has four partition blocks $\{(\False,\False)\}$, $\{(\False,\True)\}$, $\{(\True,\False)\}$, $\{(\True,\True)\}$, one per element of the product.
+A general channel with four partition blocks on $4$ symbols has $4 \times (4 - 1) = 12$ free parameters, but the Kronecker factorization gives $4$: one response rate per block per Boolean component.
+\end{example}
+
+Product types are the ``well-behaved'' case: approximation distributes over products, parameters grow additively, and the joint model factors cleanly.
+
+\subsection{Sum types and tag errors}
+\label{sec:sum}
+
+A sum type $\Set{A} + \Set{B}$ is the disjoint union (tagged union): values are either $\mathrm{Left}(a)$ for $a \in \Set{A}$ or $\mathrm{Right}(b)$ for $b \in \Set{B}$.
+The cardinality is $|\Set{A}| + |\Set{B}|$.
+
+Unlike product types, sum types do \emph{not} factor as Kronecker products.
+The fundamental reason is that a sum value has a \emph{tag} (Left or Right) and a \emph{payload} (the value within that component), and errors can affect either or both.
+
+\begin{definition}[Approximate sum type]
+An approximate sum value $\tilde{v} \in \AT{(\Set{A} + \Set{B})}$ approximates a latent value $v \in \Set{A} + \Set{B}$.
+Two kinds of error can occur:
+\begin{enumerate}
+\item \textbf{Tag error}: the tag flips (Left becomes Right or vice versa). Let $\delta$ denote the tag error probability.
+\item \textbf{Payload error}: the value within the correct component is wrong. Let $\fprate_{\Set{A}}$ and $\fprate_{\Set{B}}$ denote the per-component error rates.
+Here $\fprate_{\Set{A}}$ denotes the general per-value error rate within component $\Set{A}$, i.e., the probability that the payload is incorrect given that the tag is correct, not specifically the false positive rate.
+We reuse the $\fprate$ symbol for notational economy, since the sum type context makes the meaning unambiguous.
+\end{enumerate}
+\end{definition}
+
+\begin{theorem}[Sum type error propagation]
+\label{thm:sum_error}
+Suppose the latent value is $\mathrm{Left}(a)$ with $a \in \Set{A}$.
+Then:
+\begin{align}
+\Prob{\tilde{v} = \mathrm{Left}(a)} &= (1 - \delta)(1 - \fprate_{\Set{A}}), \\
+\Prob{\tilde{v} = \mathrm{Left}(a') \text{ for } a' \neq a} &= (1 - \delta) \cdot \frac{\fprate_{\Set{A}}}{|\Set{A}| - 1}, \\
+\Prob{\tilde{v} = \mathrm{Right}(b) \text{ for any } b} &= \delta \cdot \frac{1}{|\Set{B}|},
+\end{align}
+where the last line assumes a uniform distribution over the wrong component when a tag error occurs.
+The case for $\mathrm{Right}(b)$ is symmetric.
+\end{theorem}
+
+\begin{remark}[Non-factorizability of sum types]
+\label{rem:sum_nonfactor}
+The confusion matrix for $\AT{(\Set{A} + \Set{B})}$ does \emph{not} factor as a Kronecker product of per-component matrices.
+The reason is structural: a tag error changes which component's error model applies.
+If the tag is correct, only the payload confusion matrix for that component is relevant; if the tag is wrong, the value is drawn from the other component entirely.
+This contrasts with product types, where both components are always active and independent.
+
+Consequently, $\AT{(\Set{A} + \Set{B})} \not\cong \AT{\Set{A}} + \AT{\Set{B}}$ in general.
+The left-hand side models approximation of the sum as a whole (including tag errors); the right-hand side models a sum of independently approximated components (no tag errors possible, since the tag is exact).
+\end{remark}
+
+\begin{example}[Optional type as sum]
+The optional type $\mathrm{Maybe}(\Set{A}) = \Set{A} + \Unit$ adds a ``nothing'' case to type $\Set{A}$.
+A tag error on $\mathrm{Just}(a)$ produces $\mathrm{Nothing}$ (a false negative), and a tag error on $\mathrm{Nothing}$ produces $\mathrm{Just}(a)$ for some $a$ (a false positive).
+This is precisely the Bernoulli set membership model: the optional type is the type-theoretic formulation of approximate set membership, with $\delta = \fprate$ for negatives and $\delta = \fnrate$ for positives.
+\end{example}
+
+\subsection{Exponential types and the function space}
+\label{sec:exponential}
+
+The exponential type $\Set{A} \to \Set{B}$ is the function space: values are functions from $\Set{A}$ to $\Set{B}$.
+The cardinality is $|\Set{B}|^{|\Set{A}|}$.
+
+\begin{remark}[Exponential types are Bernoulli maps]
+An approximate exponential value $\tilde{f} \in \AT{(\Set{A} \to \Set{B})}$ is precisely a Bernoulli map $\APFun{f} \colon \Set{A} \to \Set{B}$ with per-input independent errors~\cite{bernoulliMaps}.
+The full confusion matrix over $\Set{B}^{\Set{A}}$ factors as a Kronecker product of $|\Set{A}|$ per-input channels, each of size $|\Set{B}| \times |\Set{B}|$.
+The composition theorem, entropy maps, and singular hash map construction from the companion paper on Bernoulli maps~\cite{bernoulliMaps} apply directly.
+\end{remark}
+
+\begin{remark}[Convergence of the two perspectives]
+\label{rem:convergence}
+The companion paper on Bernoulli maps~\cite{bernoulliMaps} takes a \emph{denotational} perspective: every Bernoulli approximation is a latent function $\Fun{f'} \colon \Set{X} \to \Set{Y}$ approximated per-input, and the Kronecker factorization of the joint confusion matrix is the structural theorem.
+This paper takes the \emph{constructive} counterpart: approximate types are built from primitives using type constructors, and each constructor has a derivable error propagation rule.
+The exponential type is where these perspectives meet: the type $\Set{A} \to \Set{B}$ \emph{is} the function space $\Set{B}^{\Set{A}}$, and the Kronecker factorization over inputs derived constructively (from per-input independence) is the same factorization derived denotationally (from the function-space channel structure).
+Bernoulli sets~\cite{bernoulliSets} are the special case $\Set{B} = \BitSet$.
+The optional type $\Set{A} + \Unit$ recovers Bernoulli set membership as a sum-type construction, connecting the set-theoretic and type-theoretic formulations.
+\end{remark}
+
+\subsection{Summary: the algebra of approximate types}
+\label{sec:type_summary}
+
+\begin{center}
+\begin{tabular}{@{}llll@{}}
+\toprule
+Constructor & Cardinality & Factorization & Parameters \\
+\midrule
+\Void & $0$ & trivial & $0$ \\
+\Unit & $1$ & trivial & $0$ \\
+\Bool & $2$ & atomic & $1$ (1st-order) or $2$ (2nd-order) \\
+$\Set{A} \times \Set{B}$ & $|\Set{A}| \cdot |\Set{B}|$ & Kronecker: $M_A \otimes M_B$ & $\mathrm{params}(A) + \mathrm{params}(B)$ \\
+$\Set{A} + \Set{B}$ & $|\Set{A}| + |\Set{B}|$ & does not factor & $\mathrm{params}(A) + \mathrm{params}(B) + 1$ (tag) \\
+$\Set{A} \to \Set{B}$ & $|\Set{B}|^{|\Set{A}|}$ & Kronecker: $\bigotimes_{x \in A} M_B$ & $|\Set{A}| \cdot \mathrm{params}(B)$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The product and exponential constructors preserve the Kronecker factorization: parameters grow additively (products) or multiplicatively in $|\Set{A}|$ (exponentials), but always linearly in the per-component parameter count.
+The sum constructor introduces a tag error that couples the components, breaking the factorization.
+
+\end{document}

@@ -1,0 +1,9 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{auto}\PYG{+w}{ }\PYG{n}{amap}\PYG{p}{(}\PYG{n}{function}\PYG{o}{\PYGZlt{}}\PYG{k+kt}{bool}\PYG{p}{(}\PYG{k+kt}{bool}\PYG{p}{)}\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{f}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{approx}\PYG{o}{\PYGZlt{}}\PYG{k+kt}{bool}\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{x}\PYG{p}{)}
+\PYG{p}{\PYGZob{}}
+\PYG{+w}{	}\PYG{k}{auto}\PYG{+w}{ }\PYG{n}{fnr}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{f}\PYG{p}{(}\PYG{n+nb}{true}\PYG{p}{);}
+\PYG{+w}{	}\PYG{k}{auto}\PYG{+w}{ }\PYG{n}{fpr}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{f}\PYG{p}{(}\PYG{n+nb}{false}\PYG{p}{);}
+
+\PYG{+w}{	}\PYG{k}{return}\PYG{+w}{ }\PYG{n}{approx}\PYG{o}{\PYGZlt{}}\PYG{k+kt}{bool}\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{p}{\PYGZob{}}\PYG{+w}{ }\PYG{n}{fpr}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{fnr}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{f}\PYG{p}{(}\PYG{n}{value}\PYG{p}{(}\PYG{n}{x}\PYG{p}{))}\PYG{+w}{ }\PYG{p}{\PYGZcb{};}
+\PYG{p}{\PYGZcb{}}
+\end{Verbatim}

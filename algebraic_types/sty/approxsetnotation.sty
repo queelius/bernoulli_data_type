@@ -1,0 +1,140 @@
+\NeedsTeXFormat{LaTeX2e}[1994/06/01]
+\ProvidesPackage{approxsetnotation}[2018/01/01 alex towell's approximate set notation for his various papers]
+
+\RequirePackage{setnotation}
+\RequirePackage{probabilitynotation}
+\RequirePackage{algorithm2e}
+\RequirePackage{siunitx}
+\RequirePackage{approx_data_type_notation}
+
+\newcommand{\Rho}{\mathrm{P}}
+
+\NewDocumentCommand{\AVec}{moo}{
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {{\vec{#1}}^{\pm}}
+            {{\vec{#1}}^{#2}}
+    }
+    {{\vec{#1}}_{#2}^{#3}}
+}
+
+\NewDocumentCommand{\AVecComp}{mo}{
+   \IfNoValueTF{#2}
+        {\RV{#1}^\pm}
+        {\RV{#1}_\RV{#2}^\pm}
+}
+
+\NewDocumentCommand{\ASet}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {{\setstyle{#1}}^{\pm}}
+            {{\setstyle{#1}}^{#2}}
+    }
+    {{\setstyle{#1}}_{#2}^{#3}}
+}
+
+\NewDocumentCommand{\ASetFO}{mo}{%
+    \IfNoValueTF{#2}
+        {{\setstyle{#1}}^{\epsilon}}
+        {{\setstyle{#1}}^{#2}}
+}
+
+
+\NewDocumentCommand{\PASet}{mo}{%
+    \IfNoValueTF{#2}
+        {{\setstyle{#1}}^{+}}
+        {{\setstyle{#1}}^{+}_{#2}}
+}
+
+\NewDocumentCommand{\NASet}{mo}{%
+    \IfNoValueTF{#2}
+        {{\setstyle{#1}}^{-}}
+        {{\setstyle{#1}}^{-}_{#2}}
+}
+
+
+\NewDocumentCommand{\ASetType}{m}{%
+    {#1}^{\pm}
+}
+
+\NewDocumentCommand{\ASetStyle}{moo}{%
+    \IfNoValueTF{#3}
+    {
+        \IfNoValueTF{#2}
+            {{#1}^{\pm}}
+            {{#1}^{#2}}
+    }
+    {{#1}_{#2}^{#3}}
+}
+
+
+\NewDocumentCommand{\PASetType}{m}{%
+    {#1}^{\varepsilon}
+}
+
+%\NewDocumentCommand{\ASet}{moo}{%
+%    \IfNoValueTF{#3}
+%    {
+%        \IfNoValueTF{#2}
+%            {\Set{#1}[][\sigma]}
+%            {\Set{#1}[#2][\sigma]}
+%    }
+%    {\Set{#1}[#2][#3]}
+%}
+%}
+%\NewDocumentCommand{\PASet}{mo}{%
+%    \IfNoValueTF{#2}
+%        {\ASet{#1}[][\fprate]}
+%        {\ASet{#1}[#2][\fprate]}
+%}
+%\NewDocumentCommand{\NASet}{mo}{%
+%    \IfNoValueTF{#2}
+%        {\ASet{#1}[][\fnrate]}
+%        {\ASet{#1}[#2][\fnrate]}
+%}
+
+\newcommand{\positive}{p}
+\newcommand{\negative}{n}
+\newcommand{\p}{p}
+\newcommand{\n}{n}
+
+\SetKwFunction{informed}{informed}
+\SetKwFunction{ppv}{ppv}
+\SetKwFunction{npv}{npv}
+\SetKwFunction{tpr}{tpr}
+\SetKwFunction{fpr}{fpr}
+\SetKwFunction{fnr}{fnr}
+\SetKwFunction{tnr}{tnr}
+\SetKwFunction{acc}{acc}
+\SetKwFunction{fdr}{fdr}
+\SetKwFunction{forFn}{for}
+
+%\DeclareMathOperator{\npv}{\mathsf{npv}}
+%\DeclareMathOperator{\ppv}{\mathsf{ppv}}
+%\DeclareMathOperator{\tpr}{\mathsf{tpr}}
+%\DeclareMathOperator{\fpr}{\mathsf{fpr}}
+%\DeclareMathOperator{\tnr}{\mathsf{tnr}}
+%\DeclareMathOperator{\fnr}{\mathsf{fnr}}
+%\DeclareMathOperator{\acc}{\mathsf{acc}}
+%\DeclareMathOperator{\fdr}{\mathsf{fdr}}
+%\DeclareMathOperator{\for}{\mathsf{for}}
+
+\newcommand{\POS}{\RV{P}}
+\newcommand{\NEG}{\RV{N}}
+\newcommand{\PPV}{\RV{PPV}}
+\newcommand{\NPV}{\RV{NPV}}
+\newcommand{\ACC}{\RV{ACC}}
+\newcommand{\FOR}{\RV{FOR}}
+\newcommand{\FDR}{\RV{FDR}}
+\newcommand{\FNR}{\mathcal{W}}
+\newcommand{\TNR}{\mathcal{N}}
+\newcommand{\FPR}{\mathcal{E}}
+\newcommand{\TPR}{\mathcal{T}}
+\newcommand{\TP}{\RV{TP}}
+\newcommand{\FP}{\RV{FP}}
+\newcommand{\FN}{\RV{FN}}
+\newcommand{\TN}{\RV{TN}}
+
+\endinput

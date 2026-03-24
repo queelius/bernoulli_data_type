@@ -1,0 +1,110 @@
+\documentclass[../main.tex]{subfiles}
+\begin{document}
+
+\section{Set-Indicator Functions}
+
+The set-indicator function is a function that maps an element of a set to a Boolean value. We can think of this as a function of type $X \to \Bool$, which returns true if the input is in the set and false otherwise.
+
+Let us consider Bernoulli Models for set-indicator functions~\cite{bernoulliSets}. The Bloom filter~\cite{bloom1970}, for instance, is a Bernoulli model of the set-indicator function. It is a second-order model, since false negatives occur with probability 0 and false positives occur with probability $\varepsilon$. This is actually the \emph{expectation} of the false positive rate, and the true false positive rate is a random variable that cannot usually be computed unless $X$ is a finite set.
+
+\subsection{Approximate Set-Indicator Functions}
+
+Suppose we have a cryptographic hash function $h : X \to \{0,1\}^n$, where $n$ is the number of bits in the hash value. We define an approximate set-indicator function, denoted by $\mathrm{hash\_set}$, in the following way:
+
+\begin{itemize}
+\item We are given a set $A$ to (approximately) represent.
+\item We find a seed $s$ such that $h(x s) \leq k$ for all $x \in A$.
+\item We do not look at any $x \notin A$, and by the properties of $h$, for $x \notin A$, $h(x s) \leq k$ with probability $k 2^{-n}$ corresponding to a false positive, and otherwise a true negative occurs.
+\item We define membership as $x \in A \iff h(x s) \leq k$.
+\end{itemize}
+
+So, we construct a $\mathrm{hash\_set}$ by finding a seed $s$ such that $h(x s) \leq k$ and that is the only value we need to store, but since the probability that all $x \in A$ hash to a value less than $k$ occurs with probability $k 2^{-n}$, each trial is Bernoulli distributed with probability of success given by
+\begin{align}
+    \varepsilon(m,n,k)
+        &= \prod_{j=1}^{m} \frac{k+1}{2^n}\\
+        &= \left(\frac{k+1}{2^n}\right)^m,
+\end{align}
+where $m = |A|$, $k$ is the number of hash values we accept as positives, and $n$ is the number of bits in the hash value.
+
+The number of trials $N$ is a geometric random variable with success probability $\varepsilon(m,n,k)$. The expected number of trials to find a seed $s$ such that $h(x s) \leq k$ for all $x \in A$ is given by
+\begin{equation}
+    E[N] = \frac{1}{\varepsilon(m,n,k)} = \left(\frac{2^n}{k+1}\right)^m.
+\end{equation}
+
+Since the false positive rate $\varepsilon = (k+1) 2^{-n}$, $n = \log(k/\varepsilon)$,
+we can reparameterize the space complexity as $\log(k/\varepsilon)$ bits per element.
+If we let $k=0$, this simplifies to
+$$
+\varepsilon = 2^{-n} \implies n = -\log \varepsilon
+$$
+bits per element, which is the information-theoretic lower-bound, but we achieved it only by using an algorithm
+with exponential time complexity.
+We can do better by using different algorithms, but it comes at a cost to space complexity, such as a two-level hashing
+scheme, where the first level throws each element into a bucket, and the second level hashes
+the elements in the bucket. The number of buckets can be chosen as a trade-off between time and space complexity,
+e.g., if the number of buckets is $b$, then the expected number of elements in each bucket is $m/b$,
+and the expected number of trials to find a seed $s$ such that $h(x s) \leq k$ for all $x \in A$ is given by
+\begin{equation}
+    E[N] = \frac{b}{\varepsilon(m/b,n,k)} = \left(\frac{2^n}{k+1}\right)^{m/b}.
+\end{equation}
+If we let $k=0$, this simplifies to
+$$
+    E[N] = \frac{b}{\varepsilon(m/b,n,k)} = 2^{n m / b}.
+$$
+
+This is the expected number of trials to find a seed $s$ such that $h(x s) \leq k$ for all $x \in A$.
+How many bits, then, are we expected to need to store the seed $s$? Assuming no fancy coding schemes (like a geometric code, which would be optimal), we can just store the seed in a fixed-size array whose size is the base-2 log of the seed,
+$$
+    \frac{n m}{b}
+$$
+bits in total, or $n/b$ bits per element ($m$ elements in total).
+
+Since $\varepsilon = 2^{-n}$, $n = -\log \varepsilon$, we can reparameterize the space complexity as
+$$
+-\frac{\log \varepsilon}{b}
+$$
+bits per element. This of course assumes that $m \gg b$, otherwise there may be a very uneven distribution of elements in the buckets, some with much larger than $m/b$ elements.
+
+
+\subsection{Bernoulli Model for Set-Indicator Functions}
+
+The number of functions of type $X \to \Bool$ is $2^{|X|}$. We can think of these as the set of all possible set-indicator functions. We can approximate this set of functions with a Bernoulli Model, which we denote $B_{X \to \Bool}$.
+
+We can use the simple $\mathrm{hash\_set}$ construction to induce the Bernoulli Model for set-indicator functions. Specifically, in the $\mathrm{hash\_set}$, false positives occur with some positive probability $\epsilon$ and false negatives occur with probability $0$.
+
+Technically, however, the Bernoulli Model is being applied to the set-indicator function, but this also specifies a Bernoulli Model on the Boolean output of the set-indicator function:
+\begin{equation}
+    \in : X \times \mathcal{P}(X) \to B_{\Bool}.
+\end{equation}
+
+Let's consider $X = \{1,2\}$ and $A = \{2\}$. The confusion matrix for this construction is given in Table~\ref{tbl:set_indicator}.
+
+\begin{table}[htbp]
+\centering
+\caption{Bernoulli Model for $X \to \Bool$}
+\label{tbl:set_indicator}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+& $1_\emptyset$ & $1_{\{1\}}$ & $1_{\{2\}}$ & $1_{\{1,2\}}$ \\
+\midrule
+$1_\emptyset$ & $(1-\epsilon)^2$ & $\epsilon(1-\epsilon)$ & $\epsilon(1-\epsilon)$ & $\epsilon^2$ \\
+$1_{\{1\}}$ & $0$ & $1-\epsilon$ & $0$ & $\epsilon$ \\
+$1_{\{2\}}$ & $0$ & $0$ & $1-\epsilon$ & $\epsilon$ \\
+$1_{\{1,2\}}$ & $0$ & $0$ & $0$ & $1$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+We do not know the latent set $A = \{2\}$, we only have the approximation
+$B_{X \to \Bool}(A)$, and we use this as a replacement for the latent set $A$.
+
+Notice that if we start with $A = \{2\}$, in row 3, we have zeros in the first two columns for the empty set and $\{1\}$, which makes sense as by construction no false negatives are possible, only false positives.
+
+We see that with probability $1-\epsilon$, the output is correct, and with probability $\epsilon$, the output is incorrect. This is a Bernoulli Model of the set-indicator function (or Bernoulli Set), and we can use this to provide information about the latent set.
+
+On the equality of Bernoulli Sets, we can ask the question, what is the probability that $B_{X \to \Bool}(A) = A$? This is just $1-\epsilon$, as shown in the confusion matrix. However, this is not typically what people are interested in. They are interested in per-element membership correctness: for a non-member $x \notin A$, the probability that $x$ is correctly rejected (true negative) is $1 - \epsilon$, and for a member $x \in A$, the probability that $x$ is correctly accepted (true positive) is $1$ since false negatives cannot occur by construction. Thus, false positives occur with probability $\epsilon$, and false negatives occur with probability $0$. We see that when we do membership tests, we can think of the output as a Bernoulli Boolean value:
+\begin{equation}
+    x \in B_{X \to \Bool}(A) : X \to B_\Bool^{(2)}.
+\end{equation}
+
+\end{document}

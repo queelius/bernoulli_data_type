@@ -1,0 +1,171 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+\section{Random approximate Boolean algebra}
+\label{sec:bernoulli_boolean_algebra}
+
+The type $\AT{\Bool}$ introduced in \cref{sec:approx_bitset} models approximation of a single bit.
+In this section, we extend the treatment to $n$-bit vectors and show that the
+component-wise Boolean operations inherit a tractable error model from the
+product-type Kronecker factorization of \cref{thm:product_parsimony}.
+
+\subsection{The Boolean algebra on \texorpdfstring{$\BitSet^n$}{B\^{}n}}
+
+The classical Boolean algebra over $n$-bit vectors is the six-tuple
+\begin{equation}
+\label{eq:bool_algebra}
+	\bigl(\,\BitSet^n,\;\wedge,\;\vee,\;\neg,\;\mathbf{1}^n,\;\mathbf{0}^n\,\bigr)\,,
+\end{equation}
+where $\wedge$, $\vee$, and $\neg$ denote component-wise AND, OR, and NOT,
+and $\mathbf{1}^n$ and $\mathbf{0}^n$ are the all-ones and all-zeros vectors.
+The type $\BitSet^n$ is isomorphic to the $n$-fold product $\Bool \times \cdots \times \Bool$,
+so any type with cardinality $2^n$ admits a Boolean algebra via this identification.
+For instance, $\BitSet^n$ can represent the powerset $2^{\Set{U}}$ of any universe
+$\Set{U}$ with $|\Set{U}| = n$, giving a complete implementation of set-theoretic
+operations (union, intersection, complement) on $\Set{U}$.
+
+\subsection{Approximate bit vectors}
+
+An approximate $n$-bit vector $\tilde{\mathbf{x}} \in \AT{\BitSet^n}$ replaces each
+component $x_i \in \BitSet$ by an independent Bernoulli Boolean
+$\tilde{x}_i \in \AT{\Bool}$ with per-component error rates
+$(\fprate_i, \fnrate_i)$ for $i = 1, \ldots, n$.
+Since $\BitSet^n$ is an $n$-fold product type, the Kronecker factorization
+(\cref{thm:product_parsimony}) applies directly:
+
+\begin{theorem}[Kronecker factorization of $\AT{\BitSet^n}$]
+\label{thm:bitvec_kronecker}
+The joint confusion matrix of $\AT{\BitSet^n}$ factors as
+\begin{equation}
+\label{eq:bitvec_kronecker}
+	M_{\BitSet^n}
+	= M_1 \otimes M_2 \otimes \cdots \otimes M_n\,,
+\end{equation}
+where each $M_i$ is the $2 \times 2$ per-component channel matrix
+\begin{equation}
+	M_i
+	= \begin{pmatrix}
+		1 - \fprate_i & \fprate_i \\
+		\fnrate_i     & 1 - \fnrate_i
+	  \end{pmatrix}\,.
+\end{equation}
+A general channel on $2^n$ symbols has $2^n(2^n - 1)$ free parameters.
+Under the Bernoulli independence assumption, the factorization reduces this to $2n$ parameters:
+two rates $(\fprate_i, \fnrate_i)$ per component.
+\end{theorem}
+\begin{proof}
+The type $\BitSet^n = \Bool^n$ is the $n$-fold product $\Bool \times \cdots \times \Bool$.
+By \cref{thm:product_parsimony}, the joint confusion matrix factors as the
+Kronecker product of the per-component matrices, and the total parameter count
+is $\sum_{i=1}^{n} \mathrm{params}(\Bool) = 2n$.
+\end{proof}
+
+\begin{corollary}[Correctness of approximate bit vectors]
+\label{cor:bitvec_correct}
+The probability that an approximate $n$-bit vector is fully correct is
+\begin{equation}
+	\Prob{\tilde{\mathbf{x}} = \mathbf{x}}
+	= \prod_{i=1}^{n}
+	  \bigl(x_i\,(1 - \fnrate_i) + (1 - x_i)\,(1 - \fprate_i)\bigr)\,.
+\end{equation}
+\end{corollary}
+
+\subsection{Approximate Boolean operations}
+
+The Boolean operations $\wedge$, $\vee$, and $\neg$ act component-wise
+on $\BitSet^n$, so their approximate counterparts inherit errors from the
+component channels.
+
+\begin{theorem}[Approximate AND on Bernoulli Booleans]
+\label{thm:approx_and}
+Let $\tilde{a}, \tilde{b} \in \AT{\Bool}$ be independent Bernoulli Booleans
+with rates $(\fprate_1, \fnrate_1)$ and $(\fprate_2, \fnrate_2)$ respectively.
+The output $\tilde{c} = \tilde{a} \wedge \tilde{b}$ has the conditional
+error rates
+\begin{align}
+\label{eq:and_rates}
+	\Prob{\tilde{c} = 1 \Given a = 0, b = 0}
+		&= \fprate_1 \, \fprate_2\,, \\
+	\Prob{\tilde{c} = 1 \Given a = 0, b = 1}
+		&= \fprate_1 \, (1 - \fnrate_2)\,, \\
+	\Prob{\tilde{c} = 1 \Given a = 1, b = 0}
+		&= (1 - \fnrate_1) \, \fprate_2\,, \\
+	\Prob{\tilde{c} = 1 \Given a = 1, b = 1}
+		&= (1 - \fnrate_1) \, (1 - \fnrate_2)\,.
+\end{align}
+The joint model on the input pair $(a, b) \in \BitSet^2$ has four partition
+blocks (one per input combination), yielding four distinct conditional error
+probabilities for the Boolean output, but independence yields only
+$4$ free parameters by the Kronecker factorization of $M_1 \otimes M_2$.
+\end{theorem}
+\begin{proof}
+By independence of $\tilde{a}$ and $\tilde{b}$, the joint probability
+factors:
+$\Prob{\tilde{a} = \alpha, \tilde{b} = \beta \Given a, b}
+= \Prob{\tilde{a} = \alpha \Given a} \cdot \Prob{\tilde{b} = \beta \Given b}$.
+Since AND is deterministic, $\tilde{c} = 1$ if and only if
+$\tilde{a} = 1$ and $\tilde{b} = 1$.
+The four cases follow by substituting the per-component channel probabilities.
+\end{proof}
+
+\begin{theorem}[Approximate OR on Bernoulli Booleans]
+\label{thm:approx_or}
+Under the same setup as \cref{thm:approx_and}, the output
+$\tilde{c} = \tilde{a} \vee \tilde{b}$ has the conditional error rates
+\begin{align}
+	\Prob{\tilde{c} = 1 \Given a = 0, b = 0}
+		&= 1 - (1 - \fprate_1)(1 - \fprate_2)\,, \\
+	\Prob{\tilde{c} = 1 \Given a = 0, b = 1}
+		&= 1 - (1 - \fprate_1)\,\fnrate_2\,, \\
+	\Prob{\tilde{c} = 1 \Given a = 1, b = 0}
+		&= 1 - \fnrate_1\,(1 - \fprate_2)\,, \\
+	\Prob{\tilde{c} = 1 \Given a = 1, b = 1}
+		&= 1 - \fnrate_1 \, \fnrate_2\,.
+\end{align}
+\end{theorem}
+\begin{proof}
+The event $\tilde{c} = 0$ requires $\tilde{a} = 0$ and $\tilde{b} = 0$,
+which by independence has probability
+$\Prob{\tilde{a} = 0 \Given a} \cdot \Prob{\tilde{b} = 0 \Given b}$.
+The result follows from $\Prob{\tilde{c} = 1} = 1 - \Prob{\tilde{c} = 0}$.
+\end{proof}
+
+\begin{remark}[Approximate NOT]
+\label{rem:approx_not}
+For $\tilde{a} \in \AT{\Bool}[\fprate][\fnrate]$, the negation
+$\tilde{c} = \neg\,\tilde{a}$ swaps the roles of false positives and
+false negatives: $\tilde{c} \in \AT{\Bool}[\fnrate][\fprate]$.
+This is the component-wise analogue of the complement operation on
+Bernoulli sets, where complementing swaps $\fprate$ and $\fnrate$.
+\end{remark}
+
+\subsection{Component-wise operations on \texorpdfstring{$\AT{\BitSet^n}$}{AT(B\^{}n)}}
+
+Extending the above to $n$-bit vectors is immediate: each Boolean operation
+acts independently on each component, so the $i$-th output component
+depends only on the $i$-th input components and their respective error rates.
+
+\begin{corollary}[Component-wise AND on $\AT{\BitSet^n}$]
+\label{cor:bitvec_and}
+For independent approximate bit vectors
+$\tilde{\mathbf{a}}, \tilde{\mathbf{b}} \in \AT{\BitSet^n}$,
+the component-wise AND $\tilde{\mathbf{c}} = \tilde{\mathbf{a}} \wedge \tilde{\mathbf{b}}$
+has the $i$-th component error rates given by \cref{thm:approx_and}
+applied to $(\fprate_{a,i}, \fnrate_{a,i})$ and $(\fprate_{b,i}, \fnrate_{b,i})$.
+The joint confusion matrix of $\tilde{\mathbf{c}}$ factors as a Kronecker
+product of $n$ output-component channels, each determined by the two
+input-component channels at position $i$.
+\end{corollary}
+
+\begin{remark}[Connection to Bernoulli set operations]
+When $\BitSet^n$ represents the powerset of an $n$-element universe $\Set{U}$,
+the component-wise AND, OR, and NOT correspond to set intersection, union,
+and complement.
+The error rates derived above are consistent with the set-theoretic
+composition rules for Bernoulli sets~\cite{bernoulliComposition}:
+approximate intersection has per-element false positive rate
+$\fprate_1 \fprate_2$ and approximate union has per-element false negative
+rate $\fnrate_1 \fnrate_2$.
+\end{remark}
+
+\end{document}

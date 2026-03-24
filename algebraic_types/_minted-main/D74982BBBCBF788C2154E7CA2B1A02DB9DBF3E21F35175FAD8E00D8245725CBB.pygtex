@@ -1,0 +1,5 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{+w}{	}\PYG{k}{auto}\PYG{+w}{ }\PYG{n}{fpr}\PYG{p}{(}\PYG{n}{approx}\PYG{o}{\PYGZlt{}}\PYG{k+kt}{bool}\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{x}\PYG{p}{)}\PYG{+w}{   }\PYG{p}{\PYGZob{}}\PYG{+w}{ }\PYG{k}{return}\PYG{+w}{ }\PYG{n}{x}\PYG{p}{.}\PYG{n}{fpr}\PYG{p}{;}\PYG{+w}{ }\PYG{p}{\PYGZcb{},}
+\PYG{+w}{	}\PYG{k}{auto}\PYG{+w}{ }\PYG{n}{fnr}\PYG{p}{(}\PYG{n}{approx}\PYG{o}{\PYGZlt{}}\PYG{k+kt}{bool}\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{x}\PYG{p}{)}\PYG{+w}{   }\PYG{p}{\PYGZob{}}\PYG{+w}{ }\PYG{k}{return}\PYG{+w}{ }\PYG{n}{x}\PYG{p}{.}\PYG{n}{fnr}\PYG{p}{;}\PYG{+w}{ }\PYG{p}{\PYGZcb{},}
+\PYG{+w}{	}\PYG{k}{auto}\PYG{+w}{ }\PYG{n}{value}\PYG{p}{(}\PYG{n}{approx}\PYG{o}{\PYGZlt{}}\PYG{k+kt}{bool}\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{x}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}\PYG{+w}{ }\PYG{k}{return}\PYG{+w}{ }\PYG{n}{x}\PYG{p}{.}\PYG{n}{value}\PYG{p}{;}\PYG{+w}{ }\PYG{p}{\PYGZcb{}}
+\end{Verbatim}

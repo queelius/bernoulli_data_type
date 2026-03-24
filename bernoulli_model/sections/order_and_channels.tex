@@ -1,0 +1,42 @@
+\documentclass[../main.tex]{subfiles}
+\begin{document}
+
+\section{Order of Bernoulli Types}
+
+Every Bernoulli Model also has an \emph{order}, an integer greater than or equal to 0, which describes the number of partition blocks in the domain that share a common error rate~\cite{bernoulliSets}. We denote that a Bernoulli Model of type $T$ has order $k$ with $\Ber{T}^{(k)}$. For the absurd and unit types, the maximum order is $0$, and in general $T \equiv \Berr{T}{0}$, i.e., if there are no ways to introduce errors, then the model is equivalent to the type itself.
+
+\begin{remark}[Model order vs.\ degrees of freedom]
+\label{rem:order_vs_dof}
+The companion paper on Bernoulli sets~\cite{bernoulliSets} defines model order as the number of partition blocks $n$: elements within each block share a common error rate, and a general channel on $k$ output symbols with $n$ blocks has $n(k-1)$ free parameters. For a single Boolean channel ($k=2$), the two notions coincide: $n$ partition blocks yield $n$ free parameters. For larger output alphabets (e.g., $\Bool \to \Bool$ with $k=4$), the number of free parameters grows as $n(k-1)$, but the model order remains $n$. We follow the partition-block convention throughout.
+\end{remark}
+
+Unless it is useful, we drop the order information and simply write $\Ber{T}$. In the Bernoulli Model, we may denote the latent value $x$ that is being approximated using the notation $\Ber{T}(x)$. We say that $x$ is latent if we do not know its value and are trying to approximate it using the Bernoulli Model approximation $\Ber{T}(x)$. In this case, the latent value $x$ is unobservable, and we can think of $\Ber{T}(x)$ as a noisy measurement of $x$.
+
+In the Bernoulli Boolean Model, $\Ber{\Bool}(x)$ is a random Bernoulli variable such that
+\begin{equation}
+\Pr\{ \Ber{\Bool}(x) \neq x\} = \varepsilon(x)
+\end{equation}
+for each $x \in \{0,1\}$, where $0 < \varepsilon(x) < 1$ is the probability of an error. In most practical situations, $\varepsilon(x)$ is known or its expectation is known, and it can be pre-specified to balance factors like space complexity and accuracy.
+
+\section{Binary Channels}
+
+Let's begin by examining the Binary Symmetric Channel and the Binary Asymmetric Channel. The Bernoulli Boolean model can exhibit two distinct behaviors, represented as different "channels" through which Boolean values are transmitted:
+
+\begin{enumerate}
+\item \textbf{Binary Symmetric Channel (First-order Bernoulli Model)}: The probability of an equality error is the same for $1$ and $0$. We denote this by the type $\Berr{\Bool}{1}$. This corresponds to the binary symmetric channel of Shannon~\cite{shannonBSC}.
+
+\item \textbf{Binary Asymmetric Channel (Second-order Bernoulli Model)}: The probability of an equality error differs for $1$ and $0$. We denote this by the type $\Berr{\Bool}{2}$. This corresponds to the binary asymmetric channel~\cite{coverThomas}.
+\end{enumerate}
+
+\section{False Positives and Negatives}
+
+Errors in the Bernoulli Boolean model can be understood in terms of \emph{false negatives} and \emph{false positives}:
+
+\begin{enumerate}
+\item $\Ber{\False} = \True$ is a \emph{false positive}.
+\item $\Ber{\True} = \False$ is a \emph{false negative}.
+\end{enumerate}
+
+In the first-order model, the probability of a false negative equals the probability of a false positive. In the second-order model, these probabilities differ. In a specific but common version of the second-order Bernoulli Boolean model, false negatives occur with probability 0 and false positives occur with probability $0 < \varepsilon < 1$.
+
+\end{document}

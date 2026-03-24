@@ -1,0 +1,45 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+\section{Introduction}
+\label{sec:intro}
+
+Bernoulli sets~\cite{bernoulliSets} formalize approximate set membership: the indicator function $\SetIndicator{\Set{A}} \colon \Set{U} \to \{0,1\}$ is approximated with independent per-element errors.
+Bernoulli maps~\cite{bernoulliMaps} generalize this to arbitrary functions $\Fun{f} \colon \Set{X} \to \Set{Y}$, where the per-input errors are independent and the joint confusion matrix factors as a Kronecker product of per-input channels.
+But real programs compose \emph{types}, not just sets and functions.
+A database record is a product type (tuples of fields).
+A nullable value is a sum type (the value or nothing).
+A query result is a function type (input to output).
+When these types carry approximation error, how does that error propagate through the type constructors?
+
+This paper provides the constructive counterpart to the function-space viewpoint developed in the companion paper on Bernoulli maps~\cite{bernoulliMaps}.
+Where that paper takes a \emph{denotational} perspective (every approximation is a latent function approximated per-input), this paper takes a \emph{constructive} perspective: we build approximate types from primitive types using algebraic type constructors (sum, product, exponential) and derive how approximation distributes over each constructor.
+
+\paragraph{Central claim.}
+Every algebraic data type constructor has a well-defined random approximate counterpart with quantifiable error propagation.
+Product types are well-behaved: the joint confusion matrix factors as a Kronecker product, and parameters grow additively.
+Sum types introduce a structural complication: tag errors couple the components and break the factorization.
+Exponential types (function spaces) are precisely Bernoulli maps.
+The two perspectives (denotational and constructive) converge at the exponential type, yielding the same Kronecker factorization theorem.
+
+\paragraph{Contributions.}
+\begin{enumerate}
+\item We define the random approximate value $\AT{T}$ for each algebraic type constructor: void, unit, Bool, sum, product, and exponential (\cref{sec:prims,sec:composite}).
+
+\item We prove that product types preserve the Kronecker factorization (\cref{thm:product_parsimony}): an approximate product $\AT{(\Set{A} \times \Set{B})}$ has $\mathrm{params}(A) + \mathrm{params}(B)$ free parameters, not the exponentially larger count of a general channel.
+
+\item We show that sum types break the factorization (\cref{rem:sum_nonfactor}): $\AT{(\Set{A} + \Set{B})} \not\cong \AT{\Set{A}} + \AT{\Set{B}}$ because tag errors change which component's error model applies.
+
+\item We identify the optional type $\mathrm{Maybe}(\Set{A}) = \Set{A} + \Unit$ as the type-theoretic formulation of Bernoulli set membership, with tag errors corresponding to false positives and false negatives.
+\end{enumerate}
+
+\paragraph{Organization.}
+\Cref{sec:approx_values} defines the random approximate value and develops the approximate bit as the canonical worked example.
+\Cref{sec:prims} defines the primitive approximate types (void, unit, Bool).
+\Cref{sec:composite} derives the composite type constructors (product, sum, exponential) and proves the Kronecker factorization theorem for products.
+\Cref{sec:error_prop} shows how errors propagate through function application, with a worked example for the approximate AND gate.
+\Cref{sec:bernoulli_boolean_algebra} develops the approximate Boolean algebra over bit vectors.
+\Cref{sec:invariants} addresses data types with invariants and quantifies the probability of invariant violation.
+\Cref{sec:cpp} provides a computational realization as a C++ monad.
+
+\end{document}

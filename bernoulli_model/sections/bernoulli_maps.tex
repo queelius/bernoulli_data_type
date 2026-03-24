@@ -1,0 +1,108 @@
+\documentclass[../main.tex]{subfiles}
+\begin{document}
+
+\section{Bernoulli Maps}
+\label{sec:bernoulli_maps}
+
+The Bernoulli Map~\cite{bernoulliMaps} provides a formal quantification of approximation error that is compatible with many algorithms, particularly data types that depend on hashing. This section extends our formalism to address how entire functions can be approximated using the Bernoulli model.
+
+\subsection{Latent Functions and Observable Approximations}
+
+Consider a \emph{latent} function $p : X \to Y$ and an observable approximation or noisy version of $p$, denoted by $p^* : X \to Y$, such that $p^*(x) \neq p(x)$ with probability $e(x)$, where $\{e(x) : x \in X\}$ are a priori statistically independent random variables.
+
+When we observe $p^*$, we know that it is a noisy model of some function $X \to Y$, but we do not know which function with certainty. If we are given no other prior information, then the maximum likelihood estimator of $p$ is $p^*$ itself.
+
+\subsection{Confusion Matrix for Function Spaces}
+
+Let the functions of type $X \to Y$ be named $p_1, p_2, \ldots, p_n$, where $n$ is the total number of functions in $X \to Y$. If no other information is given, $n = |Y|^{|X|}$.
+
+For a simple example like $\Bool \to \Bool$ (where $n = 4$), the confusion matrix represents the probabilities of observing each function when the latent function is known:
+
+\begin{table}[htbp]
+\centering
+\caption{Confusion Matrix for Bernoulli Maps ($\Bool \to \Bool$)}
+\label{tbl:bernoulli_maps_confusion}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+\textbf{latent / observe} & $p_1$ & $p_2$ & $p_3$ & $p_4$ \\
+\midrule
+$p_1$ & $q_{11}$ & $q_{12}$ & $q_{13}$ & $q_{14}$ \\
+$p_2$ & $q_{21}$ & $q_{22}$ & $q_{23}$ & $q_{24}$ \\
+$p_3$ & $q_{31}$ & $q_{32}$ & $q_{33}$ & $q_{34}$ \\
+$p_4$ & $q_{41}$ & $q_{42}$ & $q_{43}$ & $q_{44}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+In this matrix, $q_{ij}$ represents the probability that function $p_i$ is observed as function $p_j$. Since each row must sum to 1, there are at most $n \cdot (n-1)$ degrees of freedom, which in this case is $4 \cdot (4-1) = 12$ (see Remark~\ref{rem:order_vs_dof} for the distinction between model order and degrees of freedom).
+
+In many practical applications, the model is first-order, with most of the probability assigned to the diagonal elements, and the off-diagonal elements being nearly zero (or zero) but equal.
+
+\subsection{Notation and Type Signatures}
+
+We say that $p^*$ is a \emph{Bernoulli approximation} of $p$, and we denote this by writing $p^* \sim B_{X \to Y}(p)$, indicating that we observe $p^*$ but know it is a random observation from a conditional distribution where we are conditioning on the latent function $p$ to generate $p^*$.
+
+If we observe a realization of $p^* \sim B_{X \to Y}(p)$, where $p$ is latent, and we know it is a Bernoulli approximation, then $p^*$ has the type $X \to B_Y$, representing a function that maps from $X$ to Bernoulli approximations of elements in $Y$.
+
+\subsection{Information-Theoretic Properties}
+
+Given a prior distribution $\pi_i = \Pr\{p = p_i\}$ over the latent functions, the conditional entropy of the observation given the latent function is~\cite{coverThomas}
+\begin{equation}
+H(\text{obs} \mid \text{latent}) = \sum_{i=1}^n \pi_i H(B_{X \to Y} \mid p_i),
+\end{equation}
+where the per-row conditional entropy is
+\begin{equation}
+H(B_{X \to Y} \mid p_i) = -\sum_{j=1}^n q_{ij} \log(q_{ij}).
+\end{equation}
+
+In practice, we often know the confusion matrix a priori, or at least its properties, as the distortion results from a known process, such as a noisy channel, sensor, or measurement. This includes cases where a program introduces loss for compression, or from homomorphic encryption schemes where values are represented as products of trapdoors or one-way hashes.
+
+\subsection{Generating Bernoulli Approximations}
+
+A Bernoulli Map is a way of generating a Bernoulli approximation of a function. By the equivalence that data is code and code is data, any function can be represented as a data structure, and any data structure can be represented as a function. Therefore, we can model any data structure as a map, and then generate a Bernoulli approximation of that map.
+
+For specific data structures, more efficient and specialized methods for generating Bernoulli approximations exist. Bloom filters are perhaps the most well-known example of this approach.
+
+\section{Applications of Bernoulli Maps}
+\label{sec:bernoulli_maps_applications}
+
+\subsection{Set-Indicator Functions}
+
+The set-indicator function for a set $A$, denoted by $\mathbf{1}_A$, returns true if $x \in A$ and false otherwise. When we apply the Bernoulli Model to $\mathbf{1}_A$, we get a function of type $X \to B_{\Bool}$. We observe $B_{X \to \Bool}(\mathbf{1}_A)$ but do not know $A$ with certainty.
+
+Bloom filters~\cite{bloom1970} and counting Bloom filters are common examples of this kind of approximation. The Bernoulli Map provides a unifying algorithm that can generate approximations of any computable functions, including set-indicator functions.
+
+\subsection{Primality Tests}
+
+Consider the primality test function $\mathrm{isPrime} : \mathbb{Z} \to \Bool$. While we know how to determine exactly whether an integer is prime (e.g., by checking divisibility by all smaller integers), the function is still \emph{latent} in practice because the time required to compute it exactly for large inputs is prohibitive.
+
+Instead, we can use randomized algorithms like the Miller-Rabin primality test, which can be conceptualized as a Bernoulli approximation $\mathrm{isPrime}^* : \mathbb{Z} \to B_{\Bool}$.
+
+The Miller-Rabin test is based on Fermat's Little Theorem: if $p$ is prime and $a$ is any positive integer less than $p$, then $a^{p-1} \equiv 1 \pmod{p}$. The test works by randomly selecting values of $a$ and checking whether the congruence holds. If it fails for any $a$, then $p$ is definitely not prime. If it holds for all tested $a$, we say $p$ is probably prime, with a specifiable false positive rate.
+
+In essence, a particular seed value for the PRNG draws a sample function, a Bernoulli map, from $\mathrm{isPrime}^* \sim B_{\mathbb{Z} \to \Bool}(\mathrm{isPrime})$.
+
+\subsection{Computational Basis}
+
+Given a set of functions $F = \{f_1, \ldots, f_k\}$, we can define a Bernoulli model over $F$ by generating realizations of $B_{F}(f_1), \ldots, B_{F}(f_k)$, which we may denote as $B_{F}$.
+
+For example, if we want to support both membership testing ($\in$) and equality testing ($=$) for sets, one approach is to generate a Bernoulli approximation for each operation. However, if we define $=$ in terms of $\in$, then that \emph{induces} a Bernoulli model of $=$ through its dependence on $\in$.
+
+\subsection{Non-Regular Types}
+
+Bernoulli Models are not in general regular types, since a Bernoulli set $A$ can have countably infinite representations, and it is generally impossible to determine if two Bernoulli sets are the same.
+
+This extends to the question of which latent set is being approximately modeled by a Bernoulli set. From this perspective, equality between a Bernoulli set and a regular set is not of type $(B_{\mathrm{set}}, \mathrm{set}) \to \Bool$ but rather of type $(B_{\mathrm{set}}, \mathrm{set}) \to B_{\Bool}$. In other words, we can only express the probability that a Bernoulli set represents a given latent set.
+
+While this is typically less interesting than set-membership, it remains a valid question in the Bernoulli framework.
+
+\section{Error Propagation in Complex Data Types}
+\label{sec:error_propagation}
+
+As we consider more complex compound data types, which can be modeled as functions, we see that they can participate in the Bernoulli model in multiple ways. When a Bernoulli value is introduced into a computation, the entire computation produces a final result that is also a Bernoulli type, such as $B_{\mathrm{pair}(T_1,T_2)}$ or $\mathrm{pair}(T_1, B_{T_2})$.
+
+This can be understood by considering a Universal Turing machine where programs are built by composing circuits of binary logic gates. If a single input to the circuit is replaced with a Bernoulli Boolean, the output becomes one or more Bernoulli Booleans. Similarly, if some logic gates are replaced with Bernoulli logic gates, the output is also a Bernoulli Boolean.
+
+While we can always discard information about the uncertainty in the output, if the uncertainty is non-negligible, tracking it through the computation becomes valuable for understanding error propagation and making informed decisions about space-accuracy trade-offs.
+
+\end{document}

@@ -1,0 +1,34 @@
+# ignore all . files and . folders. note: .*/ ignores only .folders
+.*
+# except do not ignore .gitignore. note: may omit if .gitignore is explicitly
+# tracked
+!/.gitignore
+
+/build* 
+main.pdf
+*.log
+*.out
+*.fls
+*.idx
+*.pyg
+*.fdb_latexmk
+*.aux
+*.bbl
+*.ind
+*.nlo
+/_minted*
+main.synctex.gz
+*.blg
+*.ilg
+*.toc
+*.lof
+*.lot
+*.acn
+*.acr
+*.alg
+*.glg
+*.glo
+*.gls
+*.ist
+*.lol
+*.loa

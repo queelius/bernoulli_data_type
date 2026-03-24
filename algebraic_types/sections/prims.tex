@@ -1,0 +1,38 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+\section{Primitive approximate \emph{values}}
+\label{sec:prims}
+The following are the primitive algebraic data types and operations on types.
+
+These are \emph{first-order} approximate types since the approximation has a single error rate per element.
+
+\subsection{Void type}
+The most primitive type is the \emph{empty set} type, denoted by \Void.
+There are no elements in the empty set and therefore it is not possible to construct values of this type.
+There is only one function in the set $\Void \to \Set{X}$, known as the \emph{absurd} function since it can never be invoked.
+Since \Void has no values, $\AT{\Void}$ is equivalent to \Void.
+
+$\AT{\Void}$ is necessary to complete the algebra of algebraic data types, but serves only a theoretical purpose.
+
+\subsection{Unit type}
+The \emph{unit} type, denoted by \Unit, is isomorphic to any set with only a single element, i.e., any \emph{singleton set}.
+The set $\Unit \to \Set{X}$ has a cardinality $\Card{\Set{X}}$ and the set $\Set{X} \to \Unit$ has a cardinality $1$.
+If we are talking about \emph{partial} functions, then $\Set{X} \pfun \Unit$ has cardinality $2^{\Set{X}}$.
+
+The set $\Unit \to \Unit$ has a cardinality of $1$, which is the identity function $\IdFun \colon \Unit \to \Unit$.
+
+The approximate unit type $\AT{\Unit}$ is necessary to complete the algebra, but given the \Unit type, similar to the \Void type there is no uncertainty about its value, i.e., $\AT{\Unit}$ is equivalent to \Unit.
+
+In addition, if there is some function $\Fun{f} \colon \Unit \to \Set{X}$ its approximate analog is $\APFun{f} \colon \Unit \to \Set{X}$, which models an \emph{approximate} constant.
+
+\subsection{Composite type constructors}
+
+Sum, product, and exponential types are composite constructors treated in \cref{sec:composite}.
+
+\begin{remark}[Partial functions]
+Partial functions (functions not defined on their entire domain) introduce an additional source of approximation error: elements outside the preimage may be mapped to some element in the codomain rather than correctly yielding no result.
+The companion paper on Bernoulli maps~\cite{bernoulliMaps} develops the full theory of approximate partial functions, including false mapping rates and their information-theoretic lower bounds on space complexity.
+\end{remark}
+
+\end{document}

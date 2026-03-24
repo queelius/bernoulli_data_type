@@ -1,0 +1,60 @@
+%
+%
+%
+%
+%   \BitString      B^* denotes arbitrary length bit strings
+%   \BitString[n]   B^n denotes bit strings of size n
+%   \BitSet         set B denotes {0,1}
+%
+%
+\NeedsTeXFormat{LaTeX2e}[1994/06/01]
+\ProvidesPackage{functionnotation}[2018/01/01 alex towell's function notation]
+
+\RequirePackage{xparse}
+\RequirePackage{bm}
+\RequirePackage{bbm}
+\RequirePackage{amssymb}
+\RequirePackage{mathtools}
+\RequirePackage{listings}
+
+\providecommand{\Given}{\vert}
+
+\DeclarePairedDelimiterX\FuncArgs[1]{(}{)}{\renewcommand\Given{\nonscript\:\delimsize\vert\nonscript\:\mathopen{}}#1}
+
+\DeclarePairedDelimiterX\FuncArgsB[1]{[}{]}{\renewcommand\Given{\nonscript\:\delimsize\vert\nonscript\:\mathopen{}}#1}
+
+\NewDocumentCommand{\FunctionFamily}{mmo}{%
+    \IfNoValueTF{#3}
+        {\operatorname{#1}\FuncArgs*{#2}}
+        {\operatorname{#1}_{#3}\mkern-1mu\FuncArgs*{#2}}
+}
+
+\NewDocumentCommand{\Bracket}{mmo}{%
+    \IfNoValueTF{#3}
+        {\operatorname{#1}\FuncArgsB*{#2}}
+        {\operatorname{#1}_{#3}\FuncArgsB*{#2}}
+}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\newcommand{\cat}{\mathbin{+\mkern-10mu+}}
+
+\lstdefinelanguage{lambdacalc}{%
+  morekeywords={%
+    if,then,else,fix % keywords go here
+  },%
+  morekeywords={[2]int},   % types go here
+  otherkeywords={:}, % operators go here
+  literate={% replace strings with symbols
+    {->}{{$\to$}}{2}
+    {lambda}{{$\lambda$}}{1}
+  },
+  basicstyle={\sffamily},
+  keywordstyle={\bfseries},
+  keywordstyle={[2]\itshape}, % style for types
+  keepspaces,
+  mathescape % optional
+}[keywords,comments,strings]%
+
+\endinput

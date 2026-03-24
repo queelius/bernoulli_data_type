@@ -1,0 +1,115 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+\section{Data types with invariants}
+\label{sec:invariants}
+
+The type constructors of the previous sections (sum, product, exponential) produce \emph{free} types: every element of the carrier set is a valid value.
+In practice, data types carry \emph{invariants}, predicates that constrain which values are admissible.
+This section formalizes how approximation interacts with such constraints.
+
+\subsection{Definition}
+
+\begin{definition}[Data type with invariant]
+\label{def:data_type_invariant}
+A \emph{data type with invariant} is a pair $(\Set{T}, \Fun{P})$ where $\Set{T}$ is a type (a finite set) and $\Fun{P} \colon \Set{T} \to \Bool$ is a predicate.
+The set of \emph{valid values} is
+\begin{equation}
+\Set{T}_{\Fun{P}} = \SetBuilder*{t \in \Set{T}}{\Fun{P}(t) = \True}\,,
+\end{equation}
+and the set of \emph{invalid values} is its complement $\Set{T} \setminus \Set{T}_{\Fun{P}}$.
+\end{definition}
+
+A data type with invariant is equivalently a \emph{subtype}: a subset of the carrier set selected by the predicate.
+In relational terms, when $\Set{T}$ is a product type $\Set{A}_1 \times \cdots \times \Set{A}_k$, the invariant defines a \emph{relation} (a subset of the Cartesian product), and the valid values are the tuples in that relation.
+
+\subsection{Invariant violation under approximation}
+
+When a value $x^* \in \Set{T}_{\Fun{P}}$ is approximated, the approximate value $\tilde{x} \in \AT{\Set{T}}$ is drawn from the full type $\Set{T}$, not the constrained subtype $\Set{T}_{\Fun{P}}$.
+The approximation mechanism has no knowledge of the invariant: it can produce any value in $\Set{T}$ according to the confusion matrix $M$.
+
+\begin{definition}[Invariant violation probability]
+\label{def:violation_prob}
+Given a data type $(\Set{T}, \Fun{P})$ and an approximate value $\tilde{x} \in \AT{\Set{T}}$ with latent value $x^* \in \Set{T}_{\Fun{P}}$, the \emph{invariant violation probability} is
+\begin{equation}
+\label{eq:violation_prob}
+\Prob{\Fun{P}(\tilde{x}) = \False \Given x^* = s} = \sum_{\substack{t \in \Set{T} \\ \Fun{P}(t) = \False}} M_{s, t}\,.
+\end{equation}
+\end{definition}
+
+This is the total probability mass that the confusion matrix places on invalid values, given the latent value $s$.
+It depends on both the error model (through $M$) and the structure of the invariant (through the set $\Set{T} \setminus \Set{T}_{\Fun{P}}$).
+
+\begin{theorem}[Invariant violation bound]
+\label{thm:violation_bound}
+Let $(\Set{T}, \Fun{P})$ be a data type with invariant.
+Let $\tilde{x} \in \AT{\Set{T}}$ be an approximate value with latent value $x^* \in \Set{T}_{\Fun{P}}$.
+If the confusion matrix $M$ is a first-order (symmetric) channel with error rate $\fprate$, uniformly distributing error mass over all $\Card{\Set{T}} - 1$ incorrect values, then
+\begin{equation}
+\label{eq:violation_bound}
+\Prob{\Fun{P}(\tilde{x}) = \False} = \fprate \cdot \frac{\Card{\Set{T} \setminus \Set{T}_{\Fun{P}}}}{\Card{\Set{T}} - 1}\,.
+\end{equation}
+\end{theorem}
+\begin{proof}
+Under a first-order symmetric channel, each incorrect value receives probability mass $\fprate / (\Card{\Set{T}} - 1)$.
+Summing over the $\Card{\Set{T} \setminus \Set{T}_{\Fun{P}}}$ invalid values gives the result.
+\end{proof}
+
+\begin{corollary}
+If the invariant excludes only a small fraction of $\Set{T}$, the violation probability is correspondingly small.
+In the limiting case where $\Card{\Set{T}_{\Fun{P}}} = \Card{\Set{T}}$ (no constraint), the violation probability is zero.
+At the opposite extreme, if $\Card{\Set{T}_{\Fun{P}}} = 1$ (a single valid value), then $\Prob{\Fun{P}(\tilde{x}) = \False} = \fprate$.
+\end{corollary}
+
+\subsection{Product types with invariants}
+
+When the type is a product $\Set{A} \times \Set{B}$ with component-wise independent approximation, the invariant violation probability can be expressed in terms of the component error rates.
+
+Let $\Fun{P} \colon \Set{A} \times \Set{B} \to \Bool$ be an invariant on the product type.
+If the approximate value $(\tilde{a}, \tilde{b}) \in \AT{\Set{A}} \times \AT{\Set{B}}$ has independent component confusion matrices $M_{\Set{A}}$ and $M_{\Set{B}}$, then
+\begin{equation}
+\label{eq:product_violation}
+\Prob{\Fun{P}(\tilde{a}, \tilde{b}) = \False \Given (a^*, b^*)} = \sum_{\substack{(a, b) \in \Set{A} \times \Set{B} \\ \Fun{P}(a, b) = \False}} (M_{\Set{A}})_{a^*, a} \cdot (M_{\Set{B}})_{b^*, b}\,.
+\end{equation}
+
+The factored form of the joint probabilities (from the Kronecker structure of product types) makes this sum tractable.
+However, the invariant $\Fun{P}$ may couple the components, so the sum does not factor further in general.
+
+\subsection{Worked example: approximate rational numbers}
+\label{sec:approx_rational}
+
+\begin{example}[Approximate rational number]
+Consider the type $\mathrm{Rational} = (\IntSet, \IntSet)$ with invariant $\Fun{P}(n, d) = (d \neq 0)$.
+In a finite implementation with $\IntSet = \{-K, \ldots, K\}$ for some bound $K$, the type has $\Card{\IntSet}^2 = (2K + 1)^2$ values, of which $(2K + 1)$ have $d = 0$ (one for each numerator).
+
+Under independent, first-order symmetric approximation of each component with error rate $\fprate$, the probability that the denominator becomes exactly $0$ when the true denominator is $d^* \neq 0$ is
+\begin{equation}
+\Prob{\tilde{d} = 0 \Given d^* \neq 0} = \frac{\fprate}{2K}\,,
+\end{equation}
+since there are $2K$ incorrect denominator values and the error mass $\fprate$ is distributed uniformly among them.
+
+For a 32-bit integer ($K = 2^{31} - 1$), this probability is approximately $\fprate / (2^{32} - 2) \approx \fprate \cdot 2.3 \times 10^{-10}$, which is negligible for any reasonable error rate.
+The invariant is ``robust'' in the sense that the invalid subspace ($d = 0$) is a negligible fraction of the full type.
+\end{example}
+
+More generally, a data type invariant is robust under approximation when the fraction $\Card{\Set{T} \setminus \Set{T}_{\Fun{P}}} / \Card{\Set{T}}$ is small.
+Invariants that exclude a large fraction of the carrier set are fragile: approximation is likely to produce an invalid value.
+
+\subsection{Detecting and handling violations}
+
+When an approximate value may violate an invariant, there are several strategies.
+
+\paragraph{Runtime validation.}
+If the invariant $\Fun{P}$ is computable, the approximate value can be checked at runtime.
+This converts the data type to an optional type: $\AT{\Set{T}_{\Fun{P}}} \hookrightarrow \AT{\Set{T}} \to \mathrm{Maybe}(\Set{T}_{\Fun{P}})$, where the result is $\mathrm{Nothing}$ when the invariant is violated.
+The probability of obtaining $\mathrm{Nothing}$ is exactly the invariant violation probability from \cref{def:violation_prob}.
+
+\paragraph{Projection to valid subspace.}
+In some cases, there is a natural projection $\pi \colon \Set{T} \to \Set{T}_{\Fun{P}}$ that maps invalid values to nearby valid ones (e.g., clamping a denominator of $0$ to $1$).
+This introduces a deterministic correction that modifies the effective confusion matrix but eliminates invariant violations entirely.
+
+\paragraph{Accepting the violation.}
+When the violation probability is negligible (as in the rational number example), the violation can simply be accepted as part of the error model.
+The data type's operations must then be robust to occasional invalid inputs, or the violation probability must be accounted for in downstream error analysis.
+
+\end{document}

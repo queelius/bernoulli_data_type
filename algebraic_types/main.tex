@@ -1,0 +1,117 @@
+\documentclass[11pt,final,hidelinks]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage[activate={true,nocompatibility},final,tracking=true,kerning=true,spacing=true,factor=1100,stretch=10,shrink=10]{microtype}
+\microtypecontext{spacing=nonfrench}
+\usepackage[noend]{algorithm2e}
+\usepackage{caption}
+\usepackage{mathtools}
+\usepackage{commath}
+\usepackage{minted}
+\usepackage{enumerate}
+\usepackage{amsmath}
+\usepackage{subfiles}
+\usepackage{booktabs}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{pgfplots}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usepackage{tikzscale}
+\usepackage[square,numbers]{natbib}
+\bibliographystyle{plainnat}
+\usepackage{cleveref}
+\usepackage[super]{nth}
+\usepackage{siunitx}
+\usepackage[section]{placeins}
+\usepackage{subcaption}
+
+\usepackage{functionnotation}
+\usepackage[plain]{setnotation}
+\usepackage{approxsetnotation}
+\usepackage{approx_data_type_notation}
+\usepackage{probabilitynotation}
+\usepackage[fancy]{relationnotation}
+\usepackage{approxrelationnotation}
+\usepackage[section]{envnotation}
+\usepackage{algorithmnotation}
+%\usepackage{alexmisc}
+
+\newcommand{\amapsto}[2]{\,\ATOverUnder{\mapsto}[#1][\text{\raisebox{3pt}{$#2$}}]\,}
+
+\hypersetup{
+    pdftitle={Random approximate values over algebraic types},
+    pdfauthor={Alexander Towell},               % author
+    pdfsubject={computer science},              % subject of the document
+    pdfkeywords={
+        probabilistic data structure,
+        partial function,
+        random approximate set,
+        random approximate data type,
+        random approximate relation,
+        random approximate map,
+        random approximate Boolean,
+        random approximate unit,
+        random approximate sum type,
+        random approximate product type,
+        random approximate exponential type,
+        random approximate void type,
+        relation,
+        set        
+	},                    % keywords
+    colorlinks=false,                           % false: boxed links;
+    citecolor=green,                            % color of links to 
+    filecolor=magenta,                          % color of file links
+    urlcolor=green                              % color of external
+}
+
+\title
+{
+    Random approximate values over algebraic types
+}
+\author
+{
+    Alexander Towell\\
+    \texttt{atowell@siue.edu}
+}
+\date{}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+We define the semantics of \emph{random approximate values} over algebraic data types: void, unit, Bool, sum (tagged union), product (Cartesian product), and exponential (function space).
+From the Bernoulli independence axiom (per-element errors are independent), we derive how approximation distributes over type constructors.
+Product types preserve a Kronecker factorization of the joint confusion matrix, so parameters grow additively.
+Sum types break this factorization because tag errors couple the components; the optional type $A + \mathrm{Unit}$ recovers the Bernoulli set membership model as a special case.
+Exponential types are precisely Bernoulli maps, where the constructive (type-theoretic) and denotational (function-space) perspectives converge.
+\end{abstract}
+
+%\microtypesetup{protrusion=false}
+\tableofcontents
+%\microtypesetup{protrusion=true}
+
+
+%\listoffigures
+%\listofalgorithms
+
+\subfile{sections/intro}
+\subfile{sections/approx_values}
+%\subfile{sections/bernoulli_type_2}  % subsumed by approx_values.tex
+\subfile{sections/prims}
+\subfile{sections/composite_types}
+\subfile{sections/error_propagation}
+\subfile{sections/bernoulli_boolean_algebra}
+\subfile{sections/invariants}
+\subfile{sections/cpp}
+
+% Orphaned section files (not included above):
+%   sections/bernoulli_type_2.tex -- subsumed by sections/approx_values.tex
+%   sections/bernoulli_type.tex  -- near-duplicate of cpp.tex (cpp.tex is the more complete version)
+%   sections/bernoulli_prolog.tex -- raw plaintext notes on approximate Prolog, not LaTeX
+
+\bibliography{references}
+\end{document}

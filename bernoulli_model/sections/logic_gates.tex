@@ -1,0 +1,120 @@
+\documentclass[../main.tex]{subfiles}
+\begin{document}
+
+\section{Binary Logic Gates and Error Propagation}
+
+Let's consider the set of binary functions
+$f : (\Bool, \Bool) \to \Bool$.
+
+There are $2^2 = 4$ possible functions $f : \Bool \to \Bool$ since for each possible
+input, $\True$ or $\False$, we have two possible outputs, $\True$ or $\False$.
+
+More generally, if we have $f : X \to Y$, then we have $|Y|^{|X|}$ possible functions,
+where $|.|$ denotes the cardinality of a set. For instance, if $X = (\Bool, \Bool)$
+and $Y = \Bool$, then we have $2^4 = 16$ possible functions, since $|X| = 4$ and $|Y| = 2$.
+
+Each of these functions has a designated name, which we can use to refer to them,
+like $\mathrm{and}$, $\mathrm{xor}$, etc. Let's specifically look at $\mathrm{and}$, which is defined in Table~\ref{tbl:and_function}.
+
+\begin{table}[htbp]
+\centering
+\caption{Definition of $\mathrm{and} : (\Bool, \Bool) \to \Bool$}
+\label{tbl:and_function}
+\begin{tabular}{@{}ccc@{}}
+\toprule
+$x_1$ & $x_2$ & $\mathrm{and}(x_1, x_2)$ \\
+\midrule
+$\True$ & $\True$ & $\True$ \\
+$\True$ & $\False$ & $\False$ \\
+$\False$ & $\True$ & $\False$ \\
+$\False$ & $\False$ & $\False$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Now, let's consider
+$\mathrm{and} : (B_{\Bool}^{(1)}, B_{\Bool}^{(1)}) \to B_{\Bool}^{(2)}$
+
+This is more complicated than it might first seem. An error occurs if $\mathrm{and}$ returns $\True$ when it should return $\False$, or vice versa. The input variables represent \emph{latent} values, so they do not have a definite value.
+
+We will go row by row, and examine the probability that the output is correct for each \emph{output}.
+
+\subsection{Case 1: The Correct Output Is True}
+
+In order for the output to be true, both noisy inputs must be true, which is just the product of the probabilities of each condition being true since they are statistically independent outcomes.
+
+\subsection{Case 2: The Correct Output Is False Given $x_1 = \True$ and $x_2 = \False$}
+
+Consider $\mathrm{and}(B_{\Bool}^{(1)}(\True), B_{\Bool}^{(1)}(\False))$.
+For this to be true, the first must be a true positive and the second must be
+a false positive, which is just $p_1 \cdot (1-p_2)$. Since we are interested in the probability that it correctly maps to false, that is just
+$1 - p_1 \cdot (1-p_2) = 1 - p_1 + p_1 \cdot p_2$.
+
+\subsection{Case 3: The Correct Output Is False Given $x_1 = \False$ and $x_2 = \True$}
+
+Consider $\mathrm{and}(B_{\Bool}^{(1)}(\False), B_{\Bool}^{(1)}(\True))$.
+For this to be true, the first must be a false positive and the second must
+be a true positive, which is just $(1-p_1) \cdot p_2$. Since we are interested in the
+probability that it maps correctly to false, that is just
+$1 - (1-p_1) \cdot p_2 = 1 - p_2 + p_1 \cdot p_2$.
+
+\subsection{Case 4: The Correct Output Is False Given $x_1 = \False$ and $x_2 = \False$}
+
+Consider $\mathrm{and}(B_{\Bool}^{(1)}(\False), B_{\Bool}^{(1)}(\False))$.
+For this to be true, both must be false positives, which is just
+$(1-p_1) \cdot (1-p_2)$. Since we are interested in the probability that it maps correctly
+to false, that is just $1 - (1-p_1) \cdot (1-p_2) = p_1 + p_2 - p_1 \cdot p_2$.
+
+\subsection{Summary}
+
+We can summarize the error propagation for the $\mathrm{and}$ function with Bernoulli inputs in Table~\ref{tbl:and_bernoulli}.
+
+\begin{table}[htbp]
+\centering
+\caption{$\mathrm{and}$ with Bernoulli inputs}
+\label{tbl:and_bernoulli}
+\begin{tabular}{@{}cccc@{}}
+\toprule
+$x_1$ & $x_2$ & $\mathrm{and}(x_1,x_2)$ & $\Pr\{\mathrm{correct}\}$ \\
+\midrule
+$1$ & $1$ & $1$ & $p_1 \cdot p_2$ \\
+$1$ & $0$ & $0$ & $1 - p_1 + p_1 \cdot p_2$ \\
+$0$ & $1$ & $0$ & $1 - p_2 + p_1 \cdot p_2$ \\
+$0$ & $0$ & $0$ & $p_1 + p_2 - p_1 \cdot p_2$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+We see that $\mathrm{and} : (B_{\Bool}^{(1)}, B_{\Bool}^{(1)}) \to B_{\Bool}^{(4)}$
+induces an output that is a fourth-order Bernoulli Boolean. How is this possible
+when there are only two possible outputs? The answer is that the output is dependent
+on four different combinations of inputs.
+
+Since $x_1$ and $x_2$ are \emph{latent}, we can only talk about the probability that
+the output is correct or not. We see that when the output is 1, the probability that
+the output is correct is $p_1 \cdot p_2$. When the output is 0, the probability that it is
+correct is more complicated.
+
+We could store all of this information in the type $B_{\Bool}^{(4)}$, but it is
+probably more convenient to use interval arithmetic, where we store a range of
+probabilities for the probability that the Boolean value being stored is correct.
+The best choice is just the minimum length interval that contains all of the
+relevant probabilities for the output being correct. When the output is 1, we see
+that the minimum spanning interval is just $p_1 \cdot p_2$, and when the output is 0,
+the minimum spanning interval is the minimum span of
+\begin{equation}
+\min\_\mathrm{span}\{1 - p_1 + p_1 \cdot p_2, 1 - p_2 + p_1 \cdot p_2, p_1 + p_2 - p_1 \cdot p_2\}
+\end{equation}
+
+As we compose more and more logic circuits together, we can keep track of the
+minimum spanning intervals on outputs using interval arithmetic.
+
+\section{Conclusion}
+
+The Bernoulli Model is a way of thinking about the uncertainty in the output of a function, and how that uncertainty propagates through a computation. Typically, the uncertainty is due to a trade-off between space complexity and accuracy. The more space we use to represent the function, the more closely it is expected to approximate the latent function.
+
+This framework provides a formal foundation for developing space-efficient data structures with controllable error rates, such as Bloom filters and Count-Min sketches. It also enables the development of Oblivious Data Types, which maintain $\mathcal{O}(1)$ time complexity while making deliberate space-accuracy trade-offs.
+
+By understanding how errors propagate through operations on Bernoulli types, we can build systems that maintain probabilistic guarantees throughout complex computations, enabling more efficient use of computational resources in scenarios where approximate answers are acceptable.
+
+\end{document}

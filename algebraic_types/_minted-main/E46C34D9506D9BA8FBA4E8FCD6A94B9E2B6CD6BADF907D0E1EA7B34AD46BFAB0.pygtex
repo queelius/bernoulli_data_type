@@ -1,0 +1,8 @@
+\begin{Verbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8\relax}]
+\PYG{n}{optional}\PYG{o}{\PYGZlt{}}\PYG{n}{Rational}\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{rational}\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{num}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{denom}\PYG{p}{)}
+\PYG{p}{\PYGZob{}}
+\PYG{+w}{	}\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{denom}\PYG{+w}{ }\PYG{o}{==}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{)}
+\PYG{+w}{	}\PYG{k}{return}\PYG{+w}{ }\PYG{p}{\PYGZob{}\PYGZcb{};}\PYG{+w}{ }\PYG{c+c1}{// Return the value that denotes $\mathrm{Nothing}$.}
+\PYG{+w}{	}\PYG{k}{return}\PYG{+w}{ }\PYG{n}{tuple}\PYG{o}{\PYGZlt{}}\PYG{k+kt}{int}\PYG{p}{,}\PYG{k+kt}{int}\PYG{o}{\PYGZgt{}}\PYG{p}{(}\PYG{n}{num}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{denom}\PYG{p}{);}
+\PYG{p}{\PYGZcb{}}
+\end{Verbatim}

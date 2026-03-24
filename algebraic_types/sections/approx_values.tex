@@ -1,0 +1,144 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+\section{Random approximate values}
+\label{sec:approx_values}
+
+A Bernoulli set approximates set membership: the indicator function $\SetIndicator{\Set{A}} \colon \Set{U} \to \BitSet$ may err on any element with quantifiable probability.
+A Bernoulli map generalizes this to arbitrary functions $\Fun{f} \colon \Set{X} \to \Set{Y}$, where the output for each input may independently differ from the true output.
+In both cases, the fundamental object is the same: a \emph{value} that may differ from some latent (true) value with quantifiable probability.
+This section formalizes that object.
+
+\subsection{Definition}
+
+\begin{definition}[Random approximate value]
+\label{def:approx_value}
+Let $\Set{T}$ be a type (a finite set of values).
+A \emph{random approximate value} of type $\Set{T}$ is a random variable $\tilde{x}$ taking values in $\Set{T}$, associated with a latent value $x^* \in \Set{T}$, such that
+\begin{equation}
+\label{eq:approx_value_pmf}
+\Prob{\tilde{x} = t \Given x^* = s} = M_{s,t}
+\end{equation}
+for all $s, t \in \Set{T}$, where $M$ is a $\Card{\Set{T}} \times \Card{\Set{T}}$ row-stochastic matrix called the \emph{confusion matrix} (or \emph{channel matrix}) of the approximation.
+We write $\tilde{x} \in \AT{\Set{T}}$ to denote that $\tilde{x}$ is an approximate value of type $\Set{T}$.
+\end{definition}
+
+The confusion matrix $M$ encodes the complete error model.
+Its diagonal entries $M_{s,s}$ are the probabilities of correct observation; its off-diagonal entries $M_{s,t}$ for $s \neq t$ are the probabilities of specific confusions.
+A general $\Card{\Set{T}} \times \Card{\Set{T}}$ row-stochastic matrix has $\Card{\Set{T}}(\Card{\Set{T}} - 1)$ free parameters.
+In the Bernoulli framework, structural assumptions (independence, partition into blocks) reduce this count, yielding parsimonious models parameterized by a small number of error rates.
+
+\begin{remark}[Connection to Bernoulli models]
+When $\Card{\Set{T}} = 2$, the confusion matrix is a $2 \times 2$ channel.
+If $\Set{T} = \BitSet = \{0, 1\}$, the off-diagonal entries are the false positive rate $\fprate = M_{0,1}$ and the false negative rate $\fnrate = M_{1,0}$.
+This is precisely the second-order Bernoulli Boolean from the companion paper on Bernoulli models.
+The notation $\AT{\Set{T}}[\fprate][\fnrate]$ makes the rates explicit when $\Set{T}$ is binary.
+\end{remark}
+
+\begin{remark}[$\BitSet$ vs.\ $\Bool$]
+\label{rem:bitset_bool}
+Throughout this paper, $\BitSet = \{0, 1\}$ and $\Bool = \{\True, \False\}$ are isomorphic two-element sets used in different contexts.
+We write $\BitSet$ in numerical and information-theoretic settings (confusion matrices, error rates, channel models) and $\Bool$ in logical and type-theoretic settings (Boolean algebra, logic gates, type constructors).
+No distinction in the underlying error model is intended; the choice of notation reflects the surrounding context.
+\end{remark}
+
+\subsection{The primary mechanism: approximate maps}
+
+The standard way an approximate value arises is through function application.
+An \emph{approximate map} $\APFun{f} \colon \Set{X} \to \Set{Y}$ approximates a latent function $\Fun{f} \colon \Set{X} \to \Set{Y}$ by independently introducing per-input errors.
+When $\APFun{f}$ is applied to an exact input $x \in \Set{X}$, the output $\APFun{f}(x)$ is an approximate value of type $\Set{Y}$:
+\begin{equation}
+\APFun{f}(x) \in \AT{\Set{Y}}\,.
+\end{equation}
+The confusion matrix for $\APFun{f}(x)$ is the per-input channel $M_x$, a $\Card{\Set{Y}} \times \Card{\Set{Y}}$ row-stochastic matrix.
+This is the exponential-type viewpoint: an approximate map is an approximate value of the function type $\Set{X} \to \Set{Y}$, with the joint confusion matrix factoring as a Kronecker product of per-input channels (\cref{sec:exponential}).
+
+\subsection{Monadic structure}
+
+Approximate values compose.
+If $\Fun{g} \colon \Set{A} \to \Set{B}$ is an exact function and $\tilde{a} \in \AT{\Set{A}}$ is an approximate value, then $\Fun{g}(\tilde{a})$ is an approximate value of type $\Set{B}$:
+\begin{equation}
+\label{eq:monadic_lift}
+\Fun{g}(\tilde{a}) \in \AT{\Set{B}}\,.
+\end{equation}
+More generally, if both $\Fun{g}$ and the input are approximate, the composition yields a higher-order approximate value.
+This gives $\AT{(\cdot)}$ the structure of a \emph{monad}: the operation of applying a function to an approximate value (the monadic \emph{bind}) produces an approximate value whose error rates are determined by the composition of the respective confusion matrices.
+
+We make this precise in \cref{sec:error_prop}, where we derive the output confusion matrix for function application on approximate inputs.
+
+\subsection{Worked example: the approximate bit}
+\label{sec:approx_bitset}
+
+The simplest non-trivial type is $\BitSet = \{0, 1\}$.
+An approximate value $\tilde{b} \in \AT{\BitSet}[\fprate][\fnrate]$ is parameterized by two error rates:
+\begin{itemize}
+\item $\fprate = \Prob{\tilde{b} = 1 \Given b^* = 0}$ (false positive rate), and
+\item $\fnrate = \Prob{\tilde{b} = 0 \Given b^* = 1}$ (false negative rate).
+\end{itemize}
+The full conditional probability mass function is given by the $2 \times 2$ confusion matrix:
+
+\begin{center}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+& observe $0$ & observe $1$ \\
+\midrule
+latent $0$ & $1 - \fprate$ & $\fprate$ \\
+latent $1$ & $\fnrate$ & $1 - \fnrate$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Equivalently, the conditional PMF is
+\begin{equation}
+\label{eq:bitset_pmf_0}
+\Fun{p}(b \Given 0) =
+\begin{cases}
+1 - \fprate & \text{if } b = 0\,, \\
+\fprate     & \text{if } b = 1\,,
+\end{cases}
+\end{equation}
+and
+\begin{equation}
+\label{eq:bitset_pmf_1}
+\Fun{p}(b \Given 1) =
+\begin{cases}
+\fnrate     & \text{if } b = 0\,, \\
+1 - \fnrate & \text{if } b = 1\,.
+\end{cases}
+\end{equation}
+
+This is the Bernoulli Boolean: the building block for all approximate types with $\Card{\Set{T}} \geq 2$.
+When the approximate bit arises from a Bernoulli set membership query, $\fprate$ and $\fnrate$ are the set's false positive and false negative rates.
+
+\subsection{Lifting functions through approximate values}
+\label{sec:lifting_preview}
+
+Suppose $\Fun{g} \colon \BitSet \to \BitSet$ is an exact function and $\tilde{b} \in \AT{\BitSet}[\fprate][\fnrate]$ is an approximate bit.
+Then $\Fun{g}(\tilde{b})$ is an approximate bit whose conditional PMF depends on $\Fun{g}$.
+
+Given latent value $b^* = 0$, the input $\tilde{b}$ realizes $0$ with probability $1 - \fprate$ and $1$ with probability $\fprate$, so
+\begin{equation}
+\label{eq:lift_cond_0}
+\Fun{p}_{\Fun{g}(\tilde{b})}(c \Given 0) =
+\begin{cases}
+1 - \fprate & \text{if } c = \Fun{g}(0)\,, \\
+\fprate     & \text{if } c = \Fun{g}(1)\,.
+\end{cases}
+\end{equation}
+
+Given latent value $b^* = 1$, the input $\tilde{b}$ realizes $0$ with probability $\fnrate$ and $1$ with probability $1 - \fnrate$, so
+\begin{equation}
+\label{eq:lift_cond_1}
+\Fun{p}_{\Fun{g}(\tilde{b})}(c \Given 1) =
+\begin{cases}
+\fnrate     & \text{if } c = \Fun{g}(0)\,, \\
+1 - \fnrate & \text{if } c = \Fun{g}(1)\,.
+\end{cases}
+\end{equation}
+
+For the identity function $\Fun{g} = \IdFun$, the output rates equal the input rates.
+For the constant functions ($\Fun{g} \equiv 0$ or $\Fun{g} \equiv 1$), the output is exact regardless of the input error.
+For the negation function $\Fun{g} = \NegateFn$, the roles of $\fprate$ and $\fnrate$ swap.
+These four cases exhaust $\BitSet \to \BitSet$ and illustrate the general pattern: the output error rates are determined by the composition of the input confusion matrix with the function's action on the codomain.
+
+\end{document}

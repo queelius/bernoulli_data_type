@@ -1,0 +1,4 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{+w}{	}\PYG{k}{template}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{k}{typename}\PYG{+w}{ }\PYG{n+nc}{X}\PYG{o}{\PYGZgt{}}
+\PYG{+w}{	}\PYG{k}{auto}\PYG{+w}{ }\PYG{n}{fnr}\PYG{p}{(}\PYG{n}{approx}\PYG{o}{\PYGZlt{}}\PYG{n}{X}\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{x}\PYG{p}{)}\PYG{+w}{   }\PYG{p}{\PYGZob{}}\PYG{+w}{ }\PYG{c+cm}{/* implementation */}\PYG{+w}{ }\PYG{p}{\PYGZcb{},}
+\end{Verbatim}

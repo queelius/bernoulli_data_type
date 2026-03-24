@@ -1,0 +1,117 @@
+\documentclass[ ../main.tex]{subfiles}
+\providecommand{\mainx}{..}
+\begin{document}
+\section{Error propagation through operations}
+\label{sec:error_prop}
+
+The previous sections defined approximate values for each type constructor and showed that product types preserve a Kronecker factorization while sum types break it.
+This section addresses the complementary question: when an exact function is applied to approximate inputs, what are the error rates of the output?
+
+\subsection{Error propagation through function application}
+
+\begin{theorem}[Error propagation through function application]
+\label{thm:error_prop}
+Let $\Fun{f} \colon \Set{A} \to \Set{B}$ be a function and let $\tilde{a} \in \AT{\Set{A}}$ be an approximate value with confusion matrix $M_{\Set{A}}$.
+Then $\Fun{f}(\tilde{a}) \in \AT{\Set{B}}$ is an approximate value whose input-conditional output distribution is the $\Card{\Set{A}} \times \Card{\Set{B}}$ transition matrix $T$ with entries
+\begin{equation}
+\label{eq:error_prop_general}
+T_{s, t'} = \Prob{\Fun{f}(\tilde{a}) = t' \Given a^* = s} = \sum_{\substack{t \in \Set{A} \\ \Fun{f}(t) = t'}} (M_{\Set{A}})_{s, t}
+\end{equation}
+for each latent input $s \in \Set{A}$ and observed output $t' \in \Set{B}$.
+Note that $T$ is $\Card{\Set{A}} \times \Card{\Set{B}}$, not a $\Card{\Set{B}} \times \Card{\Set{B}}$ confusion matrix on $\Set{B}$, because distinct latent inputs $s_1 \neq s_2$ with $\Fun{f}(s_1) = \Fun{f}(s_2)$ may yield different rows (different conditional output distributions).
+When $\Fun{f}$ is injective, each latent output $s' = \Fun{f}(s)$ corresponds to a unique $s$, and the rows of $T$ can be re-indexed by $s' \in \Fun{f}(\Set{A}) \subseteq \Set{B}$ to obtain a $\Card{\Set{B}} \times \Card{\Set{B}}$ confusion matrix on $\Set{B}$.
+\end{theorem}
+\begin{proof}
+Since $\Fun{f}$ is deterministic, the event $\{\Fun{f}(\tilde{a}) = t'\}$ is equivalent to $\{\tilde{a} \in \Fun{f}^{-1}(t')\}$.
+Thus
+\begin{equation}
+\Prob{\Fun{f}(\tilde{a}) = t' \Given a^* = s}
+= \sum_{\substack{t \in \Set{A} \\ \Fun{f}(t) = t'}} \Prob{\tilde{a} = t \Given a^* = s}
+= \sum_{\substack{t \in \Set{A} \\ \Fun{f}(t) = t'}} (M_{\Set{A}})_{s, t}\,.
+\end{equation}
+\end{proof}
+
+In matrix notation, $T = M_{\Set{A}} \cdot F$, where $F$ is the $\Card{\Set{A}} \times \Card{\Set{B}}$ matrix with $F_{a, b} = \SetIndicator{\{\Fun{f}(a) = b\}}$.
+When $\Fun{f}$ is a bijection, $F$ is a permutation matrix and $T$ is a row/column permutation of $M_{\Set{A}}$, yielding a $\Card{\Set{B}} \times \Card{\Set{B}}$ confusion matrix on $\Set{B}$ with the error rates preserved but relabeled.
+When $\Fun{f}$ is constant, every row of $T$ is the same, so the output is exact (no dependence on the latent value).
+
+\begin{corollary}[Identity and constant functions]
+\label{cor:id_const}
+If $\Fun{f} = \IdFun$ (the identity on $\Set{A}$), then $T = M_{\Set{A}}$: errors pass through unchanged.
+If $\Fun{f}$ is constant, then every row of $T$ is the same unit vector, so the output is deterministically correct regardless of the latent input.
+\end{corollary}
+
+\subsection{Product types: independent propagation}
+
+For a product type $\Set{A} \times \Set{B}$, suppose we apply a function $\Fun{f} \colon \Set{A} \times \Set{B} \to \Set{C}$ to an approximate pair $(\tilde{a}, \tilde{b}) \in \AT{\Set{A}} \times \AT{\Set{B}}$ with independent component errors.
+By \cref{thm:error_prop}, the output transition matrix is determined by the joint confusion matrix $M_{\Set{A}} \otimes M_{\Set{B}}$ composed with the function $\Fun{f}$.
+
+When $\Fun{f}$ acts on components independently, i.e., $\Fun{f}(a, b) = (\Fun{f}_1(a), \Fun{f}_2(b))$, the output transition matrix factors:
+\begin{equation}
+T_{\Set{C}} = (M_{\Set{A}} \cdot F_1) \otimes (M_{\Set{B}} \cdot F_2)\,,
+\end{equation}
+where $F_1$ and $F_2$ are the function matrices for $\Fun{f}_1$ and $\Fun{f}_2$ respectively.
+Errors propagate independently per component.
+
+When $\Fun{f}$ couples the components (e.g., $\Fun{f}(a, b) = a \wedge b$), the factorization is lost and the full joint confusion matrix must be used.
+
+\subsection{Sum types: tag and payload interaction}
+
+For a sum type $\Set{A} + \Set{B}$, error propagation through a function $\Fun{f} \colon \Set{A} + \Set{B} \to \Set{C}$ must account for both tag errors and payload errors.
+Let $\delta$ be the tag error probability and let $M_{\Set{A}}$, $M_{\Set{B}}$ be the per-component confusion matrices.
+
+If the latent value is $\mathrm{Left}(a)$, then:
+\begin{enumerate}
+\item With probability $(1 - \delta)$, the tag is correct and the input to $\Fun{f}$ is $\mathrm{Left}(\tilde{a})$ where $\tilde{a}$ has confusion matrix $M_{\Set{A}}$.
+\item With probability $\delta$, the tag flips and the input to $\Fun{f}$ is $\mathrm{Right}(\tilde{b})$ for some $\tilde{b} \in \Set{B}$.
+\end{enumerate}
+The output confusion matrix mixes contributions from both cases, weighted by $(1 - \delta)$ and $\delta$.
+This mixing is precisely why sum types break the Kronecker factorization (\cref{rem:sum_nonfactor}): the function applied to the ``wrong'' component contributes off-diagonal entries that cannot be decomposed into per-component factors.
+
+\subsection{Worked example: approximate AND gate}
+\label{sec:approx_and}
+
+The approximate AND gate provides a concrete illustration of error propagation through a function that couples product-type components.
+By \cref{thm:approx_and} in \cref{sec:bernoulli_boolean_algebra}, applying the AND function $\AndFn \colon \BitSet \times \BitSet \to \BitSet$ to two independent approximate bits $\tilde{b}_1 \in \AT{\BitSet}[\fprate_1][\fnrate_1]$ and $\tilde{b}_2 \in \AT{\BitSet}[\fprate_2][\fnrate_2]$ yields a Boolean output whose error probability depends on the input pair:
+\begin{center}
+\begin{tabular}{@{}cccc@{}}
+\toprule
+$b_1^*$ & $b_2^*$ & $\AndFn(b_1^*, b_2^*)$ & $\Prob{\text{correct}}$ \\
+\midrule
+$1$ & $1$ & $1$ & $(1 - \fnrate_1)(1 - \fnrate_2)$ \\
+$1$ & $0$ & $0$ & $1 - (1 - \fnrate_1)\fprate_2$ \\
+$0$ & $1$ & $0$ & $1 - \fprate_1(1 - \fnrate_2)$ \\
+$0$ & $0$ & $0$ & $1 - \fprate_1 \fprate_2$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The output has four distinct correctness probabilities, one for each input combination.
+Although the output is a Boolean (at most two partition blocks in the output space), the four input combinations each induce a different conditional error probability, making the combined input-output model fourth-order on the input space $\BitSet \times \BitSet$.
+In the language of \cref{sec:composite}, applying AND destroys the Kronecker factorization of the product type, collapsing four input states into two output values with input-dependent error rates.
+
+\begin{remark}[Interval arithmetic for composed outputs]
+When tracking four input-conditional rates is impractical, we may conservatively bound the output using a second-order model with interval-valued rates.
+For the AND gate, the false positive rate of the output (probability that $\AndFn(\tilde{b}_1, \tilde{b}_2) = 1$ given the correct output is $0$) ranges over
+\begin{equation}
+\fprate_{\mathrm{out}} \in \bigl[\fprate_1 \fprate_2,\; \max\bigl\{(1 - \fnrate_1)\fprate_2,\; \fprate_1(1 - \fnrate_2)\bigr\}\bigr]\,,
+\end{equation}
+depending on which latent input pair produced the false case.
+The false negative rate is
+\begin{equation}
+\fnrate_{\mathrm{out}} = 1 - (1 - \fnrate_1)(1 - \fnrate_2) = \fnrate_1 + \fnrate_2 - \fnrate_1 \fnrate_2\,.
+\end{equation}
+This interval approach trades precision for parsimony and is composable through further operations.
+\end{remark}
+
+\subsection{Composition of approximate functions}
+
+When both the function and its input are approximate, the errors compose.
+Let $\APFun{f} \colon \Set{A} \to \Set{B}$ be an approximate map with per-input confusion matrix $M_{\Fun{f}}$ and let $\tilde{a} \in \AT{\Set{A}}$ be an approximate value with confusion matrix $M_{\Set{A}}$.
+The output $\APFun{f}(\tilde{a})$ is a higher-order approximate value of type $\Set{B}$ whose confusion matrix is determined by the product $M_{\Set{A}} \cdot M_{\Fun{f}}$.
+
+This is the \emph{k-fold composition theorem} from the Bernoulli sets framework, restated in type-theoretic language: each stage of approximation contributes a channel matrix, and the composed channel is their product.
+For $k$ stages of approximation with per-stage transition matrices $M_1, M_2, \ldots, M_k$, the combined channel matrix is $M_1 \cdot M_2 \cdots M_k$.
+In the homogeneous case where all stages use the same matrix $M$, this reduces to $M^k$.
+
+\end{document}

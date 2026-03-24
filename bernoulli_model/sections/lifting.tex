@@ -1,0 +1,115 @@
+\documentclass[../main.tex]{subfiles}
+\begin{document}
+
+\section{Lifting Unary Functions}
+
+If we have a function $f : \Bool \to \Bool$, then the space of all possible functions is given by Table~\ref{tbl:bool_functions}.
+
+\begin{table}[htbp]
+\centering
+\caption{All possible functions of type $\Bool \to \Bool$}
+\label{tbl:bool_functions}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+$f$ & $f(\True)$ & $f(\False)$ \\
+\midrule
+$\mathrm{id}$ & $\True$ & $\False$ \\
+$\mathrm{not}$ & $\False$ & $\True$ \\
+$\True$ & $\True$ & $\True$ \\
+$\False$ & $\False$ & $\False$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Suppose we replace the Boolean inputs with Bernoulli Boolean values and ask the question, "What is the probability that $f(\Berr{x}{1}) = f(x)$?"
+
+Notice that $f\bigl(\Berr{x}{1}\bigr)$ is $f(x)$ with some probability, but $f(x)$ may be latent depending on $f$. For the constant functions, $\True$ and $\False$, we get the same function, i.e., $\True : B_{\Bool}^{(k)} \to B_{\Bool}^{(0)} \equiv \True : \Bool \to \Bool$ since $\True : \Bool \to \Bool$ always outputs $\True$, and similarly for $\False : \Bool \to \Bool$.
+
+However, the $\mathrm{id}$ and $\mathrm{not}$ functions are different. For instance, suppose $\Pr\{\Berr{x}{1} = x\} = p$. Then, when we input $B_{\Bool}^{(1)}(\True)$ into $\mathrm{id}$, we get the correct output $\True$ with probability $p$ and the incorrect output $\False$ with probability $1-p$. Likewise, when we input $B_{\Bool}^{(1)}(\False)$ into $\mathrm{id}$, we get the correct output $\False$ with probability $p$ and the incorrect output $\True$ with probability $1-p$.
+
+Since we can think of these outputs as either correct or incorrect with probability $p$ and $1-p$ respectively, they are Bernoulli Boolean values, e.g., this $\mathrm{id}$ function on Bernoulli Booleans is of type $B_{\Bool}^{(1)} \to B_{\Bool}^{(1)}$. We monadically lift $\mathrm{id} : \Bool \to \Bool$ to a function of type $B_{\Bool}^{(1)} \to B_{\Bool}^{(1)}$.
+
+Notice that this is not a Bernoulli Model of $B_{\Bool \to \Bool}$, but rather a function of type $B_{\Bool} \to B_{\Bool}$. This may surprise the reader, but it is important to think about how these Bernoulli Models compose.
+
+For instance, if we have the function $\True : \Bool \to \Bool$, then when we provide it with a Bernoulli Boolean value, we know that $\True$ is the correct output -- there are no latent values. However, a Bernoulli Model of the (function) $\True : \Bool \to \Bool$ is a completely different concept. The Bernoulli approximation of this function is of type $B_{\Bool \to \Bool}$, and the latent function, $\True : \Bool \to \Bool$, is not observable, but $B_{\Bool \to \Bool}(\True)$ is observable and provides some information about the latent function.
+
+Presumably, some process generated the Bernoulli approximation $B_{\Bool \to \Bool}(\True)$, and we wish to use that approximate function as a replacement for the latent function we are actually interested in, which is $\True : \Bool \to \Bool$.
+
+There are only 4 possible functions of type $\Bool \to \Bool$, and in Table~\ref{tbl:confusion_matrix} we show the confusion matrix for the highest-order model, $B_{\Bool \to \Bool}$, which has $4(4-1) = 12$ degrees of freedom.
+
+\begin{table}[htbp]
+\centering
+\caption{Bernoulli Model for $\Bool \to \Bool$}
+\label{tbl:confusion_matrix}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+& observe $\mathrm{id}$ & observe $\mathrm{not}$ & observe $\True$ & observe $\False$ \\
+\midrule
+latent $\mathrm{id}$ & $p_{1 1}$ & $p_{1 2}$ & $p_{1 3}$ & $p_{1 4}$ \\
+latent $\mathrm{not}$ & $p_{2 1}$ & $p_{2 2}$ & $p_{2 3}$ & $p_{2 4}$ \\
+latent $\True$ & $p_{3 1}$ & $p_{3 2}$ & $p_{3 3}$ & $p_{3 4}$ \\
+latent $\False$ & $p_{4 1}$ & $p_{4 2}$ & $p_{4 3}$ & $p_{4 4}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Each row must sum to 1, $\sum_j p_{i j} = 1$, so we only have up to a maximum of $4 (4-1) = 12$ degrees of freedom (see Remark~\ref{rem:order_vs_dof}). We normally drop the order information and just write $B_{\Bool \to \Bool}$ (and propagate error rates using interval arithmetic).
+
+Often, the order is first-order for various reasons. The first-order Bernoulli Model of $\Bool \to \Bool$ is a model where every entry in the confusion matrix is a function of some single value. The maximum entropy confusion matrix, given error rates $\epsilon$, is given in Table~\ref{tbl:max_entropy}.
+
+\begin{table}[htbp]
+\centering
+\caption{Maximum Entropy Bernoulli Model for $\Bool \to \Bool$}
+\label{tbl:max_entropy}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+& observe $\mathrm{id}$ & observe $\mathrm{not}$ & observe $\True$ & observe $\False$ \\
+\midrule
+\textbf{latent} $\mathrm{id}$ & $1-\epsilon$ & $\epsilon/3$ & $\epsilon/3$ & $\epsilon/3$ \\
+\textbf{latent} $\mathrm{not}$ & $\epsilon/3$ & $1-\epsilon$ & $\epsilon/3$ & $\epsilon/3$ \\
+\textbf{latent} $\True$ & $\epsilon/3$ & $\epsilon/3$ & $1-\epsilon$ & $\epsilon/3$ \\
+\textbf{latent} $\False$ & $\epsilon/3$ & $\epsilon/3$ & $\epsilon/3$ & $1-\epsilon$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+When we have a Bernoulli Model approximation of some latent function of type
+$\Bool \to \Bool$, we wish to store the error information in the output so that we can propagate error information through the computation.
+
+We do this by saying that the output is a Bernoulli Boolean, because it may or may not be correct, i.e., the Bernoulli Model generates a function of type $\Bool \to B_{\Bool}$ where the output is a Bernoulli Boolean value. In our algorithms, we created a type system for this, using interval arithmetic to propagate the error rates through the computation.
+
+Notice that the Bernoulli Model on $\Bool \to \Bool$ does not change the type of the input, $\Bool$. We can, of course, also provide as input to this function a Bernoulli Boolean, in which case we will usually get an even higher-order Bernoulli Boolean as output.
+
+Since functions are values, we can ask the question, what is the probability
+that the latent function is equal to the observed function:
+\begin{equation}
+\Pr\{ \Ber{\Bool \to \Bool}(f) = f\}.
+\end{equation}
+
+In this case, we are asking about the equality of the functions, which is mathematically equivalent to asking whether each input in the domain maps to the same output as the latent function:
+\begin{align}
+&\Pr\{\Ber{\mathrm{id}}(\True) = \mathrm{id}(\True) \} \times \nonumber\\
+&\Pr\{\Ber{\mathrm{id}}(\False) = \mathrm{id}(\False) \}
+\end{align}
+
+From the confusion matrix, we know this product of probabilities is $1-\epsilon$. In fact, normally, the process that generates the Bernoulli Model of the latent function is based on these kinds of probabilities on individual inputs.
+
+\section{Higher-Order Bernoulli Models}
+
+If we are trying to estimate the latent function, a higher order complicates the estimation problem (more parameters to estimate). However, a higher-order may be \emph{desirable} in many cases, since it allows for more capacity to approximate the latent function. In general, when looking at the confusion matrix, we want the diagonal to be as close to 1 as possible. For the off-diagonal elements, we want functions that are more similar to the latent function to have larger probabilities than functions that are less similar to the latent function. This is just a way of minimizing a loss function.
+This generally means that the higher-order Bernoulli Model may specify larger probabilities for the elements close to the diagonal and smaller probabilities for the elements further from the diagonal in a more flexible way. Of course, this is a trade-off between the number of parameters and the flexibility of the model. In other cases, a higher-order Bernoulli Model may just be a natural result of a process or algorithm that generates samples from higher-order models, e.g., applying a first-order Bernoulli Map of $f : \Bool \to \Bool$ where the approximation is most naturally defined over predicates on its application instead of, say, equality of the function itself.
+
+> It is very unlikely to be the case that the function is equal to the latent function, but it is very likely that the function is equal to the latent function on a large number of inputs.
+
+We can think of the Bernoulli Map $\Ber{f}$ as a function that takes a Boolean value and returns a Bernoulli Boolean value, since applications may be wrong. Thus, we may think of the function as having the type
+$$
+    \Bool \to \Ber{\Bool}.
+$$
+
+Suppose the output type is a first-order Bernoulli Boolean $\Ber{\Bool}{1}$ when given a Boolean value.
+Then, if we input a $\Ber{\Bool}$ value, we get a higher-order $\Ber{\Bool}$ as output, e.g., $\Ber{f}{2} : \Ber{\Bool}{1} \to \Ber{\Bool}{2}$.
+
+More generally, if the function $f$ maps $\Bool \to \Ber{\Bool}{1}$ and the input is itself a Bernoulli Boolean $\Ber{\Bool}{1}$, the composed output is a second-order Bernoulli Boolean $\Ber{\Bool}{2}$ whose error rates are given by the product of the per-stage channel transition matrices.
+This is the same composition theorem established for Bernoulli sets~\cite{bernoulliSets,bernoulliComposition}: $k$-fold application of the approximate identity yields rates given by $M^k$, where $M$ is the $2 \times 2$ transition matrix.
+
+\end{document}

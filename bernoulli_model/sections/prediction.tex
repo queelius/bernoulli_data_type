@@ -1,0 +1,150 @@
+\documentclass[../main.tex]{subfiles}
+\begin{document}
+
+\section{Prediction}
+
+$\Ber{T}(x)$ is \emph{correlated} with the latent value $x$, and thus provides information about the latent value. For instance, it allows one to predict $x$ given $\Ber{T}(x)$ better than if no observations were given whatsoever, assuming we know the error rate $\varepsilon(x)$ is better than a random guess, e.g., in the case of $B_{\Bool}$, $\varepsilon(x) < 0.5$.
+If we have no prior information about the latent variable, the best (maximum likelihood) estimate of its value is the observation $\Ber{T}(x)$.
+
+However, because $\varepsilon(x)$ is normally known a priori, we can estimate the probability that the latent variable is $X = x$ using Bayes' rule:
+\begin{equation}
+\Pr\{X = x | \Ber{x} = x\} \propto \Pr\{\Ber{x} = x | X = x\} \Pr\{X = x\},
+\end{equation}
+where $\Pr\{X = x\}$ is the prior probability that $X = x$ and $\Pr\{\Ber{x} = x | X = x\}$ is the probability that $\Ber{x} = x$ given that $X = x$ (the probability that the observation is correct---the true positive rate $\tau$ or true negative rate $\nu$).
+
+In the first-order model, by Bayes law,
+\begin{equation}
+\Pr\{x | \Ber{x}\} \propto \tau \Pr\{X = x\},
+\end{equation}
+where $\tau = 1 - \varepsilon$ is the true positive rate. The probability of observing $x$ given that the latent value is $x$ is $\Pr\{\Ber{x} = x | X = x\} = \tau$. The probability of observing $x$ given that the latent value is not $x$ is $\Pr\{\Ber{x} = x | X \neq x\} = \varepsilon$.
+
+Assuming maximum ignorance (maximum entropy) about $x$ (i.e., $X \sim \rm{Bernoulli}(p=0.5)$), the prediction's posterior above simplifies to $\Pr\{X = x | \Ber{x} = x\} = \tau$ after we normalize the probabilities.
+
+Suppose we have $n$ noisy i.i.d. measurements of the latent variable $x$,
+\begin{equation}
+\left\{ \Ber{x}, \ldots, \Ber{x} \right\},
+\end{equation}
+in which case the maximum likelihood estimate of $x$ is the majority vote, i.e., the value that occurs most frequently in the observations.\footnote{Assuming the error rate is not larger than $0.5$.} As the number of independent sources of observations goes to infinity, the majority vote converges in probability to $x$,
+\begin{equation}
+\lim_{n \to \infty} \Pr\{\rm{majority}(\Ber{x}_1,\cdots,\Ber{x}_n ) = x\} = 1,
+\end{equation}
+where $\Ber{x}_i$ are independent Bernoulli variables (they do not need to be identically distributed). This is a consequence of the law of large numbers.
+
+This is not a typical use-case for the Bernoulli Boolean model, since it will mostly be an analytical result of probabilistic data structures and algorithms that may be framed in the context of a Bernoulli Model.
+
+\section{Inducing Bernoulli Types}
+
+Here, we discuss how to generalize the results.
+
+\subsection{Unit Functions}
+
+We discussed the idea of the Bernoulli Model for \textbf{value types} like $\Bool$. We can think of these Bernoulli Models as Bernoulli approximations of the set of unit types $() \to X$. A unit type has no input, and it maps to a single constant value in the output. There are $|X|$ functions of this type.
+
+If we replace $() \to X$ with $B_X$ or, equivalently, $B_{() \to X}$, we allow for the possibility of errors. The confusion matrix for $B_{() \to \Bool}^{(2)}$ is provided in Table~\ref{tbl:second_order}.
+
+\begin{table}[htbp]
+\centering
+\caption{Second-order Bernoulli Boolean Model for $() \to \Bool$}
+\label{tbl:second_order}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+$x / B_{\Bool}^{(2)}$ & observe $1$ & observe $0$ \\
+\midrule
+\textbf{latent} $1$ & $\tau = 1-\eta$ & $\eta$ \\
+\textbf{latent} $0$ & $\varepsilon$ & $\nu = 1-\varepsilon$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+So, we might observe $B_{() \to \Bool}(x) = 1$ and, according to the confusion matrix, the latent value $x$ is $1$ with probability $\tau$ (true positive rate) and $0$ with probability $\varepsilon$ (false positive rate). Likewise, we might observe $B_{() \to \Bool}(x) = 0$ and the latent value $x$ is $1$ with probability $\eta$ (false negative rate) and $0$ with probability $\nu$ (true negative rate).
+
+We see that the Bernoulli Model for $() \to \Bool$ has a maximum order of 2, since $\eta$ and $\varepsilon$ are independent probabilities that fully describe the model. No additional free parameters are possible, since each row must sum to 1 (the total probability theorem), i.e., given a latent value $x$, the probability of observing $1$ or $0$ must sum to $1$ since those are the only two possible outcomes in the Bernoulli Boolean Model.
+
+We can think of this as the asymmetric binary channel, where the probability of an error is different for $1$ and $0$.
+
+A first-order Bernoulli Boolean model is a model where $\epsilon = \varepsilon = \eta$. See the confusion matrix in Table~\ref{tbl:first_order}.
+
+\begin{table}[htbp]
+\centering
+\caption{First-Order Bernoulli Boolean Model for $() \to \Bool$}
+\label{tbl:first_order}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+$x / B_{\Bool}^{(1)}$ & observe $1$ & observe $0$ \\
+\midrule
+\textbf{latent} $1$ & $\tau =1-\epsilon$ & $\eta = \epsilon$ \\
+\textbf{latent} $0$ & $\varepsilon = \epsilon$ & $\nu = 1-\epsilon$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+We can see that there is only one free parameter, $\epsilon$, corresponding to the first-order Bernoulli Boolean Model. We can think of this as a binary symmetric channel, where the probability of an error is the same for $1$ and $0$.
+
+For completeness, we can write down the confusion matrix for the zeroth-order model, which is just the standard Boolean model, in Table~\ref{tbl:zeroth_order}.
+
+\begin{table}[htbp]
+\centering
+\caption{Zeroth-Order Bernoulli Boolean Model for $() \to \Bool$}
+\label{tbl:zeroth_order}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+$x / B_{\Bool}^{(0)}$ & observe $1$ & observe $0$ \\
+\midrule
+\textbf{latent} $1$ & $1$ & $0$ \\
+\textbf{latent} $0$ & $0$ & $1$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+We see that there are 0 free parameters, and the model is deterministic.
+
+\subsection{Prediction: Boolean Values}
+
+Earlier, we discussed how to predict latent values from Bernoulli Model observations. Let's apply these insights to the first-order Bernoulli Model for $() \to \Bool$, which we can denote as $B_{\Bool}^{(1)}$.
+
+We can use Bayes' rule to compute the probability that the latent value is $X=1$ given that we observed $B_{\Bool}^{(1)} = 1$:
+\begin{equation}
+\Pr\{X = 1 | \Berr{1}{1} = 1\} =
+    \frac{
+        \Pr\{\Berr{1}{1} =1 | X=1\} \Pr\{X = 1\}
+    }
+    {
+        \Pr\{\Berr{1}{1} = 1\}
+    }
+\end{equation}
+
+We know $\Pr\{\Berr{1}{1}=1 | X = 1\}$ from the confusion matrix; it's just the true positive rate, $\tau = 1 - \epsilon$:
+\begin{equation}
+\Pr\{X=1 | \Berr{1}{1}=1\} = \frac
+    {(1-\epsilon) \Pr\{X = 1\}}
+    {\Pr\{\Berr{1}{1}=1\}}
+\end{equation}
+
+What is $\Pr\{\Berr{1}{1} = 1\}$? By the total probability theorem:
+\begin{align}
+\Pr\{\Berr{1}{1} = 1\} &= \Pr\{\Berr{1}{1}=1 | X=1\} \Pr\{X = 1\} + \nonumber\\
+    &\quad \Pr\{\Berr{1}{1}=1 | X=0\} \Pr\{X = 0\}.
+\end{align}
+
+We can substitute in the confusion matrix values:
+\begin{equation}
+\Pr\{\Berr{1}{1} = 1\} = (1-\epsilon) \Pr\{X = 1\} + \epsilon \Pr\{X = 0\}.
+\end{equation}
+
+If we substitute this back into the expression for $\Pr\{X=1 | \Berr{1}{1}=1\}$, divide the numerator and denominator by $\Pr\{X = 1\}$, and then simplify, we get
+\begin{equation}
+\Pr\{X=1 | \Berr{1}{1}=1\} = \frac
+    {1-\epsilon}
+    {1-\epsilon (1 - q/(1-q))}
+\end{equation}
+where $q = \Pr\{X = 0\}$.
+
+Let's evaluate $q = \Pr\{X = 0\}$ at some interesting points:
+
+\begin{enumerate}
+\item At $q = 0$, $\Pr\{X=1 | \Berr{1}{1}=1\} = 1$. This makes sense. We know that the latent value $1$ occurs with probability $1-q=1$, therefore whatever we observe, the latent value is $1$.
+\item As $q \to 1$, $\Pr\{X=1 |\Berr{1}{1}=1\} \to 0$. This also makes sense; we know that the latent value $0$ occurs with probability $q$ approaching $1$, so no matter what we observe, the latent value is $0$.
+\item At $q = 0.5$, $\Pr\{X=1 |\Berr{1}{1}=1\} = 1-\epsilon$. This is the maximum entropy case, where we have no prior information about the latent value and assume maximum ignorance.
+\end{enumerate}
+
+\end{document}

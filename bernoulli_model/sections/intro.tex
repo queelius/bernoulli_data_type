@@ -1,0 +1,29 @@
+\documentclass[../main.tex]{subfiles}
+\begin{document}
+
+\section{Introduction}
+
+The Bernoulli Model is a general framework for thinking about probabilistic data structures and types of a particular sort. A major motivation for developing the Bernoulli Model formalism is to use it as a foundation for creating Oblivious Data Types. The basic idea is that Bernoulli approximations have desirable properties for developing oblivious data types, and the formalism allows for reasoning about their correctness while making them more space-efficient by trading accuracy for space, all while maintaining $\mathcal{O}(1)$ time complexity.
+
+Additionally, the Bernoulli Model provides a formalism for various probabilistic data structures, such as the Bloom filter~\cite{bloom1970}, Count-Min sketch, and the Bernoulli data type family. These structures all derive from the Bernoulli Model and range from sets (like Bloom filters) to maps in a near-space optimal way, allowing for additional savings through controlled accuracy-space trade-offs.
+
+\subsection{Bernoulli Boolean}
+
+The Boolean type, denoted by $\Bool$, models the set $\{\True,\False\}$. This paper explores replacing $\Bool$ with a type $\Ber{\Bool}$, which represents a sort of \emph{noisy} Boolean. In general, we can have a Bernoulli type for any type $T$, denoted by $\Ber{T}$, extending the Bernoulli set framework~\cite{bernoulliSets}. As a special case, data structures like Bloom filters~\cite{bloom1970} can be thought of as a Bernoulli approximation for the set indicator function, $1_A : X \to \Bool$. Indeed, we denote it by $1_{\Ber{A}} : X \to \Ber{\Bool}$. However, note that it's not \emph{just} for the set-indicator function; it can be for any function in the computational basis of a type, e.g., the set-complement operator
+$$
+(\cdot)^c : 2^U \to 2^U,
+$$
+can introduce uncertainty in two different ways:
+\begin{enumerate}
+\item The set-complement function can be thought of as a Bernoulli approximation of the set-complement function, i.e., $\Ber{(\cdot)^c} : 2^U \to \Ber{2^U}$. Here, an exact set comes in as input, and the output is a Bernoulli approximation of the complement of the input set.
+\item The input set can be a Bernoulli approximation, i.e., $(\cdot)^c : \Ber{2^U} \to 2^{\Ber{U}}$. Here, the input is a Bernoulli approximation of a set, and the output is also a Bernoulli approximation of the set-complement of the set. Here, the complement function is exact, but it propagates the uncertainty of the input set.
+\end{enumerate}
+
+There are two types with fewer values than the Boolean type: the absurd type, denoted by $\mathrm{void}$, which has no values (and thus values of this type cannot be constructed), and the unit type, denoted by $()$, which has only a single value, also denoted by $()$. Since there is only a single value of the unit type, there is no uncertainty in the unit type.
+
+As degenerate cases, the Bernoulli Model of the absurd is just the absurd type, $\Ber{\mathrm{void}} \equiv \mathrm{void}$, and the Bernoulli Model of the unit type is just the unit type, $\Ber{()} \equiv ()$ since there is only one possible value. We may introduce uncertainty by composing such simple types, e.g., $() \oplus \Bool$ has three possible values, $()$, $\True$, and $\False$. In this case, $\Ber{T}(\True)$ may represent any of the latent values $\True$, $\False$, or $()$, but most likely $\True$. We see that the sum type can be Bernoulli, e.g., $\Bool = \True \oplus \False$,
+and so $\Ber{\Bool} = \Ber{\True} \oplus \Ber{\False}$. On the other hand, the product type $() \times \Bool$ has two possible values, $() \times \True$ and $() \times \False$, and $\Ber{\bigl( () \times \Bool \bigr)}$ has uncertainty only over the Booleans, i.e., $()$ is not uncertain. The product type is only Bernoulli if the types have more than one value.
+
+The Boolean type $\Bool$ has two possible values, $\True$ and $\False$, and is thus the first type for which we can introduce uncertainty.
+
+\end{document}
