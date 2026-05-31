@@ -171,11 +171,11 @@ Every algebraic data type constructor (void, unit, sum, product, exponential) ha
 **Purpose**: Situate results, connections, open questions.
 **Key arguments**:
 - Unification: Bernoulli sets = approximate indicator functions over the exponential type; Bernoulli relations = approximate subsets of product types; this paper shows these are all instances of approximate algebraic types
-- Oblivious data types: approximate types with controlled error enable space-efficient, privacy-preserving data structures
+- Cipher data types: approximate types with controlled error enable space-efficient, privacy-preserving data structures
 - Approximate programs: replacing types with approximate versions yields approximate programs; error propagation is tractable for straight-line code, intractable for branching (Monte Carlo)
 - Future work: recursive types (lists, trees), approximate type inference, integration with encrypted/homomorphic computation
 
-**Existing content**: None dedicated. Fragments in `cpp.tex` lines 194–197 (branching), `prims.tex` lines 52 (approximate programs), `bernoulli_boolean_algebra.tex` lines 20–24 (oblivious types)
+**Existing content**: None dedicated. Fragments in `cpp.tex` lines 194–197 (branching), `prims.tex` lines 52 (approximate programs), `bernoulli_boolean_algebra.tex` lines 20–24 (cipher types)
 **Gap**: Entirely unwritten as a section.
 
 ---
