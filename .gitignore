@@ -3,6 +3,9 @@
 # except do not ignore .gitignore. note: may omit if .gitignore is explicitly
 # tracked
 !/.gitignore
+# do not ignore papermill state and reviews, including the two nested sub-papers
+# (bernoulli_model/, algebraic_types/). Unanchored so it matches .papermill at any depth.
+!.papermill/
 
 /build* 
 main.pdf
