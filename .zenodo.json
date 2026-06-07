@@ -1,0 +1,24 @@
+{
+  "title": "The Bernoulli Model: A Probabilistic Framework for Data Structures and Types",
+  "upload_type": "publication",
+  "description": "The Bernoulli Model, a probabilistic framework for uncertainty in data types, trading space for accuracy with O(1) operations and probabilistic guarantees; the foundational overview.",
+  "creators": [
+    {
+      "name": "Towell, Alexander",
+      "orcid": "0000-0001-6443-9897",
+      "affiliation": "Southern Illinois University Edwardsville"
+    }
+  ],
+  "keywords": [
+    "Bernoulli set",
+    "random approximate types",
+    "probabilistic data structure",
+    "data types",
+    "cipher data types",
+    "Count-Min sketch",
+    "error propagation"
+  ],
+  "license": "CC-BY-4.0",
+  "access_right": "open",
+  "publication_type": "article"
+}

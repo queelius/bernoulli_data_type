@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below."
+title: "The Bernoulli Model: A Probabilistic Framework for Data Structures and Types"
+type: article
+authors:
+  - family-names: Towell
+    given-names: Alexander
+    orcid: "https://orcid.org/0000-0001-6443-9897"
+    affiliation: "Southern Illinois University Edwardsville"
+repository-code: "https://github.com/queelius/bernoulli_data_type"
+license: CC-BY-4.0
+keywords:
+  - Bernoulli set
+  - random approximate types
+  - probabilistic data structure
+  - data types
+  - cipher data types
+  - Count-Min sketch
+  - error propagation
