@@ -83,3 +83,16 @@ YAML block is left empty for `papermill:thesis`.
 Foundational half of the `bernoulli_data_type` pair. Generalizes `bernoulli_sets/` to a
 type-theoretic setting. Reference implementation: the `bernoulli-cpp/` header library overall
 (`bernoulli<T>` ADT).
+
+## Freeze (2026-10-21)
+
+Final preprint version prepared for a Zenodo re-deposit (concept
+10.5281/zenodo.19105398). Superseded by the monograph *Bernoulli Types:
+Two-Sided Error in Approximate Membership, Retrieval, and Computation*,
+Chapters 1 to 4 and 13. Status and errata box after the abstract
+(`status_errata.tex`); full list in `ERRATA.md`. The 2026-05-29 criticals C1 and
+C2 (symbol conflation, two-level space below the lower bound) and M-A to M-C are
+fixed; prior work (Decaf, Rely, Chisel, EnerJ, Uncertain<T>, Giry monad,
+Parker-McCluskey, PTMs, seed-search lineage) is credited. Build: `pdflatex &&
+bibtex && pdflatex && pdflatex`, 0 errors, 0 undefined refs/cites, 24 pages.
+Stage: frozen; no further revisions planned.

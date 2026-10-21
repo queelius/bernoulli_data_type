@@ -21,7 +21,7 @@ However, if an approximate relation does violate the invariants, it can simply b
 %An algebraic data type is defined by a set of \emph{higher-order} operations on \emph{data types}.
 %In other words, operations on sets, like Cartesian product or disjoint union.
 Viewing a \emph{type} as a set, most programming languages have primitive types like \emph{integers}, \emph{Booleans}, and \emph{characters}.
-In C++, these are respectively denoted by \mintinline{c++}{int}, \mintinline{c++}{bool}, and \mintinline{c++}{char} with cardinalities given respectively by $2^{32}$, $2^8$, and $2^1$.
+In C++, these are respectively denoted by \mintinline{c++}{int}, \mintinline{c++}{bool}, and \mintinline{c++}{char} with cardinalities given respectively by $2^{32}$, $2^1$, and $2^8$ (on common platforms).
 Any type needs one or more \emph{value constructors} to construct objects that model values in that type.
 For instance, in C++ the value that denotes the Boolean value of \emph{true} is constructed with the syntax \mintinline{c++}{true}.
 
@@ -163,18 +163,21 @@ which has a computational basis given by
 	auto value(approx<bool> x) { return x.value; }
 \end{minted}
 
-The function $\mathtt{fmap} \colon (\mathtt{bool} \to \mathtt{bool}) \times \mathtt{approx\textless bool\textgreater} \to \mathtt{approx\textless bool\textgreater}$ is defined as
+The function $\mathtt{amap} \colon (\mathtt{bool} \to \mathtt{bool}) \times \mathtt{approx}\langle\mathtt{bool}\rangle \to \mathtt{approx}\langle\mathtt{bool}\rangle$ implements \cref{eq:lift_cond_0,eq:lift_cond_1}: the identity keeps the rates, negation swaps them, and a constant function gives an exact output.
 \begin{minted}{c++}
 auto amap(function<bool(bool)> f, approx<bool> x)
 {
-	auto fnr = f(true);
-	auto fpr = f(false);
-
-	return approx<bool> { fpr, fnr, f(value(x)) };
+	if (f(true) == f(false))   // constant: output is exact
+		return approx<bool> { 0.0, 0.0, f(value(x)) };
+	if (f(true))               // identity: rates unchanged
+		return approx<bool> { fpr(x), fnr(x), f(value(x)) };
+	// negation: false positives and false negatives swap
+	return approx<bool> { fnr(x), fpr(x), f(value(x)) };
 }
 \end{minted}
 
-If we compose functions to construct an \emph{algorithm} (or program), then if some of the values (e.g., functions or Boolean values) are replaced by approximate values, the algorithm becomes (in general) an approximate algorithm and we may deduce its false positive and negative rates as we did previously through, say, function composition.
+If we compose functions to construct an \emph{algorithm} (or program), then if some of the values (e.g., functions or Boolean values) are replaced by approximate values, the algorithm becomes (in general) an approximate algorithm, and we may compute its output distribution conditional on each latent input assignment by \cref{thm:error_prop}.
+A single pair of false positive and false negative rates summarizes the output only after averaging over a distribution of latent inputs, and values used more than once make later inputs dependent; storing one pair per value, as \mintinline{c++}{approx<bool>} does, is exact for unary functions such as \mintinline{c++}{amap} but not for multi-argument operations in general.
 
 If the algorithm includes \emph{branching}, the algorithm is still an approximate algorithm, but in order to infer the false positive and false negative rate, we must go down \emph{all} branches, which is in general not tractable.
 However, we could estimate the result using Monte Carlo simulation.

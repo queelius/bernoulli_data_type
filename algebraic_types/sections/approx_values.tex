@@ -62,7 +62,8 @@ If $\Fun{g} \colon \Set{A} \to \Set{B}$ is an exact function and $\tilde{a} \in 
 \Fun{g}(\tilde{a}) \in \AT{\Set{B}}\,.
 \end{equation}
 More generally, if both $\Fun{g}$ and the input are approximate, the composition yields a higher-order approximate value.
-This gives $\AT{(\cdot)}$ the structure of a \emph{monad}: the operation of applying a function to an approximate value (the monadic \emph{bind}) produces an approximate value whose error rates are determined by the composition of the respective confusion matrices.
+The underlying structure is the probability (Giry) monad~\cite{giry1982categorical,ramsey2002stochastic}: the operation of applying a function to an approximate value (the monadic \emph{bind}) produces an approximate value whose distribution, conditional on the latent input, is determined by the composition of the respective channel matrices.
+Summarizing the result by a confusion matrix on the output type alone is not closed under bind: when the function is not injective, distinct latent inputs with the same latent output can have different output distributions, so the composite is indexed by the latent input (\cref{thm:error_prop}).
 
 We make this precise in \cref{sec:error_prop}, where we derive the output confusion matrix for function application on approximate inputs.
 

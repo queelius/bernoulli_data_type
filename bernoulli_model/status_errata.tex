@@ -1,0 +1,32 @@
+% Status and errata box (October 2026 freeze). \input right after \end{abstract}.
+\begingroup
+\setlength{\fboxsep}{7pt}%
+\begin{center}
+\fbox{\begin{minipage}{0.93\linewidth}\small
+\setlength{\parskip}{4pt}%
+\setlength{\parindent}{0pt}%
+\textbf{Status and errata (October 2026).}
+This is the final version of this preprint; no further revisions are planned.
+It is superseded by Chapters~1 to~4 (the noisy bit, binary channels and model
+order, Boolean algebra under noise, the two axioms) and Chapter~13 (\emph{The
+Algebra of Approximate Types}) of the monograph
+\emph{Bernoulli Types: Two-Sided Error in Approximate Membership, Retrieval,
+and Computation} (A.~Towell, 2026),
+\url{https://metafunctor.com/latex/bernoulli-monograph/book.html}
+(project hub: \url{https://metafunctor.com/research/bernoulli/}).
+Please cite the monograph in preference to this preprint.
+
+\textbf{Corrections in this version.}
+\begin{itemize}\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}
+\item Abstract and introduction: no longer claim to introduce the Bernoulli model or to develop Count-Min sketches; a prior-work paragraph is added.
+\item Set-indicator functions: the per-element false-positive rate $\varepsilon=(k+1)2^{-n}$ and the per-seed success probability $\varepsilon^m$ no longer share a symbol; off-by-one ($k$ versus $k+1$) and $n=\log_2((k+1)/\varepsilon)$ corrected.
+\item Two-level hashing: the expected trial count gains its missing factor $b$, and the space is $-\log_2\varepsilon$ bits per element (not $-\log_2\varepsilon/b$, which violated the stated lower bound); bucketing saves time, not space.
+\item Logic gates and error propagation: interval propagation is restricted to read-once circuits, and the output error is stated to depend on the latent input assignment, not on one fixed pair of rates.
+\item Lifting: a stray Markdown fragment is turned into prose.
+\end{itemize}
+
+\textbf{Predecessors credited.} The Bernoulli Boolean is randomized response~\cite{warner1965} on a binary channel; gate error propagation is signal-probability analysis~\cite{parker1975probabilistic} and probabilistic transfer matrices~\cite{krishnaswamy2008ptm}; typed values with composed correctness probabilities are Decaf~\cite{boston2015decaf}, with Rely~\cite{carbin2013rely}, Chisel~\cite{misailovic2014chisel}, EnerJ~\cite{sampson2011enerj} and Uncertain$\langle T\rangle$~\cite{bornholt2014uncertain}; lifting is the probability monad~\cite{giry1982categorical,ramsey2002stochastic}; the seed search is the standard construction of~\cite{esposito2020recsplit,lehmann2025seeds}. These results are known; no novelty is claimed for them.
+A dated list of changes is in \texttt{ERRATA.md} in the source repository.
+\end{minipage}}
+\end{center}
+\endgroup

@@ -37,8 +37,10 @@
 \maketitle
 
 \begin{abstract}
-This paper introduces the Bernoulli Model, a probabilistic framework designed to handle uncertainty in data types, particularly Boolean values. The Bernoulli Model provides a formalism for optimizing space and accuracy in data representation through controlled trade-offs. We explore its applications in developing space-efficient data structures, such as Bloom filters and Count-Min sketches, and introduce the concept of Cipher Data Types. The framework allows for $\mathcal{O}(1)$ time complexity while maintaining probabilistic guarantees on accuracy. This work forms a foundational part of a larger project aimed at enhancing data structure efficiency and error propagation analysis.
+Building on the Bernoulli set model~\cite{bernoulliSets}, this note recasts it as a probabilistic model indexed by data types, particularly Boolean values: a value of type $T$ is observed through a channel (confusion matrix) conditioned on a latent value. We discuss model order, Bayesian prediction of the latent value, lifting exact functions to noisy arguments, set-indicator functions such as Bloom filters, and the error of logic gates applied to noisy Booleans, where the error rate of the output depends on the latent input assignment. Cipher data types are mentioned as a motivation only. The individual results are known (randomized response, binary channels, signal-probability analysis of circuits, and probability types for approximate programs); the note is a type-indexed presentation of them.
 \end{abstract}
+
+\input{status_errata}
 
 \tableofcontents
 

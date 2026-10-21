@@ -101,7 +101,7 @@ While this is typically less interesting than set-membership, it remains a valid
 
 As we consider more complex compound data types, which can be modeled as functions, we see that they can participate in the Bernoulli model in multiple ways. When a Bernoulli value is introduced into a computation, the entire computation produces a final result that is also a Bernoulli type, such as $B_{\mathrm{pair}(T_1,T_2)}$ or $\mathrm{pair}(T_1, B_{T_2})$.
 
-This can be understood by considering a Universal Turing machine where programs are built by composing circuits of binary logic gates. If a single input to the circuit is replaced with a Bernoulli Boolean, the output becomes one or more Bernoulli Booleans. Similarly, if some logic gates are replaced with Bernoulli logic gates, the output is also a Bernoulli Boolean.
+This can be understood by considering a Universal Turing machine where programs are built by composing circuits of binary logic gates. If a single input to the circuit is replaced with a Bernoulli Boolean, the output becomes one or more noisy Booleans. Similarly, if some logic gates are replaced with Bernoulli logic gates, the output is also noisy. In general the output's error rates depend on the latent input assignment (Section~\ref{sec:logic_gates}), so the output is a higher-order model rather than a Bernoulli Boolean with one fixed pair of rates.
 
 While we can always discard information about the uncertainty in the output, if the uncertainty is non-negligible, tracking it through the computation becomes valuable for understanding error propagation and making informed decisions about space-accuracy trade-offs.
 

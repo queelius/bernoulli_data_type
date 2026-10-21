@@ -2,6 +2,7 @@
 \begin{document}
 
 \section{Binary Logic Gates and Error Propagation}
+\label{sec:logic_gates}
 
 Let's consider the set of binary functions
 $f : (\Bool, \Bool) \to \Bool$.
@@ -86,9 +87,10 @@ $0$ & $0$ & $0$ & $p_1 + p_2 - p_1 \cdot p_2$ \\
 \end{table}
 
 We see that $\mathrm{and} : (B_{\Bool}^{(1)}, B_{\Bool}^{(1)}) \to B_{\Bool}^{(4)}$
-induces an output that is a fourth-order Bernoulli Boolean. How is this possible
-when there are only two possible outputs? The answer is that the output is dependent
-on four different combinations of inputs.
+induces a fourth-order model over the input space. How is this possible
+when there are only two possible outputs? The answer is that the output's error
+probability depends on which of the four latent input combinations occurred, so no
+single pair of output rates describes it.
 
 Since $x_1$ and $x_2$ are \emph{latent}, we can only talk about the probability that
 the output is correct or not. We see that when the output is 1, the probability that
@@ -107,7 +109,15 @@ the minimum spanning interval is the minimum span of
 \end{equation}
 
 As we compose more and more logic circuits together, we can keep track of the
-minimum spanning intervals on outputs using interval arithmetic.
+minimum spanning intervals on outputs using interval arithmetic, provided the circuit is
+read-once (no input or intermediate value feeds two gates), so that the inputs of every
+gate are independent. Shared inputs make gate inputs dependent and the product formulas
+above no longer apply. Even for read-once circuits, the exact error of the output depends
+on the full latent input assignment; a single pair of output rates, carried from gate to
+gate, can understate it (the correct calculation conditions on the latent inputs, as in
+Table~\ref{tbl:and_bernoulli}). This per-input-assignment propagation is the classical
+signal-probability analysis of combinational circuits~\cite{parker1975probabilistic} and
+its matrix form, the probabilistic transfer matrix~\cite{krishnaswamy2008ptm}.
 
 \section{Conclusion}
 
@@ -115,6 +125,6 @@ The Bernoulli Model is a way of thinking about the uncertainty in the output of 
 
 This framework provides a formal foundation for developing space-efficient data structures with controllable error rates, such as Bloom filters and Count-Min sketches. It also enables the development of Cipher Data Types, which maintain $\mathcal{O}(1)$ time complexity while making deliberate space-accuracy trade-offs.
 
-By understanding how errors propagate through operations on Bernoulli types, we can build systems that maintain probabilistic guarantees throughout complex computations, enabling more efficient use of computational resources in scenarios where approximate answers are acceptable.
+By understanding how errors propagate through operations on Bernoulli types, conditioned on the latent inputs, we can reason about the error of computations built from them, in scenarios where approximate answers are acceptable.
 
 \end{document}

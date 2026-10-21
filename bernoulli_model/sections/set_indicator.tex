@@ -14,56 +14,52 @@ Suppose we have a cryptographic hash function $h : X \to \{0,1\}^n$, where $n$ i
 \begin{itemize}
 \item We are given a set $A$ to (approximately) represent.
 \item We find a seed $s$ such that $h(x s) \leq k$ for all $x \in A$.
-\item We do not look at any $x \notin A$, and by the properties of $h$, for $x \notin A$, $h(x s) \leq k$ with probability $k 2^{-n}$ corresponding to a false positive, and otherwise a true negative occurs.
+\item We do not look at any $x \notin A$, and by the properties of $h$ (modeled as uniform on $\{0,\ldots,2^n-1\}$), for $x \notin A$, $h(x s) \leq k$ with probability $\varepsilon = (k+1) 2^{-n}$ corresponding to a false positive, and otherwise a true negative occurs.
 \item We define membership as $x \in A \iff h(x s) \leq k$.
 \end{itemize}
 
-So, we construct a $\mathrm{hash\_set}$ by finding a seed $s$ such that $h(x s) \leq k$ and that is the only value we need to store, but since the probability that all $x \in A$ hash to a value less than $k$ occurs with probability $k 2^{-n}$, each trial is Bernoulli distributed with probability of success given by
+So, we construct a $\mathrm{hash\_set}$ by finding a seed $s$ such that $h(x s) \leq k$ for all $x \in A$, and that is the only value we need to store. Each member hashes to a value at most $k$ with probability $(k+1) 2^{-n}$, so each trial (one candidate seed) is Bernoulli distributed with probability of success
 \begin{align}
-    \varepsilon(m,n,k)
+    P_{\mathrm{seed}}(m,n,k)
         &= \prod_{j=1}^{m} \frac{k+1}{2^n}\\
-        &= \left(\frac{k+1}{2^n}\right)^m,
+        &= \left(\frac{k+1}{2^n}\right)^m = \varepsilon^m,
 \end{align}
 where $m = |A|$, $k$ is the number of hash values we accept as positives, and $n$ is the number of bits in the hash value.
 
-The number of trials $N$ is a geometric random variable with success probability $\varepsilon(m,n,k)$. The expected number of trials to find a seed $s$ such that $h(x s) \leq k$ for all $x \in A$ is given by
+The number of trials $N$ is a geometric random variable with success probability $P_{\mathrm{seed}}(m,n,k)$. The expected number of trials to find a seed $s$ such that $h(x s) \leq k$ for all $x \in A$ is given by
 \begin{equation}
-    E[N] = \frac{1}{\varepsilon(m,n,k)} = \left(\frac{2^n}{k+1}\right)^m.
+    E[N] = \frac{1}{P_{\mathrm{seed}}(m,n,k)} = \left(\frac{2^n}{k+1}\right)^m.
 \end{equation}
+The seed index needs about $\log_2 E[N] = m \log_2(1/\varepsilon)$ bits, that is, $\log_2(1/\varepsilon)$ bits per element.
 
-Since the false positive rate $\varepsilon = (k+1) 2^{-n}$, $n = \log(k/\varepsilon)$,
-we can reparameterize the space complexity as $\log(k/\varepsilon)$ bits per element.
+Since the false positive rate is $\varepsilon = (k+1) 2^{-n}$, we have $n = \log_2((k+1)/\varepsilon)$.
 If we let $k=0$, this simplifies to
 $$
 \varepsilon = 2^{-n} \implies n = -\log \varepsilon
 $$
 bits per element, which is the information-theoretic lower-bound, but we achieved it only by using an algorithm
 with exponential time complexity.
-We can do better by using different algorithms, but it comes at a cost to space complexity, such as a two-level hashing
+We can reduce the construction time with a two-level hashing
 scheme, where the first level throws each element into a bucket, and the second level hashes
-the elements in the bucket. The number of buckets can be chosen as a trade-off between time and space complexity,
+the elements in the bucket. The number of buckets controls the construction time,
 e.g., if the number of buckets is $b$, then the expected number of elements in each bucket is $m/b$,
-and the expected number of trials to find a seed $s$ such that $h(x s) \leq k$ for all $x \in A$ is given by
+and the expected total number of trials, summed over the $b$ buckets (each bucket needs its own seed), is
 \begin{equation}
-    E[N] = \frac{b}{\varepsilon(m/b,n,k)} = \left(\frac{2^n}{k+1}\right)^{m/b}.
+    E[N] = \frac{b}{P_{\mathrm{seed}}(m/b,n,k)} = b \left(\frac{2^n}{k+1}\right)^{m/b}.
 \end{equation}
 If we let $k=0$, this simplifies to
 $$
-    E[N] = \frac{b}{\varepsilon(m/b,n,k)} = 2^{n m / b}.
+    E[N] = \frac{b}{P_{\mathrm{seed}}(m/b,n,0)} = b \, 2^{n m / b}.
 $$
 
-This is the expected number of trials to find a seed $s$ such that $h(x s) \leq k$ for all $x \in A$.
-How many bits, then, are we expected to need to store the seed $s$? Assuming no fancy coding schemes (like a geometric code, which would be optimal), we can just store the seed in a fixed-size array whose size is the base-2 log of the seed,
+How many bits, then, are we expected to need to store the seeds? Each of the $b$ seeds is stored in a fixed-size field of about
 $$
     \frac{n m}{b}
 $$
-bits in total, or $n/b$ bits per element ($m$ elements in total).
-
-Since $\varepsilon = 2^{-n}$, $n = -\log \varepsilon$, we can reparameterize the space complexity as
-$$
--\frac{\log \varepsilon}{b}
-$$
-bits per element. This of course assumes that $m \gg b$, otherwise there may be a very uneven distribution of elements in the buckets, some with much larger than $m/b$ elements.
+bits (the base-2 log of its expected index), so the $b$ seeds take about $n m$ bits in total, or $n = -\log_2 \varepsilon$ bits per element ($m$ elements in total), the same as the single-level scheme.
+Bucketing therefore reduces construction time, not space; a space figure below $-\log_2 \varepsilon$ bits per element would contradict the lower bound stated above.
+This also assumes that $m \gg b$, otherwise there may be a very uneven distribution of elements in the buckets, some with much larger than $m/b$ elements.
+Brute-force seed search of this kind, and its bucketed variants, are the standard mechanism of minimal perfect hashing and retrieval constructions such as RecSplit~\cite{esposito2020recsplit}; the one-seed case and its exponential construction cost are analyzed by Lehmann et al.~\cite{lehmann2025seeds}. No novelty is claimed for the construction.
 
 
 \subsection{Bernoulli Model for Set-Indicator Functions}

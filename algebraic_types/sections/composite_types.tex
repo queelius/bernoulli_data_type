@@ -110,7 +110,7 @@ The cardinality is $|\Set{B}|^{|\Set{A}|}$.
 \begin{remark}[Exponential types are Bernoulli maps]
 An approximate exponential value $\tilde{f} \in \AT{(\Set{A} \to \Set{B})}$ is precisely a Bernoulli map $\APFun{f} \colon \Set{A} \to \Set{B}$ with per-input independent errors~\cite{bernoulliMaps}.
 The full confusion matrix over $\Set{B}^{\Set{A}}$ factors as a Kronecker product of $|\Set{A}|$ per-input channels, each of size $|\Set{B}| \times |\Set{B}|$.
-The composition theorem, entropy maps, and singular hash map construction from the companion paper on Bernoulli maps~\cite{bernoulliMaps} apply directly.
+The composition theorem, entropy maps, and singular hash map construction from the companion paper on Bernoulli maps~\cite{bernoulliMaps} apply, subject to the corrections in that paper's final version: composing a realized approximate map with another is not closed under the independent-input law when two inputs share an intermediate value, because an error frozen at the shared value is common to both outputs.
 \end{remark}
 
 \begin{remark}[Convergence of the two perspectives]

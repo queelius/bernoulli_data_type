@@ -1,7 +1,7 @@
 {
   "title": "The Bernoulli Model: A Probabilistic Framework for Data Structures and Types",
   "upload_type": "publication",
-  "description": "The Bernoulli Model, a probabilistic framework for uncertainty in data types, trading space for accuracy with O(1) operations and probabilistic guarantees; the foundational overview.",
+  "description": "Final version (October 2026), with errata; superseded by the monograph Bernoulli Types: Two-Sided Error in Approximate Membership, Retrieval, and Computation, Chapters 1, 2, 3, 4 and 13. An overview of the Bernoulli model of approximate data types: values observed through binary channels with false-positive and false-negative rates, trading space for accuracy. Credits probability-typed approximate computing (Decaf, Rely, Uncertain<T>).",
   "creators": [
     {
       "name": "Towell, Alexander",
@@ -15,7 +15,6 @@
     "probabilistic data structure",
     "data types",
     "cipher data types",
-    "Count-Min sketch",
     "error propagation"
   ],
   "license": "CC-BY-4.0",

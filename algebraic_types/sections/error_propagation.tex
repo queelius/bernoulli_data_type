@@ -71,7 +71,7 @@ This mixing is precisely why sum types break the Kronecker factorization (\cref{
 \subsection{Worked example: approximate AND gate}
 \label{sec:approx_and}
 
-The approximate AND gate provides a concrete illustration of error propagation through a function that couples product-type components.
+The approximate AND gate provides a concrete illustration of error propagation through a function that couples product-type components; this per-input-word calculation is classical signal-probability analysis~\cite{parker1975probabilistic,krishnaswamy2008ptm}.
 By \cref{thm:approx_and} in \cref{sec:bernoulli_boolean_algebra}, applying the AND function $\AndFn \colon \BitSet \times \BitSet \to \BitSet$ to two independent approximate bits $\tilde{b}_1 \in \AT{\BitSet}[\fprate_1][\fnrate_1]$ and $\tilde{b}_2 \in \AT{\BitSet}[\fprate_2][\fnrate_2]$ yields a Boolean output whose error probability depends on the input pair:
 \begin{center}
 \begin{tabular}{@{}cccc@{}}
@@ -101,14 +101,16 @@ The false negative rate is
 \begin{equation}
 \fnrate_{\mathrm{out}} = 1 - (1 - \fnrate_1)(1 - \fnrate_2) = \fnrate_1 + \fnrate_2 - \fnrate_1 \fnrate_2\,.
 \end{equation}
-This interval approach trades precision for parsimony and is composable through further operations.
+This interval approach trades precision for parsimony.
+It can be carried through further gates when the circuit is read-once (no input or intermediate value feeds two gates), because the output probabilities of AND, OR and NOT are monotone in each independent input probability; shared inputs make gate inputs dependent and invalidate the product formulas.
+A single point pair of rates (for example the corner value $\fprate_1\fprate_2$) is not composable: reusing it as the input rate of a later gate can understate the exact error, which must be computed conditional on the full latent input assignment.
 \end{remark}
 
 \subsection{Composition of approximate functions}
 
 When both the function and its input are approximate, the errors compose.
 Let $\APFun{f} \colon \Set{A} \to \Set{B}$ be an approximate map with per-input confusion matrix $M_{\Fun{f}}$ and let $\tilde{a} \in \AT{\Set{A}}$ be an approximate value with confusion matrix $M_{\Set{A}}$.
-The output $\APFun{f}(\tilde{a})$ is a higher-order approximate value of type $\Set{B}$ whose confusion matrix is determined by the product $M_{\Set{A}} \cdot M_{\Fun{f}}$.
+The output $\APFun{f}(\tilde{a})$ is a higher-order approximate value of type $\Set{B}$; when the per-input channel of $\APFun{f}$ is the same for every input (up to relabeling by $\Fun{f}$), its transition matrix from the latent input is the product $M_{\Set{A}} \cdot M_{\Fun{f}}$, and in general it is $\sum_{t} (M_{\Set{A}})_{s,t} (M_t)_{\Fun{f}(t), \cdot}$ with $M_t$ the channel at input $t$.
 
 This is the \emph{k-fold composition theorem} from the Bernoulli sets framework, restated in type-theoretic language: each stage of approximation contributes a channel matrix, and the composed channel is their product.
 For $k$ stages of approximation with per-stage transition matrices $M_1, M_2, \ldots, M_k$, the combined channel matrix is $M_1 \cdot M_2 \cdots M_k$.

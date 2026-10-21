@@ -1,0 +1,23 @@
+{
+  "title": "Random approximate values over algebraic types",
+  "upload_type": "publication",
+  "description": "Final version (October 2026), with errata; superseded by the monograph Bernoulli Types: Two-Sided Error in Approximate Membership, Retrieval, and Computation, Chapter 13. Random approximate values over algebraic data types (sums, products, functions) with per-type error rates, credited against probability-typed approximate computing (Decaf, Rely, Uncertain<T>, EnerJ, Chisel) and the Giry monad.",
+  "creators": [
+    {
+      "name": "Towell, Alexander",
+      "orcid": "0000-0001-6443-9897",
+      "affiliation": "Southern Illinois University Edwardsville"
+    }
+  ],
+  "keywords": [
+    "Bernoulli set",
+    "random approximate types",
+    "probabilistic data structure",
+    "algebraic data types",
+    "approximate computing",
+    "probability types"
+  ],
+  "license": "CC-BY-4.0",
+  "access_right": "open",
+  "publication_type": "article"
+}

@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below."
+title: "Random approximate values over algebraic types"
+type: article
+authors:
+  - family-names: Towell
+    given-names: Alexander
+    orcid: "https://orcid.org/0000-0001-6443-9897"
+    affiliation: "Southern Illinois University Edwardsville"
+repository-code: "https://github.com/queelius/bernoulli_data_type/tree/main/algebraic_types"
+license: CC-BY-4.0
+doi: "10.5281/zenodo.19105396"
+url: "https://doi.org/10.5281/zenodo.19105395"
+keywords:
+  - Bernoulli set
+  - random approximate types
+  - probabilistic data structure
+  - algebraic data types
+  - approximate computing
+  - probability types

@@ -97,3 +97,17 @@ block is left empty for `papermill:thesis`.
 ### Related Work and Software
 Type-theoretic extension of the `bernoulli_model/` sub-paper. Generalizes all prior papers in
 the family. Reference implementation: `bernoulli-cpp/` (`bernoulli<T>`, `bool_coder.hpp`).
+
+## Freeze (2026-10-21)
+
+Final preprint version prepared for a Zenodo re-deposit (concept
+10.5281/zenodo.19105395). Superseded by the monograph *Bernoulli Types:
+Two-Sided Error in Approximate Membership, Retrieval, and Computation*,
+Chapter 13 (with Chapters 3 and 4). Status and errata box after the abstract
+(`status_errata.tex`); full list in `ERRATA.md`. Fixed: the cpp.tex `amap`
+listing (review item 4), monad closure wording, interval/corner-rate
+composability, intersection/union rate scope; prior work credited (Decaf, Rely,
+Chisel, EnerJ, Uncertain<T>, Giry monad, Parker-McCluskey, PTMs); the four
+uncited bib entries are now partly cited (Warner). Build:
+`TEXINPUTS=".:./sty:" pdflatex -shell-escape` + bibtex + 2x pdflatex, 0 errors,
+0 undefined refs/cites, 20 pages. Stage: frozen; no further revisions planned.

@@ -76,6 +76,9 @@ The Boolean operations $\wedge$, $\vee$, and $\neg$ act component-wise
 on $\BitSet^n$, so their approximate counterparts inherit errors from the
 component channels.
 
+These gate formulas are the classical signal-probability calculation for
+combinational circuits with independent inputs~\cite{parker1975probabilistic,krishnaswamy2008ptm}.
+
 \begin{theorem}[Approximate AND on Bernoulli Booleans]
 \label{thm:approx_and}
 Let $\tilde{a}, \tilde{b} \in \AT{\Bool}$ be independent Bernoulli Booleans
@@ -152,9 +155,11 @@ $\tilde{\mathbf{a}}, \tilde{\mathbf{b}} \in \AT{\BitSet^n}$,
 the component-wise AND $\tilde{\mathbf{c}} = \tilde{\mathbf{a}} \wedge \tilde{\mathbf{b}}$
 has the $i$-th component error rates given by \cref{thm:approx_and}
 applied to $(\fprate_{a,i}, \fnrate_{a,i})$ and $(\fprate_{b,i}, \fnrate_{b,i})$.
-The joint confusion matrix of $\tilde{\mathbf{c}}$ factors as a Kronecker
-product of $n$ output-component channels, each determined by the two
-input-component channels at position $i$.
+The joint transition matrix of $\tilde{\mathbf{c}}$, from the latent input pair
+$(\mathbf{a}, \mathbf{b})$ to the observed output, factors as a Kronecker
+product of $n$ per-position $4 \times 2$ transition matrices, each determined by the two
+input-component channels at position $i$; the $i$-th factor is indexed by the latent pair
+$(a_i, b_i)$, not by the latent output bit alone.
 \end{corollary}
 
 \begin{remark}[Connection to Bernoulli set operations]
@@ -163,9 +168,12 @@ the component-wise AND, OR, and NOT correspond to set intersection, union,
 and complement.
 The error rates derived above are consistent with the set-theoretic
 composition rules for Bernoulli sets~\cite{bernoulliComposition}:
-approximate intersection has per-element false positive rate
-$\fprate_1 \fprate_2$ and approximate union has per-element false negative
-rate $\fnrate_1 \fnrate_2$.
+approximate intersection has false positive rate
+$\fprate_1 \fprate_2$ on elements absent from both inputs and approximate union has false negative
+rate $\fnrate_1 \fnrate_2$ on elements present in both.
+Elements in exactly one input have the mixed rates of the middle rows of
+\cref{thm:approx_and,thm:approx_or}, so the composite is a higher-order model, not a
+second-order one with a single pair of rates.
 \end{remark}
 
 \end{document}

@@ -10,14 +10,19 @@ Research paper(s): **"Random approximate values over algebraic types"** by Alexa
 ## Build
 
 ```bash
-# algebraic_types sub-paper
-cd algebraic_types && pdflatex -shell-escape main.tex && pdflatex -shell-escape main.tex
+# algebraic_types sub-paper (sty/ on TEXINPUTS; minted needs -shell-escape)
+cd algebraic_types && TEXINPUTS=".:./sty:" pdflatex -shell-escape main.tex && bibtex main \
+  && TEXINPUTS=".:./sty:" pdflatex -shell-escape main.tex \
+  && TEXINPUTS=".:./sty:" pdflatex -shell-escape main.tex
 
-# bernoulli_model sub-paper
-cd bernoulli_model && pdflatex main.tex && pdflatex main.tex
+# bernoulli_model sub-paper (references.bib, so bibtex is required)
+cd bernoulli_model && pdflatex main.tex && bibtex main && pdflatex main.tex && pdflatex main.tex
 ```
 
 Note: `algebraic_types/` uses `minted` package, requiring `-shell-escape`.
+
+Both sub-papers were frozen on 2026-10-21 (final preprint versions, superseded
+by the monograph); see each sub-paper's `ERRATA.md` and `status_errata.tex`.
 
 ## Structure
 

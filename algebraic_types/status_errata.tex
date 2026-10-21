@@ -1,0 +1,32 @@
+% Status and errata box (October 2026 freeze). \input right after \end{abstract}.
+\begingroup
+\setlength{\fboxsep}{7pt}%
+\begin{center}
+\fbox{\begin{minipage}{0.93\linewidth}\small
+\setlength{\parskip}{4pt}%
+\setlength{\parindent}{0pt}%
+\textbf{Status and errata (October 2026).}
+This is the final version of this preprint; no further revisions are planned.
+It is superseded by Chapter~13 (\emph{The Algebra of Approximate Types}) of the
+monograph \emph{Bernoulli Types: Two-Sided Error in Approximate Membership,
+Retrieval, and Computation} (A.~Towell, 2026), with Chapters~3 and~4 for the
+gate formulas and the Kronecker factorization,
+\url{https://metafunctor.com/latex/bernoulli-monograph/book.html}
+(project hub: \url{https://metafunctor.com/research/bernoulli/}).
+Please cite the monograph in preference to this preprint.
+
+\textbf{Corrections in this version.}
+\begin{itemize}\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}
+\item Introduction: the contributions list is restated as known consequences of independence, and a prior-work paragraph is added.
+\item Monadic structure (\cref{sec:approx_values}): the monad is identified as the probability monad, and an output-only confusion matrix is noted not to be closed under bind for non-injective functions.
+\item Interval rates for AND (\cref{sec:error_prop}): propagation through further gates is restricted to read-once circuits; a single corner pair of rates is not composable.
+\item Boolean algebra (\cref{sec:bernoulli_boolean_algebra}): the intersection and union rates $\fprate_1\fprate_2$ and $\fnrate_1\fnrate_2$ are scoped to elements absent from (present in) both inputs; the component-wise factorization is of $4\times 2$ transition matrices.
+\item Composition of approximate functions: the matrix-product formula is scoped to input-independent channels, and the map-composition closure is qualified for shared intermediate values.
+\item C++ section: the \texttt{amap} listing, which assigned Boolean outputs to the rate fields, now implements the lifting equations; the \texttt{bool}/\texttt{char} cardinalities are corrected.
+\end{itemize}
+
+\textbf{Predecessors credited.} Typed approximate values with composed correctness probabilities are Decaf~\cite{boston2015decaf}, with Rely~\cite{carbin2013rely}, Chisel~\cite{misailovic2014chisel}, EnerJ~\cite{sampson2011enerj} and Uncertain$\langle T\rangle$~\cite{bornholt2014uncertain}; lifting is the probability monad~\cite{giry1982categorical,ramsey2002stochastic}; the AND/OR/NOT error formulas are signal-probability analysis~\cite{parker1975probabilistic} and probabilistic transfer matrices~\cite{krishnaswamy2008ptm}; the per-element channel is randomized response~\cite{warner1965}. These results are known; no novelty is claimed for them.
+A dated list of changes is in \texttt{ERRATA.md} in the source repository.
+\end{minipage}}
+\end{center}
+\endgroup
